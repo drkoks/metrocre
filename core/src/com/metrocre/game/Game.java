@@ -2,6 +2,7 @@ package com.metrocre.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,39 +11,33 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Game extends ApplicationAdapter {
 	private SpriteBatch batch;
-	private Texture img;
-	private float x;
-	private float y;
-	private OrthographicCamera camera;
-	
+	private Texture texture;
+	private float x, y; // Position of the sprite
+
 	@Override
-	public void create() {
+	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("img1.png");
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 1920, 1080);
+		texture = new Texture("badlogic.jpg"); // Load a texture (you need to put the image in the assets folder)
+		x = Gdx.graphics.getWidth() / 2 - texture.getWidth() / 2; // Center the sprite horizontally
+		y = Gdx.graphics.getHeight() / 2 - texture.getHeight() / 2; // Center the sprite vertically
 	}
 
 	@Override
-	public void render() {
-		ScreenUtils.clear(1, 1, 1, 1);
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
+	public void render () {
+		// Clear the screen
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		// Draw the sprite
 		batch.begin();
-		batch.draw(img, x, y);
+		batch.draw(texture, x, y);
 		batch.end();
-		if(Gdx.input.isTouched()) {
-			Vector3 touchPos = new Vector3();
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touchPos);
-			x = touchPos.x - img.getWidth() / 2.f;
-			y = touchPos.y - img.getHeight() / 2.f;
-		}
 	}
-	
+
 	@Override
-	public void dispose() {
+	public void dispose () {
+		// Dispose of resources when they are no longer needed
 		batch.dispose();
-		img.dispose();
+		texture.dispose();
 	}
 }

@@ -1,0 +1,26 @@
+{
+  "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+    "play": {
+      "down": "play-button-down",
+      "up": "play-button-up",
+      "font": "default-font",
+      "fontColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1,
+        "a": 1
+      }
+    },
+    "exit": {
+      "down": "exit-button-down",
+      "up": "exit-button-up",
+      "font": "default-font",
+      "fontColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1,
+        "a": 1
+      }
+    }
+  }
+}
