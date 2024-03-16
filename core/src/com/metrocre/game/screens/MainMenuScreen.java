@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -25,38 +26,25 @@ public class MainMenuScreen implements Screen {
         stage = new Stage(new FitViewport(MyGame.WIDTH, MyGame.HEIGHT));
 
         // Create a skin
-        Skin skin = new Skin();
-
-        // Load texture regions for button states
-        TextureRegion playButtonUp = new TextureRegion(new Texture(Gdx.files.internal("play.png")));
-        TextureRegion playButtonDown = new TextureRegion(new Texture(Gdx.files.internal("play.png")));
-        TextureRegion exitButtonUp = new TextureRegion(new Texture(Gdx.files.internal("exit.png")));
-        TextureRegion exitButtonDown = new TextureRegion(new Texture(Gdx.files.internal("exit.png")));
-
-        // Register texture regions with the skin
-        skin.add("play-button-up", playButtonUp);
-        skin.add("play-button-down", playButtonDown);
-        skin.add("exit-button-up", exitButtonUp);
-        skin.add("exit-button-down", exitButtonDown);
-
-        // Load the default font
-        BitmapFont defaultFont = new BitmapFont(Gdx.files.internal("default.fnt"));
-
-        // Register the default font with the skin
-        skin.add("default-font", defaultFont);
-
-        // Load uiskin.json and register the styles
-        skin.load(Gdx.files.internal("uiskin.json"));
+        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         // Create buttons
-        TextButton playButton = new TextButton("Play", skin);
-        TextButton exitButton = new TextButton("Exit", skin);
+        TextButton playButton = new TextButton("", skin, "play");
+        TextButton exitButton = new TextButton("", skin, "exit");
+
 
         // Set button positions and sizes
-        playButton.setSize(200, 50);
-        playButton.setPosition(MyGame.WIDTH / 2 - 100, MyGame.HEIGHT / 2);
-        exitButton.setSize(200, 50);
-        exitButton.setPosition(MyGame.WIDTH / 2 - 100, MyGame.HEIGHT / 2 - 100);
+        playButton.setSize(200, 200);
+        playButton.setPosition(MyGame.WIDTH / 2 - 100, MyGame.HEIGHT / 2 - 50);
+        exitButton.setSize(200, 200);
+        exitButton.setPosition(MyGame.WIDTH / 2 - 100, MyGame.HEIGHT / 2 - 200 - 50);
+
+        // Создание метки для заголовка
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin.getFont("default-font"); // Замените "default-font" на имя вашего шрифта в skin, если оно отличается
+        Label titleLabel = new Label("Metrocre", labelStyle);
+        titleLabel.setSize(100, 50); // Размер можно настроить
+        titleLabel.setPosition(MyGame.WIDTH / 2  -40, MyGame.HEIGHT - 50); // Размещение заголовка вверху экрана
 
         // Add listeners to buttons
         playButton.addListener(new ClickListener() {
@@ -76,6 +64,7 @@ public class MainMenuScreen implements Screen {
         // Add buttons to the stage
         stage.addActor(playButton);
         stage.addActor(exitButton);
+        stage.addActor(titleLabel);
 
         // Make the stage handle inputs
         Gdx.input.setInputProcessor(stage);
