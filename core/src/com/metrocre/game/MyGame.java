@@ -2,8 +2,11 @@ package com.metrocre.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.metrocre.game.screens.MainMenuScreen;
 
 public class MyGame extends Game {
+	public static final int WIDTH = 800; // Set your preferred width
+	public static final int HEIGHT = 480; // Set your preferred height
 	static final long FPS = 60;
 	static final long NANOS_PER_FRAME = 1_000_000_000 / FPS;
 
@@ -11,7 +14,7 @@ public class MyGame extends Game {
 
 	@Override
 	public void create() {
-		screen = new GameScreen();
+		setScreen(new MainMenuScreen(this));
 	}
 
 	@Override

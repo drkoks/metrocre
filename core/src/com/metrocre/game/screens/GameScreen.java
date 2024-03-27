@@ -1,4 +1,4 @@
-package com.metrocre.game;
+package com.metrocre.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -11,11 +11,20 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.metrocre.game.Enemy;
+import com.metrocre.game.Entity;
+import com.metrocre.game.Joystick;
+import com.metrocre.game.Map;
+import com.metrocre.game.Messages;
+import com.metrocre.game.MyGame;
+import com.metrocre.game.Player;
+import com.metrocre.game.WorldManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameScreen implements Screen {
+    private MyGame game;
     private SpriteBatch batch;
     private Texture playerTexture;
     private Texture enemyTexture;
@@ -30,7 +39,8 @@ public class GameScreen implements Screen {
     private Enemy[] enemies;
     private List<Entity> entities = new ArrayList<>();
 
-    public GameScreen() {
+    public GameScreen(MyGame game) {
+        this.game = game;
         batch = new SpriteBatch();
         playerTexture = new Texture("img1.png");
         enemyTexture = new Texture("enemy.png");
