@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 public class Joystick extends Actor {
     public static final float JOYSTICK_RADIUS = 1;
@@ -17,18 +19,32 @@ public class Joystick extends Actor {
     private boolean follow;
     private float posX;
     private float posY;
-    private float width;
-    private float height;
+    private final float sensitivity;
 
-    public Joystick(Texture img, float posX, float posY, float width, float height, boolean follow) {
+    public Joystick(Texture img, float posX, float posY, float width, float height, float sensitivity, boolean follow) {
         this.img = img;
         this.posX = posX;
         this.posY = posY;
-        this.width = width;
-        this.height = height;
+        this.sensitivity = sensitivity;
         this.follow = follow;
         setBounds(posX, posY, width, height);
-        addListener(new JoystickInputListener(this));
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Joystick.this.touch(x, y);
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                Joystick.this.untouch();
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                Joystick.this.drag(x, y);
+            }
+        });
     }
 
     public void touch(float x, float y) {
@@ -60,9 +76,12 @@ public class Joystick extends Actor {
         if (!isTouched) {
             return new Vector2();
         }
-        float dx = curX - joystickX;
-        float dy = curY - joystickY;
-        return new Vector2(dx, dy);
+        Vector2 delta = new Vector2(curX - joystickX, curY - joystickY);
+        if (delta.len() < sensitivity * JOYSTICK_RADIUS) {
+            delta.x = 0;
+            delta.y = 0;
+        }
+        return delta;
     }
 
     public Vector2 getDirection() {
