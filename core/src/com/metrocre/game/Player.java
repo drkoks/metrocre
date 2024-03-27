@@ -1,5 +1,9 @@
 package com.metrocre.game;
 
+import static java.lang.Math.max;
+
+import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -8,76 +12,59 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 
-public class Player {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Player extends Entity implements Telegraph {
     public static final float SIZE = 1f;
 
-    private Body body;
-    private Texture img;
-    private World world;
+    private float shootCooldown = 0;
+    private float reloadTime = 1f;
 
-    public Player(float x, float y, World world, Texture img) {
-        body = createBody(x, y, world);
-        this.world = world;
-        this.img = img;
-    }
-
-    public void draw(SpriteBatch batch) {
-        batch.draw(img, body.getPosition().x - SIZE / 2, body.getPosition().y - SIZE / 2, SIZE, SIZE);
-    }
-
-    public Body getBody() {
-        return body;
-    }
-
-    public void setVelocity(Vector2 velocity) {
-        body.setLinearVelocity(velocity);
+    public Player(float x, float y, WorldManager worldManager, Texture texture) {
+        super(SIZE, SIZE, worldManager, texture);
+        body = worldManager.createCircleBody(x, y, SIZE / 2, this);
     }
 
     public void shoot(Vector2 direction) {
-        if (direction.len() == 0) {
+        if (shootCooldown > 0 || direction.len() == 0) {
             return;
         }
-        BodyDef bd = new BodyDef();
-        bd.type = BodyDef.BodyType.DynamicBody;
-        bd.fixedRotation = true;
-        bd.bullet = true;
-        bd.position.set(body.getPosition().add(direction.scl(0.75f)));
-        Body bullet = world.createBody(bd);
-        bullet.setLinearVelocity(direction.scl(10));
+        shootCooldown = reloadTime;
+        class MyRayCastCallback implements RayCastCallback {
+            Enemy hitTarget = null;
 
-        CircleShape shape = new CircleShape();
-        shape.setRadius(0.125f);
-
-        FixtureDef fd = new FixtureDef();
-        fd.shape = shape;
-        fd.friction = 0;
-        //fd.isSensor = true;
-
-        Fixture fixture = bullet.createFixture(fd);
-
-        shape.dispose();
+            @Override
+            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                Object fixtureUserData = fixture.getUserData();
+                if (fixtureUserData instanceof Enemy) {
+                    hitTarget = (Enemy) fixtureUserData;
+                    return fraction;
+                }
+                return -1;
+            }
+        }
+        MyRayCastCallback rayCastCallback = new MyRayCastCallback();
+        worldManager.getWorld().rayCast(
+            rayCastCallback,
+            body.getPosition(),
+            body.getPosition().cpy().add(direction.scl(10))
+        );
+        if (rayCastCallback.hitTarget != null) {
+            worldManager.getMessageDispatcher().dispatchMessage(this, rayCastCallback.hitTarget, Messages.HIT);
+        }
     }
 
-    private Body createBody(float x, float y, World world) {
-        BodyDef bd = new BodyDef();
-        bd.type = BodyDef.BodyType.DynamicBody;
-        bd.fixedRotation = true;
-        bd.position.set(new Vector2(x, y));
-        body = world.createBody(bd);
+    @Override
+    public void update(float delta) {
+        shootCooldown -= delta;
+    }
 
-        CircleShape shape = new CircleShape();
-        shape.setRadius(SIZE / 2);
-
-        FixtureDef fd = new FixtureDef();
-        fd.shape = shape;
-        fd.friction = 0;
-
-        Fixture fixture = body.createFixture(fd);
-
-        shape.dispose();
-
-        return body;
+    @Override
+    public boolean handleMessage(Telegram msg) {
+        return false;
     }
 }

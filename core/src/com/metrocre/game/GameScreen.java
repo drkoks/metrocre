@@ -12,33 +12,49 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameScreen implements Screen {
     private SpriteBatch batch;
-    private Texture img;
+    private Texture playerTexture;
+    private Texture enemyTexture;
     private OrthographicCamera camera;
-    private World world;
+    private WorldManager worldManager;
     private Box2DDebugRenderer b2ddr;
     private Player player;
     private Map map;
     private Stage stage;
     private Joystick moveJoystick;
     private Joystick attackJoystick;
+    private Enemy[] enemies;
+    private List<Entity> entities = new ArrayList<>();
 
     public GameScreen() {
         batch = new SpriteBatch();
-        img = new Texture("img1.png");
+        playerTexture = new Texture("img1.png");
+        enemyTexture = new Texture("enemy.png");
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 16, 9);
-        world = new World(new Vector2(0, 0), false);
+        worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         b2ddr = new Box2DDebugRenderer();
-        player = new Player(0, 4, world, img);
-        map = new Map(new int[][]{{1, 0, 1}, {0, 1, 0}, {1, 0, 1}}, world);
+        player = new Player(0, 4, worldManager, playerTexture);
+        map = new Map(new int[][]{{1, 0, 1}, {0, 1, 0}, {1, 0, 1}}, worldManager);
         stage = new Stage(new StretchViewport(16, 9));
-        moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6, 6, true);
+        moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6, 6, 0, true);
         stage.addActor(moveJoystick);
-        attackJoystick = new Joystick(new Texture("joystick.png"), 10, 0, 6, 6, false);
+        attackJoystick = new Joystick(new Texture("joystick.png"), 10, 0, 6, 6, 0.2f, false);
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
+        enemies = new Enemy[3];
+        enemies[0] = new Enemy(5, 5, worldManager, enemyTexture);
+        enemies[1] = new Enemy(7, 5, worldManager, enemyTexture);
+        enemies[2] = new Enemy(5, 7, worldManager, enemyTexture);
+        entities.add(player);
+        for (Enemy enemy : enemies) {
+            entities.add(enemy);
+            worldManager.getMessageDispatcher().addListener(enemy, Messages.HIT);
+        }
     }
 
     @Override
@@ -55,7 +71,10 @@ public class GameScreen implements Screen {
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        player.draw(batch);
+        for (Entity entity : entities) {
+            entity.draw(batch);
+            entity.update(delta);
+        }
         batch.end();
 
         Vector2 moveDirection = moveJoystick.getDelta();
@@ -64,11 +83,11 @@ public class GameScreen implements Screen {
         Vector2 attackDirection = attackJoystick.getDirection();
         player.shoot(attackDirection);
 
-        world.step(1f / 60, 6, 2);
+        worldManager.getWorld().step(delta, 6, 2);
 
-        b2ddr.render(world, camera.combined);
+        b2ddr.render(worldManager.getWorld(), camera.combined);
 
-        stage.act(1f / 60);
+        stage.act(delta);
         stage.draw();
     }
 
@@ -95,7 +114,8 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-        img.dispose();
+        playerTexture.dispose();
+        enemyTexture.dispose();
         stage.dispose();
     }
 }
