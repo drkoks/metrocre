@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.metrocre.game.screens.MainMenuScreen;
 
 public class MyGame extends Game {
+	public static final float UNIT_SCALE = 1 / 32f;
 	public static final int WIDTH = 800; // Set your preferred width
 	public static final int HEIGHT = 480; // Set your preferred height
 	static final long FPS = 60;

@@ -20,47 +20,33 @@ import java.util.List;
 
 public class Player extends Entity implements Telegraph {
     public static final float SIZE = 1f;
-
-    private float shootCooldown = 0;
-    private float reloadTime = 1f;
+    private Weapon weapon;
 
     public Player(float x, float y, WorldManager worldManager, Texture texture) {
-        super(SIZE, SIZE, worldManager, texture);
-        body = worldManager.createCircleBody(x, y, SIZE / 2, this);
+        super(worldManager, texture);
+        body = worldManager.createCircleBody(x, y, SIZE / 2, false, false, this);
     }
 
     public void shoot(Vector2 direction) {
-        if (shootCooldown > 0 || direction.len() == 0) {
+        if (weapon == null) {
             return;
         }
-        shootCooldown = reloadTime;
-        class MyRayCastCallback implements RayCastCallback {
-            Enemy hitTarget = null;
+        weapon.shoot(direction);
+    }
 
-            @Override
-            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-                Object fixtureUserData = fixture.getUserData();
-                if (fixtureUserData instanceof Enemy) {
-                    hitTarget = (Enemy) fixtureUserData;
-                    return fraction;
-                }
-                return -1;
-            }
-        }
-        MyRayCastCallback rayCastCallback = new MyRayCastCallback();
-        worldManager.getWorld().rayCast(
-            rayCastCallback,
-            body.getPosition(),
-            body.getPosition().cpy().add(direction.scl(10))
-        );
-        if (rayCastCallback.hitTarget != null) {
-            worldManager.getMessageDispatcher().dispatchMessage(this, rayCastCallback.hitTarget, Messages.HIT);
-        }
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
     }
 
     @Override
     public void update(float delta) {
-        shootCooldown -= delta;
+        weapon.update(delta);
+    }
+
+    @Override
+    public void draw(SpriteBatch batch) {
+        super.draw(batch);
+        weapon.draw(batch);
     }
 
     @Override
