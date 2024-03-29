@@ -17,7 +17,10 @@ import com.metrocre.game.Joystick;
 import com.metrocre.game.Map;
 import com.metrocre.game.Messages;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.Pistol;
 import com.metrocre.game.Player;
+import com.metrocre.game.ProjectileManager;
+import com.metrocre.game.Railgun;
 import com.metrocre.game.WorldManager;
 
 import java.util.ArrayList;
@@ -30,6 +33,7 @@ public class GameScreen implements Screen {
     private Texture enemyTexture;
     private OrthographicCamera camera;
     private WorldManager worldManager;
+    private ProjectileManager projectileManager;
     private Box2DDebugRenderer b2ddr;
     private Player player;
     private Map map;
@@ -49,11 +53,14 @@ public class GameScreen implements Screen {
         worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         b2ddr = new Box2DDebugRenderer();
         player = new Player(0, 4, worldManager, playerTexture);
+        projectileManager = new ProjectileManager(worldManager);
+        //player.setWeapon(new Railgun(player, projectileManager, new Texture("railgun.png")));
+        player.setWeapon(new Pistol(player, projectileManager, new Texture("railgun.png")));
         map = new Map(new int[][]{{1, 0, 1}, {0, 1, 0}, {1, 0, 1}}, worldManager);
         stage = new Stage(new StretchViewport(16, 9));
         moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6, 6, 0, true);
         stage.addActor(moveJoystick);
-        attackJoystick = new Joystick(new Texture("joystick.png"), 10, 0, 6, 6, 0.2f, false);
+        attackJoystick = new Joystick(new Texture("joystick.png"), 10, 0, 6, 6, 0.5f, false);
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
         enemies = new Enemy[3];
@@ -85,6 +92,7 @@ public class GameScreen implements Screen {
             entity.draw(batch);
             entity.update(delta);
         }
+        projectileManager.draw(batch);
         batch.end();
 
         Vector2 moveDirection = moveJoystick.getDelta();
@@ -93,6 +101,7 @@ public class GameScreen implements Screen {
         Vector2 attackDirection = attackJoystick.getDirection();
         player.shoot(attackDirection);
 
+        projectileManager.update(delta);
         worldManager.getWorld().step(delta, 6, 2);
 
         b2ddr.render(worldManager.getWorld(), camera.combined);
@@ -126,6 +135,8 @@ public class GameScreen implements Screen {
         batch.dispose();
         playerTexture.dispose();
         enemyTexture.dispose();
+        projectileManager.dispose();
+        worldManager.dispose();
         stage.dispose();
     }
 }

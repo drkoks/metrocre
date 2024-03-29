@@ -1,30 +1,28 @@
 package com.metrocre.game;
 
+import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
-public abstract class Entity {
+public abstract class Entity implements Telegraph {
     private static int id_counter = 0;
 
     protected int id;
     protected Texture texture;
     protected Body body;
-    protected float width;
-    protected float height;
     protected WorldManager worldManager;
+    protected boolean destroyed = false;
 
-    protected Entity(float width, float height, WorldManager worldManager, Texture texture) {
+    protected Entity(WorldManager worldManager, Texture texture) {
         id = id_counter++;
-        this.width = width;
-        this.height = height;
         this.worldManager = worldManager;
         this.texture = texture;
     }
 
     public void draw(SpriteBatch batch) {
-        batch.draw(texture, body.getPosition().x - width / 2, body.getPosition().y - height / 2, width, height);
+        batch.draw(texture, body.getPosition().x - texture.getWidth() * MyGame.UNIT_SCALE / 2, body.getPosition().y - texture.getHeight() * MyGame.UNIT_SCALE / 2, texture.getWidth() * MyGame.UNIT_SCALE, texture.getHeight() * MyGame.UNIT_SCALE);
     }
 
     public Body getBody() {
@@ -37,5 +35,9 @@ public abstract class Entity {
 
     public void update(float delta) {
 
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
     }
 }

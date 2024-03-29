@@ -12,19 +12,20 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
-public class Enemy extends Entity implements Telegraph {
+public class Enemy extends Entity {
     public static final float SIZE = 1f;
 
     public Enemy(float x, float y, WorldManager worldManager, Texture texture) {
-        super(SIZE, SIZE, worldManager, texture);
-        body = worldManager.createCircleBody(x, y, SIZE / 2, this);
+        super(worldManager, texture);
+        body = worldManager.createCircleBody(x, y, SIZE / 2, false, false, this);
     }
 
     @Override
     public boolean handleMessage(Telegram msg) {
         switch (msg.message) {
             case Messages.HIT:
-                worldManager.getWorld().destroyBody(this.getBody());
+                //worldManager.getWorld().destroyBody(this.getBody());
+                destroyed = true;
                 return true;
         }
         return false;
