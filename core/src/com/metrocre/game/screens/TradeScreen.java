@@ -37,7 +37,7 @@ public class TradeScreen extends ScreenAdapter {
 
         Label itemInfo = new Label("", skin);
 
-        // Создание UI компонентов
+
         List<String> itemList = new List<>(skin);
 
         itemList.setItems("Speed", "Defence", "Attack");
@@ -47,7 +47,8 @@ public class TradeScreen extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 String selectedItem = itemList.getSelected();
-                itemInfo.setText("Информация о " + selectedItem + ": [описание, стоимость и т.д.]");
+                itemInfo.setText("+ 20% to " + selectedItem + " cost " +
+                        100 * game.playersProfile.getSelectedItem(selectedItem) +" coins");
             }
         });
 
@@ -55,7 +56,11 @@ public class TradeScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 String selectedItem = itemList.getSelected();
-                System.out.println(selectedItem + " куплен.");
+                if (game.playersProfile.buyItem(selectedItem)) {
+                    itemInfo.setText(selectedItem + " purchased.");
+                } else {
+                    itemInfo.setText("Not enough coins.");
+                }
             }
         });
 

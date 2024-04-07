@@ -48,7 +48,7 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, 16, 9);
         worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         b2ddr = new Box2DDebugRenderer();
-        player = new Player(0, 4, worldManager, playerTexture);
+        player = new Player(0, 4, worldManager, playerTexture, game.playersProfile);
         map = new Map(new int[][]{{1, 0, 1}, {0, 1, 0}, {1, 0, 1}}, worldManager);
         stage = new Stage(new StretchViewport(16, 9));
         moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6, 6, 0, true);

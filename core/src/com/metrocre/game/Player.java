@@ -23,8 +23,11 @@ public class Player extends Entity implements Telegraph {
 
     private float shootCooldown = 0;
     private float reloadTime = 1f;
+    private int speed;
+    private int defence;
+    private int attack;
 
-    public Player(float x, float y, WorldManager worldManager, Texture texture) {
+    public Player(float x, float y, WorldManager worldManager, Texture texture, PlayersProfile playersProfile) {
         super(SIZE, SIZE, worldManager, texture);
         body = worldManager.createCircleBody(x, y, SIZE / 2, this);
     }

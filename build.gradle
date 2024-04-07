@@ -1,3 +1,5 @@
+apply plugin: 'java'
+
 buildscript {
     
 
@@ -10,9 +12,15 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.2.2'
-        classpath "com.badlogicgames.gdx:gdx-ai:1.8.1"
+        classpath "com.badlogicgames.gdx:gdx-ai:1.8.2"
+
 
     }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
 allprojects {
@@ -46,6 +54,8 @@ project(":desktop") {
 
     dependencies {
         implementation project(":core")
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
@@ -60,6 +70,8 @@ project(":android") {
     configurations { natives }
 
     dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
@@ -82,9 +94,18 @@ project(":core") {
 
 
     dependencies {
+        implementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        runtimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
 
     }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
