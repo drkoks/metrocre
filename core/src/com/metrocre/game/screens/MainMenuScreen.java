@@ -25,7 +25,6 @@ public class MainMenuScreen implements Screen {
         this.game = game;
         stage = new Stage(new FitViewport(MyGame.WIDTH, MyGame.HEIGHT));
 
-        // Create a skin
         Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 

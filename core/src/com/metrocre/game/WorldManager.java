@@ -89,13 +89,14 @@ public class WorldManager {
         fd.isSensor = isSensor;
 
         Fixture fixture = body.createFixture(fd);
+        fixture.setUserData(userData);
 
         shape.dispose();
 
         return body;
     }
 
-    public Body createRectBody(float x, float y, float width, float height, Object userData) {
+    public Body createRectangleBody(float x, float y, float width, float height, Object userData) {
         BodyDef bd = new BodyDef();
         bd.type = BodyDef.BodyType.StaticBody;
         bd.fixedRotation = true;
@@ -124,4 +125,6 @@ public class WorldManager {
     public void dispose() {
         world.dispose();
     }
+
+
 }
