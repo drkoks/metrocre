@@ -56,6 +56,7 @@ public class GameScreen implements Screen {
         projectileManager = new ProjectileManager(worldManager);
         //player.setWeapon(new Railgun(player, projectileManager, new Texture("railgun.png")));
         player.setWeapon(new Pistol(player, projectileManager, new Texture("railgun.png")));
+
         map = new Map(new int[][]{{1, 0, 1}, {0, 1, 0}, {1, 0, 1}}, worldManager);
         stage = new Stage(new StretchViewport(16, 9));
         moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6, 6, 0, true);

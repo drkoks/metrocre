@@ -3,13 +3,18 @@ package com.metrocre.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.metrocre.game.screens.MainMenuScreen;
+import com.metrocre.game.screens.TradeScreen;
 
 public class MyGame extends Game {
+	public static final int WIDTH = 800;
+	public PlayersProfile playersProfile = new PlayersProfile("Player", 1, 0, 0, 1, 1, 1);
+	public static final int HEIGHT = 480;
 	public static final float UNIT_SCALE = 1 / 32f;
-	public static final int WIDTH = 800; // Set your preferred width
-	public static final int HEIGHT = 480; // Set your preferred height
+
 	static final long FPS = 60;
 	static final long NANOS_PER_FRAME = 1_000_000_000 / FPS;
+
+
 
 	private long prevRenderTime = 0;
 

@@ -20,6 +20,7 @@ import java.util.List;
 
 public class Player extends Entity implements Telegraph {
     public static final float SIZE = 1f;
+
     private Weapon weapon;
 
     public Player(float x, float y, WorldManager worldManager, Texture texture) {
