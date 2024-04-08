@@ -22,10 +22,28 @@ public class Player extends Entity implements Telegraph {
     public static final float SIZE = 1f;
 
     private Weapon weapon;
+    private float shootCooldown = 0;
+    private float reloadTime = 1f;
+    private int speed;
+    private PlayersProfile playersProfile;
+    private int defence;
+    private int attack;
 
-    public Player(float x, float y, WorldManager worldManager, Texture texture) {
-        super(worldManager, texture);
+    public float getX() {
+        return body.getPosition().x;
+    }
+
+    public float getY() {
+        return body.getPosition().y;
+    }
+
+    public Player(float x, float y, WorldManager worldManager, Texture texture, PlayersProfile playersProfile) {
+        super(worldManager, texture, SIZE, SIZE);
+        this.playersProfile = playersProfile;
         body = worldManager.createCircleBody(x, y, SIZE / 2, false, false, this);
+    }
+    public void addMoney(int money) {
+        playersProfile.setMoney(playersProfile.getMoney() + money);
     }
 
     public void shoot(Vector2 direction) {
