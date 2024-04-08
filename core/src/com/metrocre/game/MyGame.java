@@ -12,9 +12,15 @@ public class MyGame extends Game {
 	public static final float UNIT_SCALE = 1 / 32f;
 
 	static final long FPS = 60;
+	private float volume = 1.0f;
 	static final long NANOS_PER_FRAME = 1_000_000_000 / FPS;
 
-
+	public float getVolume() {
+		return volume;
+	}
+	public void setVolume(float volume) {
+		this.volume = volume;
+	}
 
 	private long prevRenderTime = 0;
 

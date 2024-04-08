@@ -58,6 +58,7 @@ public class GameScreen implements Screen {
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
         backgroundMusic.setLooping(true);
         backgroundMusic.play();
+        backgroundMusic.setVolume(game.getVolume());
         playerTexture = new Texture("avatar.png");
         enemyTexture = new Texture("enemy.png");
         camera = new OrthographicCamera();
