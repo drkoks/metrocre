@@ -51,7 +51,7 @@ public class Map {
     private Cell createCell(int x, int y, int[][] mapData, WorldManager worldManager) {
         Cell cell = new Cell();
         if (mapData[x][y] == 1) {
-            worldManager.createRectBody(x, y, 1, 1, cell);
+            worldManager.createRectangleBody(x, y, 1, 1, cell);
         }
         cell.setTile(new StaticTiledMapTile(SPLIT_TILES[mapData[x][y] / SPLIT_TILES[0].length][mapData[x][y] % SPLIT_TILES[0].length]));
         return cell;
