@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.audio.Music;
 import com.metrocre.game.Enemy;
 import com.metrocre.game.Entity;
 import com.metrocre.game.Joystick;
@@ -33,6 +34,7 @@ import java.util.List;
 
 public class GameScreen implements Screen {
     private MyGame game;
+    private Music backgroundMusic;
     private SpriteBatch batch;
     private Texture playerTexture;
     private Texture enemyTexture;
@@ -53,6 +55,9 @@ public class GameScreen implements Screen {
     public GameScreen(MyGame game) {
         this.game = game;
         batch = new SpriteBatch();
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
         playerTexture = new Texture("avatar.png");
         enemyTexture = new Texture("enemy.png");
         camera = new OrthographicCamera();
@@ -84,12 +89,13 @@ public class GameScreen implements Screen {
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
         train = new Train(2, 8, worldManager, new Texture("train.png"), 5, 1);
         entities.add(train);
-        nextLevelButton = new TextButton("",skin, "next");
+        nextLevelButton = new TextButton("", skin, "next");
         nextLevelButton.setVisible(false);
         nextLevelButton.setSize(5, 3);
         nextLevelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                backgroundMusic.stop();
                 game.setScreen(new TradeScreen(game));
             }
         });
@@ -101,7 +107,8 @@ public class GameScreen implements Screen {
     public void show() {
 
     }
-    private boolean isAbleToFinishLevel(){
+
+    private boolean isAbleToFinishLevel() {
 //        for (Enemy enemy : enemies) {
 //            if (enemy.getBody() != null) {
 //                return false;
@@ -109,6 +116,7 @@ public class GameScreen implements Screen {
 //        }
         return true;
     }
+
     @Override
     public void render(float delta) {
         ScreenUtils.clear(1, 1, 1, 1);

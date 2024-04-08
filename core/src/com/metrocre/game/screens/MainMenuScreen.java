@@ -2,6 +2,7 @@ package com.metrocre.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -19,6 +20,7 @@ import com.metrocre.game.MyGame;
 public class MainMenuScreen implements Screen {
 
     private Stage stage;
+    private Music backgroundMusic;
     private MyGame game;
 
     public MainMenuScreen(final MyGame game) {
@@ -26,6 +28,10 @@ public class MainMenuScreen implements Screen {
         stage = new Stage(new FitViewport(MyGame.WIDTH, MyGame.HEIGHT));
 
         Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/MainMenuTheme.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
 
 
         TextButton playButton = new TextButton("", skin, "play");
@@ -49,6 +55,7 @@ public class MainMenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                backgroundMusic.stop();
                 game.setScreen(new GameScreen(game));
             }
         });

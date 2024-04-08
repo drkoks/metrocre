@@ -42,6 +42,9 @@ public class Player extends Entity implements Telegraph {
         this.playersProfile = playersProfile;
         body = worldManager.createCircleBody(x, y, SIZE / 2, false, false, this);
     }
+    public void addMoney(int money) {
+        playersProfile.setMoney(playersProfile.getMoney() + money);
+    }
 
     public void shoot(Vector2 direction) {
         if (weapon == null) {
