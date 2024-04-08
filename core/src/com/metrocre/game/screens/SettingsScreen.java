@@ -6,18 +6,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
 
 public class SettingsScreen implements Screen {
-    private Stage stage;
-    private MyGame game;
+    private final Stage stage;
+    private final MyGame game;
     private Skin skin;
 
     public SettingsScreen(final MyGame game) {
@@ -33,12 +33,12 @@ public class SettingsScreen implements Screen {
         volumeSlider.setSize(200, 30);
         volumeSlider.setPosition(50, Gdx.graphics.getHeight() - 100);
 
-        volumeSlider.setValue(100*game.getVolume());
+        volumeSlider.setValue(100 * game.getVolume());
         volumeSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 float volume = volumeSlider.getValue() / 100f;
-               game.setVolume(volume);
+                game.setVolume(volume);
             }
         });
 
@@ -61,7 +61,8 @@ public class SettingsScreen implements Screen {
     }
 
     @Override
-    public void show() {}
+    public void show() {
+    }
 
     @Override
     public void render(float delta) {
@@ -77,13 +78,16 @@ public class SettingsScreen implements Screen {
     }
 
     @Override
-    public void pause() {}
+    public void pause() {
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+    }
 
     @Override
-    public void hide() {}
+    public void hide() {
+    }
 
     @Override
     public void dispose() {

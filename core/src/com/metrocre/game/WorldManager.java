@@ -16,8 +16,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class WorldManager {
-    private World world;
-    private MessageDispatcher messageDispatcher;
+    private final World world;
+    private final MessageDispatcher messageDispatcher;
 
     public WorldManager(World world) {
         this.world = world;

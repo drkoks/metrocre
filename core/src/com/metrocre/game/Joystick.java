@@ -9,17 +9,16 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 public class Joystick extends Actor {
     public static final float JOYSTICK_RADIUS = 1;
-
+    private final float sensitivity;
     private boolean isTouched = false;
     private float joystickX;
     private float joystickY;
     private float curX;
     private float curY;
-    private Texture img;
-    private boolean follow;
-    private float posX;
-    private float posY;
-    private final float sensitivity;
+    private final Texture img;
+    private final boolean follow;
+    private final float posX;
+    private final float posY;
 
     public Joystick(Texture img, float posX, float posY, float width, float height, float sensitivity, boolean follow) {
         this.img = img;

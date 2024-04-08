@@ -5,12 +5,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -18,14 +15,13 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.metrocre.game.MyGame;
 
 
-
 public class MainMenuScreen implements Screen {
 
-    private Stage stage;
-    private Music backgroundMusic;
-    private SpriteBatch batch;
-    private Texture logo;
-    private MyGame game;
+    private final Stage stage;
+    private final Music backgroundMusic;
+    private final SpriteBatch batch;
+    private final Texture logo;
+    private final MyGame game;
 
     public MainMenuScreen(final MyGame game) {
         this.game = game;
@@ -49,7 +45,7 @@ public class MainMenuScreen implements Screen {
         playButton.setSize(200, 200);
         playButton.setPosition(150, MyGame.HEIGHT / 2 - 200);
         settingsButton.setSize(200, 200);
-        settingsButton.setPosition(MyGame.WIDTH  - 200 - 150, MyGame.HEIGHT / 2 - 200);
+        settingsButton.setPosition(MyGame.WIDTH - 200 - 150, MyGame.HEIGHT / 2 - 200);
 
 
         //Label.LabelStyle labelStyle = new Label.LabelStyle();
@@ -85,7 +81,8 @@ public class MainMenuScreen implements Screen {
     }
 
     @Override
-    public void show() {}
+    public void show() {
+    }
 
     @Override
     public void render(float delta) {
@@ -96,7 +93,7 @@ public class MainMenuScreen implements Screen {
         batch.begin();
         float logoWidth = 400;
         float logoHeight = 200;
-        batch.draw(logo, (Gdx.graphics.getWidth() - logoWidth) / 2 , Gdx.graphics.getHeight() - logoHeight , logoWidth, logoHeight);
+        batch.draw(logo, (Gdx.graphics.getWidth() - logoWidth) / 2, Gdx.graphics.getHeight() - logoHeight, logoWidth, logoHeight);
         batch.end();
 
         stage.act(delta);
@@ -109,13 +106,16 @@ public class MainMenuScreen implements Screen {
     }
 
     @Override
-    public void pause() {}
+    public void pause() {
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+    }
 
     @Override
-    public void hide() {}
+    public void hide() {
+    }
 
     @Override
     public void dispose() {

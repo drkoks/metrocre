@@ -8,8 +8,8 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
 public class Rail {
     public static final float LIFE_TIME = 1;
 
-    private Vector2 p1;
-    private Vector2 p2;
+    private final Vector2 p1;
+    private final Vector2 p2;
     private float clock = 0;
 
     public Rail(Vector2 p1, Vector2 p2) {

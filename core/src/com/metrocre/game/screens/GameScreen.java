@@ -2,6 +2,7 @@ package com.metrocre.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.badlogic.gdx.audio.Music;
 import com.metrocre.game.Enemy;
 import com.metrocre.game.Entity;
 import com.metrocre.game.Joystick;
@@ -25,7 +25,6 @@ import com.metrocre.game.MyGame;
 import com.metrocre.game.Pistol;
 import com.metrocre.game.Player;
 import com.metrocre.game.ProjectileManager;
-import com.metrocre.game.Railgun;
 import com.metrocre.game.Train;
 import com.metrocre.game.WorldManager;
 
@@ -33,24 +32,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameScreen implements Screen {
-    private MyGame game;
-    private Music backgroundMusic;
-    private SpriteBatch batch;
-    private Texture playerTexture;
-    private Texture enemyTexture;
-    private OrthographicCamera camera;
-    private WorldManager worldManager;
-    private ProjectileManager projectileManager;
-    private Box2DDebugRenderer b2ddr;
-    private Player player;
-    private Train train;
-    private Map map;
-    private Stage stage;
-    private Joystick moveJoystick;
-    private Joystick attackJoystick;
-    private Enemy[] enemies;
-    private List<Entity> entities = new ArrayList<>();
-    private TextButton nextLevelButton;
+    private final MyGame game;
+    private final Music backgroundMusic;
+    private final SpriteBatch batch;
+    private final Texture playerTexture;
+    private final Texture enemyTexture;
+    private final OrthographicCamera camera;
+    private final WorldManager worldManager;
+    private final ProjectileManager projectileManager;
+    private final Box2DDebugRenderer b2ddr;
+    private final Player player;
+    private final Train train;
+    private final Map map;
+    private final Stage stage;
+    private final Joystick moveJoystick;
+    private final Joystick attackJoystick;
+    private final Enemy[] enemies;
+    private final List<Entity> entities = new ArrayList<>();
+    private final TextButton nextLevelButton;
 
     public GameScreen(MyGame game) {
         this.game = game;

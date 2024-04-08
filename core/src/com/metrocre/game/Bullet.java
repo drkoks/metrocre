@@ -1,7 +1,6 @@
 package com.metrocre.game;
 
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -36,11 +35,9 @@ public class Bullet extends Entity {
 
     @Override
     public boolean handleMessage(Telegram msg) {
-        switch (msg.message) {
-            case Messages.HIT:
-                //worldManager.getWorld().destroyBody(body);
-                destroyed = true;
-                return true;
+        if (msg.message == Messages.HIT) {//worldManager.getWorld().destroyBody(body);
+            destroyed = true;
+            return true;
         }
         return false;
     }

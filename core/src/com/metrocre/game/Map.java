@@ -9,21 +9,14 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
 
 public class Map {
     public static final int TILE_SIZE = 32;
     public static final TextureRegion[][] SPLIT_TILES = TextureRegion.split(new Texture("tiles.png"), TILE_SIZE, TILE_SIZE);
-    private int width;
-    private int height;
-    private TiledMap map;
-    private OrthogonalTiledMapRenderer renderer;
+    private final int width;
+    private final int height;
+    private final TiledMap map;
+    private final OrthogonalTiledMapRenderer renderer;
 
     public Map(int[][] mapData, WorldManager worldManager) {
         height = mapData.length;

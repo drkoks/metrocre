@@ -18,12 +18,12 @@ import java.util.List;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class ProjectileManager {
-    private List<Rail> rails = new LinkedList<>();
-    private List<Bullet> bullets = new LinkedList<>();
-    private WorldManager worldManager;
-    private Texture texture;
-    private TextureRegion region;
-    private Texture bulletTexture = new Texture("bullet.png");
+    private final List<Rail> rails = new LinkedList<>();
+    private final List<Bullet> bullets = new LinkedList<>();
+    private final WorldManager worldManager;
+    private final Texture texture;
+    private final TextureRegion region;
+    private final Texture bulletTexture = new Texture("bullet.png");
 
     public ProjectileManager(WorldManager worldManager) {
         this.worldManager = worldManager;
@@ -68,8 +68,8 @@ public class ProjectileManager {
 
     public void createRail(Vector2 position, Vector2 direction, float len) {
         class MyRayCastCallback implements RayCastCallback {
-            List<Enemy> hitted = new ArrayList<>();
-            List<Float> fractions = new ArrayList<>();
+            final List<Enemy> hitted = new ArrayList<>();
+            final List<Float> fractions = new ArrayList<>();
             Vector2 hitPoint = position.cpy().add(direction.scl(len));
             float hitPointFraction = 1;
 

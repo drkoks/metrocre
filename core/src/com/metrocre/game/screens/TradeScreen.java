@@ -1,9 +1,8 @@
 package com.metrocre.game.screens;
-import com.badlogic.gdx.Game;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -14,13 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
 
 public class TradeScreen extends ScreenAdapter {
     private Stage stage;
-    private MyGame game;
+    private final MyGame game;
 
     public TradeScreen(MyGame game) {
         this.game = game;
@@ -29,11 +27,11 @@ public class TradeScreen extends ScreenAdapter {
     @Override
     public void show() {
         stage = new Stage(new ScreenViewport());
-        Skin skin =  new Skin(Gdx.files.internal("lib.json"));
+        Skin skin = new Skin(Gdx.files.internal("lib.json"));
 
         Label titleLabel = new Label("TradeCenter", skin);
         titleLabel.setSize(100, 50);
-        titleLabel.setPosition(MyGame.WIDTH / 2  -40, MyGame.HEIGHT - 50);
+        titleLabel.setPosition(MyGame.WIDTH / 2 - 40, MyGame.HEIGHT - 50);
 
         Label itemInfo = new Label("", skin);
 
@@ -48,7 +46,7 @@ public class TradeScreen extends ScreenAdapter {
             public void changed(ChangeEvent event, Actor actor) {
                 String selectedItem = itemList.getSelected();
                 itemInfo.setText("+ 20% to " + selectedItem + " cost " +
-                        100 * game.playersProfile.getSelectedItem(selectedItem) +" coins");
+                        100 * game.playersProfile.getSelectedItem(selectedItem) + " coins");
             }
         });
 
@@ -95,9 +93,11 @@ public class TradeScreen extends ScreenAdapter {
         stage.act(Math.min(delta, 1 / 30f));
         stage.draw();
     }
-    public void resize (int width, int height) {
+
+    public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
+
     @Override
     public void dispose() {
         stage.dispose();
