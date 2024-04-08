@@ -38,7 +38,7 @@ public class Player extends Entity implements Telegraph {
     }
 
     public Player(float x, float y, WorldManager worldManager, Texture texture, PlayersProfile playersProfile) {
-        super(worldManager, texture);
+        super(worldManager, texture, SIZE, SIZE);
         this.playersProfile = playersProfile;
         body = worldManager.createCircleBody(x, y, SIZE / 2, false, false, this);
     }

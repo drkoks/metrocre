@@ -16,7 +16,7 @@ public class Enemy extends Entity {
     public static final float SIZE = 1f;
 
     public Enemy(float x, float y, WorldManager worldManager, Texture texture) {
-        super(worldManager, texture);
+        super(worldManager, texture, SIZE, SIZE);
         body = worldManager.createCircleBody(x, y, SIZE / 2, false, false, this);
     }
 
