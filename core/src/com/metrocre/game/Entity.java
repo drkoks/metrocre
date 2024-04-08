@@ -12,6 +12,8 @@ public abstract class Entity implements Telegraph {
     protected int id;
     protected Texture texture;
     protected Body body;
+    protected float width = -1;
+    protected float height = -1;
     protected WorldManager worldManager;
     protected boolean destroyed = false;
 
@@ -20,10 +22,21 @@ public abstract class Entity implements Telegraph {
         this.worldManager = worldManager;
         this.texture = texture;
     }
+    protected Entity(WorldManager worldManager, Texture texture, float width, float height) {
+        this.width = width;
+        this.height = height;
+        id = id_counter++;
+        this.worldManager = worldManager;
+        this.texture = texture;
+    }
 
     public void draw(SpriteBatch batch) {
-        batch.draw(texture, body.getPosition().x - texture.getWidth() * MyGame.UNIT_SCALE / 2, body.getPosition().y - texture.getHeight() * MyGame.UNIT_SCALE / 2, texture.getWidth() * MyGame.UNIT_SCALE, texture.getHeight() * MyGame.UNIT_SCALE);
-    }
+        if (width != -1 && height != -1) {
+            batch.draw(texture, body.getPosition().x - width / 2, body.getPosition().y - height / 2, width, height);
+        } else {
+            batch.draw(texture, body.getPosition().x - texture.getWidth() * MyGame.UNIT_SCALE / 2, body.getPosition().y - texture.getHeight() * MyGame.UNIT_SCALE / 2, texture.getWidth() * MyGame.UNIT_SCALE, texture.getHeight() * MyGame.UNIT_SCALE);
+        }
+        }
 
     public Body getBody() {
         return body;

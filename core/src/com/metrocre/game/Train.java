@@ -7,7 +7,7 @@ public class Train extends Entity{
     private float x, y, width, height;
 
     public Train(float x, float y, WorldManager worldManager, Texture texture, float width, float height) {
-        super(worldManager, texture);
+        super(worldManager, texture, width, height);
         this.x = x;
         this.y = y;
         this.width = width;
