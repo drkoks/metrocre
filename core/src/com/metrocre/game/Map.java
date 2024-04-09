@@ -40,13 +40,13 @@ public class Map {
         height = layer.getHeight();
         for (int x = 0; x < layer.getWidth(); x++) {
             for (int y = 0; y < layer.getHeight(); y++) {
-                System.out.println(layer.getCell(x, y).getTile().getId());
+                //System.out.println(layer.getCell(x, y).getTile().getId());
                 if (isEmptyTile(layer.getCell(x, y))) {
                     worldManager.createRectangleBody(x, y, 1, 1, layer.getCell(x, y));
                 }
             }
         }
-        System.out.println("<<<<<" + emptyTile.getId() + ">>>>");
+        //System.out.println("<<<<<" + emptyTile.getId() + ">>>>");
         layers.add(layer);
         renderer = new OrthogonalTiledMapRenderer(map, 1f / TILE_SIZE_KATE);
     }

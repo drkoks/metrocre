@@ -125,8 +125,6 @@ public class WorldManager {
                     rayCastResult.fractions.add(fraction);
                     return 1;
                 } else if (fixtureUserData instanceof TiledMapTileLayer.Cell) {
-                    rayCastResult.hitted.clear();
-                    rayCastResult.fractions.clear();
                     rayCastResult.hitPoint = point.cpy();
                     rayCastResult.hitPointFraction = fraction;
                     return fraction;
