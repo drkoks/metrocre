@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
     private final ProjectileManager projectileManager;
     private final Box2DDebugRenderer b2ddr;
     private final Player player;
-    //private final Train train;
+    private final Train train;
     private final Map map;
     private final Stage stage;
     private final Joystick moveJoystick;
@@ -92,11 +92,12 @@ public class GameScreen implements Screen {
         }
 
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
-        //train = new Train(2, 8, worldManager, new Texture("train.png"), 5, 1);
-        //entities.add(train);
+        train = new Train(1, 0, worldManager, new Texture("data/empty.png"), 3, map.getHeight());
+        entities.add(train);
         nextLevelButton = new TextButton("", skin, "next");
         nextLevelButton.setVisible(false);
-        nextLevelButton.setSize(5, 3);
+        nextLevelButton.setSize(4, 4);
+        nextLevelButton.setPosition(stage.getWidth()-nextLevelButton.getWidth(), 0);
         nextLevelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -140,7 +141,7 @@ public class GameScreen implements Screen {
 
         map.draw(camera);
 
-        //nextLevelButton.setVisible(train.isPlayerOnTrain(player) && isAbleToFinishLevel());
+        nextLevelButton.setVisible(train.isPlayerOnTrain(player) && isAbleToFinishLevel());
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
