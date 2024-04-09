@@ -2,7 +2,8 @@ package com.metrocre.game.wepons;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.metrocre.game.Player;
+import com.metrocre.game.world.Entity;
+import com.metrocre.game.world.Player;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -13,13 +14,13 @@ public class Rail {
     private final Vector2 p2;
     private float clock = 0;
     private float damage;
-    private Player player;
+    private Entity sender;
 
-    public Rail(Vector2 p1, Vector2 p2, float damage, Player player) {
+    public Rail(Vector2 p1, Vector2 p2, float damage, Entity sender) {
         this.damage = damage;
         this.p1 = p1;
         this.p2 = p2;
-        this.player = player;
+        this.sender = sender;
     }
 
     public void update(float delta) {
@@ -38,7 +39,7 @@ public class Rail {
         return clock >= LIFE_TIME;
     }
 
-    public Player getPlayer() {
-        return player;
+    public Entity getSender() {
+        return sender;
     }
 }

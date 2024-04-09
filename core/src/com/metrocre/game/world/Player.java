@@ -1,8 +1,9 @@
-package com.metrocre.game;
+package com.metrocre.game.world;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.metrocre.game.PlayersProfile;
 import com.metrocre.game.wepons.Weapon;
 
 public class Player extends Entity {

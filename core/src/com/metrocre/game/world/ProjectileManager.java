@@ -1,20 +1,17 @@
-package com.metrocre.game;
+package com.metrocre.game.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import com.metrocre.game.MyGame;
 import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.RailHitEventData;
 import com.metrocre.game.wepons.Projectile;
 import com.metrocre.game.wepons.Rail;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,44 +54,22 @@ public class ProjectileManager {
         }
     }
 
-    public void createRail(Vector2 position, Vector2 direction, float len, float damage, Player player) {
-        class MyRayCastCallback implements RayCastCallback {
-            final List<Enemy> hitted = new ArrayList<>();
-            final List<Float> fractions = new ArrayList<>();
-            Vector2 hitPoint = position.cpy().add(direction.scl(len));
-            float hitPointFraction = 1;
-
-            @Override
-            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-                Object fixtureUserData = fixture.getBody().getUserData();
-                if (fixtureUserData instanceof Enemy) {
-                    hitted.add((Enemy) fixtureUserData);
-                    fractions.add(fraction);
-                    return 1;
-                } else if (fixtureUserData instanceof TiledMapTileLayer.Cell) {
-                    hitPoint = point.cpy();
-                    hitPointFraction = fraction;
-                    return fraction;
-                }
-                return -1;
-            }
-        }
-        MyRayCastCallback rayCastCallback = new MyRayCastCallback();
-        worldManager.getWorld().rayCast(rayCastCallback, position.cpy(), position.cpy().add(direction.scl(len)));
-        Rail rail = new Rail(position.cpy(), rayCastCallback.hitPoint, damage, player);
+    public void createRail(Vector2 position, Vector2 direction, float len, float damage, Entity owner) {
+        RayCastResult rayCastResult = worldManager.castRay(position.cpy(), position.cpy().add(direction.scl(len)));
+        Rail rail = new Rail(position.cpy(), rayCastResult.hitPoint, damage, owner);
         rails.add(rail);
-        for (int i = 0; i < rayCastCallback.fractions.size(); i++) {
-            if (rayCastCallback.fractions.get(i) < rayCastCallback.hitPointFraction) {
+        for (int i = 0; i < rayCastResult.fractions.size(); i++) {
+            if (rayCastResult.fractions.get(i) < rayCastResult.hitPointFraction) {
                 RailHitEventData railHitEventData = new RailHitEventData();
                 railHitEventData.rail = rail;
-                railHitEventData.hittedObject = rayCastCallback.hitted.get(i);
+                railHitEventData.hittedObject = rayCastResult.hitted.get(i);
                 worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.RAIL_HIT, railHitEventData);
             }
         }
     }
 
-    public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Player player) {
-        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager, bulletTexture, player);
+    public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Entity owner) {
+        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager, bulletTexture, owner);
         worldManager.addEntity(bullet);
     }
 
