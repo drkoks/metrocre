@@ -1,17 +1,14 @@
 package com.metrocre.game;
 
-import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.metrocre.game.wepons.Weapon;
 
-public class Player extends Entity implements Telegraph {
+public class Player extends Entity {
     public static final float SIZE = 1f;
 
     private Weapon weapon;
-    private final float shootCooldown = 0;
-    private final float reloadTime = 1f;
     private int speed;
     private final PlayersProfile playersProfile;
     private int defence;
@@ -20,6 +17,9 @@ public class Player extends Entity implements Telegraph {
     public Player(float x, float y, WorldManager worldManager, Texture texture, PlayersProfile playersProfile) {
         super(worldManager, texture, SIZE, SIZE);
         this.playersProfile = playersProfile;
+        speed = playersProfile.getSpeed();
+        defence = playersProfile.getDefence();
+        attack = playersProfile.getAttack();
         body = worldManager.createCircleBody(x, y, SIZE / 2, false, false, this);
     }
 
@@ -29,6 +29,14 @@ public class Player extends Entity implements Telegraph {
 
     public float getY() {
         return body.getPosition().y;
+    }
+
+    public PlayersProfile getPlayersProfile() {
+        return playersProfile;
+    }
+
+    public void move(Vector2 direction) {
+        body.setLinearVelocity(direction.scl(5 + (speed - 1) * 2));
     }
 
     public void addMoney(int money) {
@@ -55,10 +63,5 @@ public class Player extends Entity implements Telegraph {
     public void draw(SpriteBatch batch) {
         super.draw(batch);
         weapon.draw(batch);
-    }
-
-    @Override
-    public boolean handleMessage(Telegram msg) {
-        return false;
     }
 }

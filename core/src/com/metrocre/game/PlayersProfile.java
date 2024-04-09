@@ -70,35 +70,40 @@ public class PlayersProfile {
         this.defenceLevel = defenceLevel;
     }
 
-    public boolean buyItem(String ItemName){
-        int price = getSelectedItem(ItemName) * 100;
-        if (getMoney() < price){
+    public boolean canBuyItem(Upgrades item) {
+        int price = getSelectedItem(item) * 100;
+        return getMoney() >= price;
+    }
+
+    public boolean buyItem(Upgrades item) {
+        if (!canBuyItem(item)) {
             return false;
         }
+        int price = getSelectedItem(item) * 100;
         setMoney(getMoney() - price);
-        if(ItemName == "Speed"){
-            setSpeed(getSpeed() + 1);
-        }
-        else if(ItemName == "Defence"){
-            setDefence(getDefence() + 1);
-        }
-        else if(ItemName == "Attack"){
-            setAttack(getAttack() + 1);
+        switch (item) {
+            case Speed:
+                setSpeed(getSpeed() + 1);
+                break;
+            case Defence:
+                setDefence(getDefence() + 1);
+                break;
+            case Attack:
+                setAttack(getAttack() + 1);
+                break;
         }
         return true;
     }
-    public int getSelectedItem(String ItemName){
-        if(ItemName == "Speed"){
-            return getSpeed();
+    public int getSelectedItem(Upgrades item){
+        switch (item) {
+            case Speed:
+                return getSpeed();
+            case Defence:
+                return getDefence();
+            case Attack:
+                return getAttack();
         }
-        else if(ItemName == "Defence"){
-            return getDefence();
-        }
-        else if(ItemName == "Attack"){
-           return getAttack();
-        } else {
-            return 0;
-        }
+        return 0;
     }
 
     public void setAttack(int attackLevel) {

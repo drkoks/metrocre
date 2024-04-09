@@ -9,6 +9,10 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.event.world.RailHitEventData;
+import com.metrocre.game.wepons.Projectile;
+import com.metrocre.game.wepons.Rail;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,7 +23,6 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class ProjectileManager {
     private final List<Rail> rails = new LinkedList<>();
-    private final List<Bullet> bullets = new LinkedList<>();
     private final WorldManager worldManager;
     private final Texture texture;
     private final TextureRegion region;
@@ -44,15 +47,6 @@ public class ProjectileManager {
                 rail.update(delta);
             }
         }
-        for (Iterator<Bullet> it = bullets.iterator(); it.hasNext(); ) {
-            Bullet bullet = it.next();
-            if (bullet.isDestroyed()) {
-                worldManager.getWorld().destroyBody(bullet.getBody());
-                it.remove();
-            } else {
-                bullet.update(delta);
-            }
-        }
     }
 
     public void draw(SpriteBatch batch) {
@@ -61,12 +55,9 @@ public class ProjectileManager {
         for (Rail rail : rails) {
             rail.draw(shapeDrawer);
         }
-        for (Bullet bullet : bullets) {
-            bullet.draw(shapeDrawer);
-        }
     }
 
-    public void createRail(Vector2 position, Vector2 direction, float len) {
+    public void createRail(Vector2 position, Vector2 direction, float len, float damage, Player player) {
         class MyRayCastCallback implements RayCastCallback {
             final List<Enemy> hitted = new ArrayList<>();
             final List<Float> fractions = new ArrayList<>();
@@ -81,7 +72,7 @@ public class ProjectileManager {
                     fractions.add(fraction);
                     return 1;
                 } else if (fixtureUserData instanceof TiledMapTileLayer.Cell) {
-                    hitPoint = point;
+                    hitPoint = point.cpy();
                     hitPointFraction = fraction;
                     return fraction;
                 }
@@ -90,18 +81,21 @@ public class ProjectileManager {
         }
         MyRayCastCallback rayCastCallback = new MyRayCastCallback();
         worldManager.getWorld().rayCast(rayCastCallback, position.cpy(), position.cpy().add(direction.scl(len)));
-        Rail rail = new Rail(position.cpy(), rayCastCallback.hitPoint);
+        Rail rail = new Rail(position.cpy(), rayCastCallback.hitPoint, damage, player);
         rails.add(rail);
         for (int i = 0; i < rayCastCallback.fractions.size(); i++) {
             if (rayCastCallback.fractions.get(i) < rayCastCallback.hitPointFraction) {
-                worldManager.getMessageDispatcher().dispatchMessage(null, rayCastCallback.hitted.get(i), Messages.HIT);
+                RailHitEventData railHitEventData = new RailHitEventData();
+                railHitEventData.rail = rail;
+                railHitEventData.hittedObject = rayCastCallback.hitted.get(i);
+                worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.RAIL_HIT, railHitEventData);
             }
         }
     }
 
-    public void createBullet(Vector2 position, Vector2 direction, float speed) {
-        Bullet bullet = new Bullet(position, direction, speed, worldManager, bulletTexture);
-        bullets.add(bullet);
+    public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Player player) {
+        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager, bulletTexture, player);
+        worldManager.addEntity(bullet);
     }
 
     public void dispose() {

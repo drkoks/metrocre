@@ -1,10 +1,13 @@
-package com.metrocre.game;
+package com.metrocre.game.wepons;
 
 import static java.lang.Math.max;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.metrocre.game.MyGame;
+import com.metrocre.game.Player;
+import com.metrocre.game.ProjectileManager;
 
 public abstract class Weapon {
     protected float fireRate;

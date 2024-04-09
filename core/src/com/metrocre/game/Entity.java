@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
-public abstract class Entity implements Telegraph {
+public abstract class Entity {
     private static int id_counter = 0;
 
     protected int id;
@@ -24,11 +24,9 @@ public abstract class Entity implements Telegraph {
     }
 
     protected Entity(WorldManager worldManager, Texture texture, float width, float height) {
+        this(worldManager, texture);
         this.width = width;
         this.height = height;
-        id = id_counter++;
-        this.worldManager = worldManager;
-        this.texture = texture;
     }
 
     public void draw(SpriteBatch batch) {
@@ -44,6 +42,10 @@ public abstract class Entity implements Telegraph {
         return body;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void setVelocity(Vector2 velocity) {
         body.setLinearVelocity(velocity);
     }
@@ -54,5 +56,9 @@ public abstract class Entity implements Telegraph {
 
     public boolean isDestroyed() {
         return destroyed;
+    }
+
+    public void destroy() {
+        destroyed = true;
     }
 }
