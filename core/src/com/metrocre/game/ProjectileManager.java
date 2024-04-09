@@ -72,7 +72,7 @@ public class ProjectileManager {
                     fractions.add(fraction);
                     return 1;
                 } else if (fixtureUserData instanceof TiledMapTileLayer.Cell) {
-                    hitPoint = point;
+                    hitPoint = point.cpy();
                     hitPointFraction = fraction;
                     return fraction;
                 }
