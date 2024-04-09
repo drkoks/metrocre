@@ -15,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.Upgrades;
+import com.metrocre.game.event.trade.BuyEventData;
+import com.metrocre.game.event.trade.TradeEvents;
 
 public class TradeScreen extends ScreenAdapter {
     private Stage stage;
@@ -44,8 +47,8 @@ public class TradeScreen extends ScreenAdapter {
         itemList.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String selectedItem = itemList.getSelected();
-                itemInfo.setText("+ 20% to " + selectedItem + " cost " +
+                Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
+                itemInfo.setText("+ 20% to " + selectedItem.toString() + " cost " +
                         100 * game.playersProfile.getSelectedItem(selectedItem) + " coins");
             }
         });
@@ -53,8 +56,11 @@ public class TradeScreen extends ScreenAdapter {
         tradeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String selectedItem = itemList.getSelected();
-                if (game.playersProfile.buyItem(selectedItem)) {
+                Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
+                if (game.playersProfile.canBuyItem(selectedItem)) {
+                    BuyEventData buyEventData = new BuyEventData();
+                    buyEventData.upgrade = selectedItem;
+                    game.getMessageDispatcher().dispatchMessage(TradeEvents.BUY, buyEventData);
                     itemInfo.setText(selectedItem + " purchased.");
                 } else {
                     itemInfo.setText("Not enough coins.");

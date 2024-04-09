@@ -17,19 +17,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.metrocre.game.Enemy;
-import com.metrocre.game.Entity;
-import com.metrocre.game.Joystick;
+import com.metrocre.game.controller.Joystick;
 import com.metrocre.game.Map;
-import com.metrocre.game.Messages;
 import com.metrocre.game.MyGame;
-import com.metrocre.game.Pistol;
 import com.metrocre.game.Player;
-import com.metrocre.game.ProjectileManager;
+import com.metrocre.game.wepons.Railgun;
 import com.metrocre.game.Train;
 import com.metrocre.game.WorldManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GameScreen implements Screen {
     private final MyGame game;
@@ -39,7 +33,6 @@ public class GameScreen implements Screen {
     private final Texture enemyTexture;
     private final OrthographicCamera camera;
     private final WorldManager worldManager;
-    private final ProjectileManager projectileManager;
     private final Box2DDebugRenderer b2ddr;
     private final Player player;
     private final Train train;
@@ -47,8 +40,6 @@ public class GameScreen implements Screen {
     private final Stage stage;
     private final Joystick moveJoystick;
     private final Joystick attackJoystick;
-    private final Enemy[] enemies;
-    private final List<Entity> entities = new ArrayList<>();
     private final TextButton nextLevelButton;
 
     public GameScreen(MyGame game) {
@@ -65,9 +56,8 @@ public class GameScreen implements Screen {
         worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         b2ddr = new Box2DDebugRenderer();
         player = new Player(0, 4, worldManager, playerTexture, game.playersProfile);
-        projectileManager = new ProjectileManager(worldManager);
-        //player.setWeapon(new Railgun(player, projectileManager, new Texture("railgun.png")));
-        player.setWeapon(new Pistol(player, projectileManager, new Texture("railgun.png")));
+        player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
+        //player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
 
         map = new Map(new int[][]{{1, 0, 1}, {0, 1, 0}, {1, 0, 1}}, worldManager);
         stage = new Stage(new StretchViewport(16, 9));
@@ -76,19 +66,14 @@ public class GameScreen implements Screen {
         attackJoystick = new Joystick(new Texture("joystick.png"), 10, 0, 6, 6, 0.5f, false);
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
-        enemies = new Enemy[3];
-        enemies[0] = new Enemy(5, 5, worldManager, enemyTexture);
-        enemies[1] = new Enemy(7, 5, worldManager, enemyTexture);
-        enemies[2] = new Enemy(5, 7, worldManager, enemyTexture);
-        entities.add(player);
-        for (Enemy enemy : enemies) {
-            entities.add(enemy);
-            worldManager.getMessageDispatcher().addListener(enemy, Messages.HIT);
-        }
+        worldManager.addEntity(new Enemy(5, 5, 3, 100, worldManager, enemyTexture));
+        worldManager.addEntity(new Enemy(7, 5, 3, 100, worldManager, enemyTexture));
+        worldManager.addEntity(new Enemy(5, 7, 3, 100, worldManager, enemyTexture));
+        worldManager.addEntity(player);
 
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
         train = new Train(2, 8, worldManager, new Texture("train.png"), 5, 1);
-        entities.add(train);
+        worldManager.addEntity(train);
         nextLevelButton = new TextButton("", skin, "next");
         nextLevelButton.setVisible(false);
         nextLevelButton.setSize(5, 3);
@@ -128,20 +113,16 @@ public class GameScreen implements Screen {
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        for (Entity entity : entities) {
-            entity.draw(batch);
-            entity.update(delta);
-        }
-        projectileManager.draw(batch);
+        worldManager.drawWorld(batch);
         batch.end();
 
         Vector2 moveDirection = moveJoystick.getDelta();
-        player.setVelocity(moveDirection.scl(5));
+        player.move(moveDirection);
 
         Vector2 attackDirection = attackJoystick.getDirection();
         player.shoot(attackDirection);
 
-        projectileManager.update(delta);
+        worldManager.update(delta);
         worldManager.getWorld().step(delta, 6, 2);
 
         b2ddr.render(worldManager.getWorld(), camera.combined);
@@ -175,7 +156,6 @@ public class GameScreen implements Screen {
         batch.dispose();
         playerTexture.dispose();
         enemyTexture.dispose();
-        projectileManager.dispose();
         worldManager.dispose();
         stage.dispose();
     }

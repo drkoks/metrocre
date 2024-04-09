@@ -1,7 +1,8 @@
-package com.metrocre.game;
+package com.metrocre.game.wepons;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.metrocre.game.Player;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -11,10 +12,14 @@ public class Rail {
     private final Vector2 p1;
     private final Vector2 p2;
     private float clock = 0;
+    private float damage;
+    private Player player;
 
-    public Rail(Vector2 p1, Vector2 p2) {
+    public Rail(Vector2 p1, Vector2 p2, float damage, Player player) {
+        this.damage = damage;
         this.p1 = p1;
         this.p2 = p2;
+        this.player = player;
     }
 
     public void update(float delta) {
@@ -25,7 +30,15 @@ public class Rail {
         shapeDrawer.line(p1.x, p1.y, p2.x, p2.y, new Color(1, 0, 0, 1 - clock / LIFE_TIME));
     }
 
+    public float getDamage() {
+        return damage;
+    }
+
     public boolean isExpired() {
         return clock >= LIFE_TIME;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }

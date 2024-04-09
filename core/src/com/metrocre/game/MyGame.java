@@ -1,7 +1,10 @@
 package com.metrocre.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.metrocre.game.event.trade.BuyEventHandler;
+import com.metrocre.game.event.trade.TradeEvents;
 import com.metrocre.game.screens.MainMenuScreen;
 
 public class MyGame extends Game {
@@ -13,6 +16,8 @@ public class MyGame extends Game {
     public PlayersProfile playersProfile = new PlayersProfile("Player", 1, 0, 0, 1, 1, 1);
     private float volume = 1.0f;
     private long prevRenderTime = 0;
+    private MessageDispatcher messageDispatcher = new MessageDispatcher();
+    private BuyEventHandler buyEventHandler = new BuyEventHandler(playersProfile);
 
     public float getVolume() {
         return volume;
@@ -22,8 +27,13 @@ public class MyGame extends Game {
         this.volume = volume;
     }
 
+    public MessageDispatcher getMessageDispatcher() {
+        return messageDispatcher;
+    }
+
     @Override
     public void create() {
+        messageDispatcher.addListener(buyEventHandler, TradeEvents.BUY);
         setScreen(new MainMenuScreen(this));
     }
 

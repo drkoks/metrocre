@@ -1,7 +1,7 @@
 package com.metrocre.game;
 
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -14,14 +14,27 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.IntMap;
+import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.event.world.ProjectileHitEventData;
+import com.metrocre.game.event.world.ProjectileHitEventHandler;
+import com.metrocre.game.event.world.RailHitEventHandler;
+import com.metrocre.game.wepons.Projectile;
+
+import java.util.Iterator;
 
 public class WorldManager {
     private final World world;
-    private final MessageDispatcher messageDispatcher;
+    private final MessageDispatcher messageDispatcher = new MessageDispatcher();
+    private IntMap<Entity> entities = new IntMap<>();
+    private ProjectileManager projectileManager = new ProjectileManager(this);
+    private ProjectileHitEventHandler projectileHitEventHandler = new ProjectileHitEventHandler();
+    private RailHitEventHandler railHitEventHandler = new RailHitEventHandler();
 
     public WorldManager(World world) {
         this.world = world;
-        messageDispatcher = new MessageDispatcher();
+        messageDispatcher.addListener(projectileHitEventHandler, WorldEvents.PROJECTILE_HIT);
+        messageDispatcher.addListener(railHitEventHandler, WorldEvents.RAIL_HIT);
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
@@ -33,20 +46,17 @@ public class WorldManager {
                     return;
                 }
                 System.out.println(data1.getClass() + " " + data2.getClass());
-                if (data2 instanceof Bullet) {
+                if (data2 instanceof Projectile) {
                     Object tmp = data1;
                     data1 = data2;
                     data2 = tmp;
                 }
-                if (data1 instanceof Bullet) {
-                    Bullet bullet = (Bullet) data1;
-                    if (data2 instanceof Enemy) {
-                        Enemy enemy = (Enemy) data2;
-                        messageDispatcher.dispatchMessage(null, enemy, Messages.HIT);
-                        messageDispatcher.dispatchMessage(null, bullet, Messages.HIT);
-                    } else if (data2 instanceof TiledMapTileLayer.Cell) {
-                        messageDispatcher.dispatchMessage(null, bullet, Messages.HIT);
-                    }
+                if (data1 instanceof Projectile) {
+                    Projectile bullet = (Projectile) data1;
+                    ProjectileHitEventData projectileHitEventData = new ProjectileHitEventData();
+                    projectileHitEventData.projectile = bullet;
+                    projectileHitEventData.hittedObject = data2;
+                    messageDispatcher.dispatchMessage(WorldEvents.PROJECTILE_HIT, projectileHitEventData);
                 }
             }
 
@@ -69,6 +79,34 @@ public class WorldManager {
 
     public World getWorld() {
         return world;
+    }
+
+    public ProjectileManager getProjectileManager() {
+        return projectileManager;
+    }
+
+    public void update(float delta) {
+        projectileManager.update(delta);
+        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
+            Entity entity = it.next().value;
+            if (entity.isDestroyed()) {
+                world.destroyBody(entity.getBody());
+                it.remove();
+            }
+            entity.update(delta);
+        }
+    }
+
+    public void addEntity(Entity entity) {
+        entities.put(entity.getId(), entity);
+    }
+
+    public void drawWorld(SpriteBatch batch) {
+        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
+            Entity entity = it.next().value;
+            entity.draw(batch);
+        }
+        projectileManager.draw(batch);
     }
 
     public Body createCircleBody(float x, float y, float radius, boolean isSensor, boolean isBullet, Object userData) {
@@ -124,6 +162,7 @@ public class WorldManager {
 
     public void dispose() {
         world.dispose();
+        projectileManager.dispose();
     }
 
 

@@ -1,4 +1,4 @@
-package com.metrocre.game;
+package com.metrocre.game.controller;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;

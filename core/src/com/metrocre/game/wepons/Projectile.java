@@ -1,18 +1,25 @@
-package com.metrocre.game;
+package com.metrocre.game.wepons;
 
-import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.metrocre.game.Entity;
+import com.metrocre.game.Player;
+import com.metrocre.game.WorldManager;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
-public class Bullet extends Entity {
+public class Projectile extends Entity {
     public static final float SIZE = 1f / 8;
 
-    public Bullet(Vector2 position, Vector2 direction, float speed, WorldManager worldManager, Texture texture) {
+    private float damage;
+    private Player player;
+
+    public Projectile(Vector2 position, Vector2 direction, float damage, float speed, WorldManager worldManager, Texture texture, Player player) {
         super(worldManager, texture);
+        this.damage = damage;
+        this.player = player;
         body = worldManager.createCircleBody(position.x, position.y, SIZE / 2, true, true, this);
         body.setLinearVelocity(direction.scl(speed));
     }
@@ -33,12 +40,11 @@ public class Bullet extends Entity {
         return body;
     }
 
-    @Override
-    public boolean handleMessage(Telegram msg) {
-        if (msg.message == Messages.HIT) {//worldManager.getWorld().destroyBody(body);
-            destroyed = true;
-            return true;
-        }
-        return false;
+    public float getDamage() {
+        return damage;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }

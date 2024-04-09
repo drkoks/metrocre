@@ -23,9 +23,4 @@ public class Train extends Entity {
         float playerY = player.getY();
         return playerX <= x + width / 2 && playerX >= x - width / 2 && playerY <= y && playerY >= y - height;
     }
-
-    @Override
-    public boolean handleMessage(Telegram msg) {
-        return false;
-    }
 }
