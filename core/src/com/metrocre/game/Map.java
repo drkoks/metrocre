@@ -32,10 +32,11 @@ public class Map {
         return emptyCellsID.contains(cell.getTile().getId());
     }
     public Map(WorldManager worldManager) {
-
         map = new TmxMapLoader().load("tilesAtribute/mapmap.tmx");
         MapLayers layers = map.getLayers();
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
+        width = layer.getWidth();
+        height = layer.getHeight();
         for (int x = 0; x < layer.getWidth(); x++) {
             for (int y = 0; y < layer.getHeight(); y++) {
                 System.out.println(layer.getCell(x, y).getTile().getId());
@@ -79,5 +80,12 @@ public class Map {
         }
         cell.setTile(new StaticTiledMapTile(SPLIT_TILES[mapData[x][y] / SPLIT_TILES[0].length][mapData[x][y] % SPLIT_TILES[0].length]));
         return cell;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+    public float getHeight() {
+        return height;
     }
 }
