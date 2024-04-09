@@ -15,13 +15,13 @@ public class Train extends Entity {
         this.y = y;
         this.width = width;
         this.height = height;
-        body = worldManager.createRectangleBody(x, y, 0.1F, 0.1F, this);
+        body = worldManager.createRectangleBody(x, y, width, height, this);
     }
 
     public boolean isPlayerOnTrain(Player player) {
         float playerX = player.getX();
         float playerY = player.getY();
-        return playerX <= x + width / 2 && playerX >= x - width / 2 && playerY <= y && playerY >= y - height;
+        return playerX <= x + width + 1 && playerX >= x - width -1 && playerY >= y && playerY <= y + height;
     }
 
     @Override
