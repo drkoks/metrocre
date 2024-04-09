@@ -1,4 +1,4 @@
-package com.metrocre.game.pathAi;
+package com.metrocre.game.map;
 
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

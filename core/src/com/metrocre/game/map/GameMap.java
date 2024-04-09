@@ -1,4 +1,4 @@
-package com.metrocre.game.pathAi;
+package com.metrocre.game.map;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;

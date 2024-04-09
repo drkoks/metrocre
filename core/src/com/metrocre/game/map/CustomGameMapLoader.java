@@ -1,4 +1,4 @@
-package com.metrocre.game.pathAi;
+package com.metrocre.game.map;
 
 
 import java.util.Random;
@@ -7,8 +7,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 
-import static com.metrocre.game.pathAi.Room.drawCorridor;
-import static com.metrocre.game.pathAi.Room.initialRoom;
+import static com.metrocre.game.map.Room.drawCorridor;
+import static com.metrocre.game.map.Room.initialRoom;
 
 public class CustomGameMapLoader {
     private static final Json json = new Json();

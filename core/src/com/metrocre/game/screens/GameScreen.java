@@ -42,7 +42,7 @@ public class GameScreen implements Screen {
     private final ProjectileManager projectileManager;
     private final Box2DDebugRenderer b2ddr;
     private final Player player;
-    private final Train train;
+    //private final Train train;
     private final Map map;
     private final Stage stage;
     private final Joystick moveJoystick;
@@ -64,12 +64,12 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, 16, 9);
         worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         b2ddr = new Box2DDebugRenderer();
-        player = new Player(0, 4, worldManager, playerTexture, game.playersProfile);
+        player = new Player(6, 1, worldManager, playerTexture, game.playersProfile);
         projectileManager = new ProjectileManager(worldManager);
         //player.setWeapon(new Railgun(player, projectileManager, new Texture("railgun.png")));
         player.setWeapon(new Pistol(player, projectileManager, new Texture("railgun.png")));
 
-        map = new Map(new int[][]{{1, 0, 1}, {0, 1, 0}, {1, 0, 1}}, worldManager);
+        map = new Map(worldManager);
         stage = new Stage(new StretchViewport(16, 9));
         moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6, 6, 0, true);
         stage.addActor(moveJoystick);
@@ -77,9 +77,9 @@ public class GameScreen implements Screen {
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
         enemies = new Enemy[3];
-        enemies[0] = new Enemy(5, 5, worldManager, enemyTexture);
-        enemies[1] = new Enemy(7, 5, worldManager, enemyTexture);
-        enemies[2] = new Enemy(5, 7, worldManager, enemyTexture);
+        enemies[0] = new Enemy(12, 6, worldManager, enemyTexture);
+        enemies[1] = new Enemy(14, 6, worldManager, enemyTexture);
+        enemies[2] = new Enemy(14, 7, worldManager, enemyTexture);
         entities.add(player);
         for (Enemy enemy : enemies) {
             entities.add(enemy);
@@ -87,8 +87,8 @@ public class GameScreen implements Screen {
         }
 
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
-        train = new Train(2, 8, worldManager, new Texture("train.png"), 5, 1);
-        entities.add(train);
+        //train = new Train(2, 8, worldManager, new Texture("train.png"), 5, 1);
+        //entities.add(train);
         nextLevelButton = new TextButton("", skin, "next");
         nextLevelButton.setVisible(false);
         nextLevelButton.setSize(5, 3);
@@ -124,7 +124,7 @@ public class GameScreen implements Screen {
 
         map.draw(camera);
 
-        nextLevelButton.setVisible(train.isPlayerOnTrain(player) && isAbleToFinishLevel());
+        //nextLevelButton.setVisible(train.isPlayerOnTrain(player) && isAbleToFinishLevel());
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -144,7 +144,7 @@ public class GameScreen implements Screen {
         projectileManager.update(delta);
         worldManager.getWorld().step(delta, 6, 2);
 
-        b2ddr.render(worldManager.getWorld(), camera.combined);
+        //b2ddr.render(worldManager.getWorld(), camera.combined);
 
         stage.act(delta);
         stage.draw();

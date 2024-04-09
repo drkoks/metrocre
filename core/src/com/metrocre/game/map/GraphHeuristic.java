@@ -1,4 +1,4 @@
-package com.metrocre.game.pathAi;
+package com.metrocre.game.map;
 
 import com.badlogic.gdx.ai.pfa.Heuristic;
 import com.badlogic.gdx.math.Vector2;

@@ -1,4 +1,4 @@
-package com.metrocre.game.pathAi;
+package com.metrocre.game.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,7 +21,8 @@ public class CustomGameMap extends GameMap {
 
 
     public CustomGameMap () {
-        CustomGameMapData data = CustomGameMapLoader.loadMap("basic", "", mapWidth, mapHeight);
+        CustomGameMapData data = CustomGameMapLoader.generateBasicMap(
+                "1", "basic", mapWidth, mapHeight);
         this.id = data.id;
         this.name = data.name;
         this.map = data.map;
