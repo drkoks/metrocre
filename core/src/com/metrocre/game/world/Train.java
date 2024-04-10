@@ -1,7 +1,9 @@
-package com.metrocre.game;
+package com.metrocre.game.world;
 
-import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.graphics.Texture;
+import com.metrocre.game.world.Entity;
+import com.metrocre.game.world.Player;
+import com.metrocre.game.world.WorldManager;
 
 public class Train extends Entity {
     private final float x;

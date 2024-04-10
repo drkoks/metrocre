@@ -1,10 +1,10 @@
-package com.metrocre.game;
+package com.metrocre.game.world;
 
-import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.metrocre.game.MyGame;
 
 public abstract class Entity {
     private static int id_counter = 0;

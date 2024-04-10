@@ -21,15 +21,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.metrocre.game.Enemy;
+import com.metrocre.game.towers.GunTower;
+import com.metrocre.game.world.Enemy;
 import com.metrocre.game.controller.Joystick;
 import com.metrocre.game.Map;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.Player;
-import com.metrocre.game.wepons.Pistol;
 import com.metrocre.game.wepons.Railgun;
-import com.metrocre.game.Train;
-import com.metrocre.game.WorldManager;
+import com.metrocre.game.world.Train;
+import com.metrocre.game.world.WorldManager;
 
 public class GameScreen implements Screen {
     private final MyGame game;
@@ -76,6 +76,7 @@ public class GameScreen implements Screen {
         worldManager.addEntity(new Enemy(14, 6, 3, 100, worldManager, enemyTexture));
         worldManager.addEntity(new Enemy(14, 7, 3, 100, worldManager, enemyTexture));
         worldManager.addEntity(player);
+        worldManager.addEntity(new GunTower(6.5f, 5.9f, 5, 10, worldManager, player, new Texture("guntower.png")));
 
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
         train = new Train(1, 0, worldManager, new Texture("data/empty.png"), 3, map.getHeight());
