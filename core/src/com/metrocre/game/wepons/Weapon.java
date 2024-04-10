@@ -9,7 +9,7 @@ import com.metrocre.game.MyGame;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.ProjectileManager;
-import com.metrocre.game.WorldManager;
+import com.metrocre.game.world.WorldManager;
 
 public abstract class Weapon {
     protected float fireRate;
