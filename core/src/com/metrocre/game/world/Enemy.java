@@ -1,8 +1,9 @@
-package com.metrocre.game;
+package com.metrocre.game.world;
 
 import static java.lang.Math.max;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.metrocre.game.towers.Tower;
 
 public class Enemy extends Entity {
     public static final float SIZE = 1f;
@@ -23,8 +24,13 @@ public class Enemy extends Entity {
         health = max(0f, health - damage);
         if (health == 0) {
             destroy();
+            Player player = null;
             if (sender instanceof Player) {
-                Player player = (Player) sender;
+                player = (Player) sender;
+            } else if (sender instanceof Tower) {
+                player = ((Tower) sender).getPlayer();
+            }
+            if (player != null) {
                 player.addMoney(reward);
             }
         }
