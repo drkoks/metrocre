@@ -12,6 +12,9 @@ public class Pistol extends Weapon {
     public Pistol(Player player, ProjectileManager projectileManager, Texture texture) {
         super(player, 0.3f, projectileManager, texture);
     }
+    public Pistol(Player player, ProjectileManager projectileManager, Texture texture, float width, float height) {
+        super(player, 0.3f, projectileManager, texture, width, height);
+    }
 
     @Override
     public boolean shoot(Vector2 direction) {

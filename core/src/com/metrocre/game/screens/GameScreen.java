@@ -26,6 +26,7 @@ import com.metrocre.game.controller.Joystick;
 import com.metrocre.game.Map;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.Player;
+import com.metrocre.game.wepons.Pistol;
 import com.metrocre.game.wepons.Railgun;
 import com.metrocre.game.Train;
 import com.metrocre.game.WorldManager;
@@ -61,8 +62,8 @@ public class GameScreen implements Screen {
         worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         b2ddr = new Box2DDebugRenderer();
         player = new Player(6, 1, worldManager, playerTexture, game.playersProfile);
-        player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
-        //player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
+        //player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
+        player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F, 0.4F));
 
         map = new Map(worldManager);
         stage = new Stage(new StretchViewport(16, 9));

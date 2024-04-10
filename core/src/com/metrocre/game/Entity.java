@@ -31,7 +31,7 @@ public abstract class Entity {
 
     public void draw(SpriteBatch batch) {
         if (width != -1 && height != -1) {
-            batch.draw(texture, body.getPosition().x - width / 2, body.getPosition().y - height / 2, width, height);
+            batch.draw(texture, body.getPosition().x - width / 2, body.getPosition().y - height / 4, width, height);
         } else {
             batch.draw(texture, body.getPosition().x - texture.getWidth() * MyGame.UNIT_SCALE / 2,
                     body.getPosition().y - texture.getHeight() * MyGame.UNIT_SCALE / 2, texture.getWidth() * MyGame.UNIT_SCALE, texture.getHeight() * MyGame.UNIT_SCALE);
