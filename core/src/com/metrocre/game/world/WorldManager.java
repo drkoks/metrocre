@@ -1,6 +1,7 @@
 package com.metrocre.game.world;
 
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
@@ -22,18 +23,19 @@ import com.metrocre.game.event.world.ProjectileHitEventData;
 import com.metrocre.game.event.world.ProjectileHitEventHandler;
 import com.metrocre.game.event.world.RailHitEventHandler;
 import com.metrocre.game.wepons.Projectile;
-import com.metrocre.game.world.Enemy;
-import com.metrocre.game.world.Entity;
-import com.metrocre.game.world.ProjectileManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class WorldManager {
     private final World world;
+    private Player player;
     private final MessageDispatcher messageDispatcher = new MessageDispatcher();
     private IntMap<Entity> entities = new IntMap<>();
+    private Map<String, Texture> textures = new HashMap<>();
     private ProjectileManager projectileManager = new ProjectileManager(this);
     private ProjectileHitEventHandler projectileHitEventHandler = new ProjectileHitEventHandler();
     private RailHitEventHandler railHitEventHandler = new RailHitEventHandler();
@@ -102,7 +104,14 @@ public class WorldManager {
     }
 
     public void addEntity(Entity entity) {
+        if (entity instanceof Player) {
+            this.player = (Player) entity;
+        }
         entities.put(entity.getId(), entity);
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public void drawWorld(SpriteBatch batch) {
@@ -207,4 +216,10 @@ public class WorldManager {
     }
 
 
+    public void addTexture(Texture texture, String name) {
+        textures.put(name, texture);
+    }
+    public Texture getTexture(String name) {
+        return textures.get(name);
+    }
 }

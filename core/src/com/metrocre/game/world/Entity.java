@@ -38,12 +38,21 @@ public abstract class Entity {
         }
     }
 
+
     public Body getBody() {
         return body;
     }
 
     public int getId() {
         return id;
+    }
+
+    public float getX() {
+        return body.getPosition().x;
+    }
+
+    public float getY() {
+        return body.getPosition().y;
     }
 
     public void setVelocity(Vector2 velocity) {

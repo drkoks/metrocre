@@ -1,7 +1,7 @@
 package com.metrocre.game.towers;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.metrocre.game.world.Enemy;
+import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.RayCastResult;
@@ -14,8 +14,8 @@ public class GunTower extends Tower {
     private Pistol gun;
     private float detectRadius;
 
-    public GunTower(float x, float y, float health, float detectRadius, WorldManager worldManager, Player player, Texture texture) {
-        super(x, y, health, worldManager, player, texture);
+    public GunTower(float x, float y, float health, float detectRadius, WorldManager worldManager, Player player, String texture) {
+        super(x, y, health, worldManager, player, worldManager.getTexture(texture));
         gun = new Pistol(this, worldManager.getProjectileManager(), null);
         this.detectRadius = detectRadius;
     }

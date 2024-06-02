@@ -1,5 +1,7 @@
 package com.metrocre.game.world;
 
+import static com.metrocre.game.MyGame.SCALE;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
@@ -23,6 +25,6 @@ public class Train extends Entity {
     public boolean isPlayerOnTrain(Player player) {
         float playerX = player.getX();
         float playerY = player.getY();
-        return playerX <= x + width + 1 && playerX >= x - width -1 && playerY >= y && playerY <= y + height;
+        return playerX <= x + width + SCALE && playerX >= x - width -SCALE && playerY >= y && playerY <= y + height;
     }
 }

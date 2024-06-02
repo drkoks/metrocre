@@ -1,5 +1,7 @@
 package com.metrocre.game;
 
+import static com.metrocre.game.MyGame.SCALE;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -24,6 +26,7 @@ public class Map {
     public static final StaticTiledMapTile emptyTile = new StaticTiledMapTile(SPLIT_TILES_KATE[0][8]);
     private  int height;
     private  int width;
+
     private final TiledMap map;
     private static final Set<Integer> emptyCellsID =
             new HashSet<>(Arrays.asList(310, 695, 756, 740, 741, 757));
@@ -36,19 +39,19 @@ public class Map {
         map = new TmxMapLoader().load("tilesAtribute/mapmap.tmx");
         MapLayers layers = map.getLayers();
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
-        width = layer.getWidth();
-        height = layer.getHeight();
+        width = layer.getWidth()*SCALE;
+        height = layer.getHeight()*SCALE;
         for (int x = 0; x < layer.getWidth(); x++) {
             for (int y = 0; y < layer.getHeight(); y++) {
                 //System.out.println(layer.getCell(x, y).getTile().getId());
                 if (isEmptyTile(layer.getCell(x, y))) {
-                    worldManager.createRectangleBody(x, y, 1, 1, layer.getCell(x, y));
+                    worldManager.createRectangleBody(x*SCALE, y*SCALE, SCALE, SCALE, layer.getCell(x, y));
                 }
             }
         }
         //System.out.println("<<<<<" + emptyTile.getId() + ">>>>");
         layers.add(layer);
-        renderer = new OrthogonalTiledMapRenderer(map, 1f / TILE_SIZE_KATE);
+        renderer = new OrthogonalTiledMapRenderer(map, (float) SCALE / TILE_SIZE_KATE);
     }
 
     public Map(int[][] mapData, WorldManager worldManager) {

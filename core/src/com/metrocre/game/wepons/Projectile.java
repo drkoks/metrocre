@@ -1,5 +1,7 @@
 package com.metrocre.game.wepons;
 
+import static com.metrocre.game.MyGame.SCALE;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -11,7 +13,7 @@ import com.metrocre.game.world.WorldManager;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class Projectile extends Entity {
-    public static final float SIZE = 1f / 8;
+    public static final float SIZE = (float) SCALE / 8;
 
     private float damage;
     private Entity sender;

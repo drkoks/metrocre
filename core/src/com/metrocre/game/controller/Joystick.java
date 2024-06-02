@@ -1,5 +1,7 @@
 package com.metrocre.game.controller;
 
+import static com.metrocre.game.MyGame.SCALE;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -8,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 public class Joystick extends Actor {
-    public static final float JOYSTICK_RADIUS = 1;
+    public static final float JOYSTICK_RADIUS = SCALE;
     private final float sensitivity;
     private boolean isTouched = false;
     private float joystickX;
