@@ -1,12 +1,14 @@
 package com.metrocre.game.towers;
 
+import static com.metrocre.game.MyGame.SCALE;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.WorldManager;
 
 public abstract class Tower extends Entity {
-    public static final float SIZE = 1f;
+    public static final float SIZE = SCALE;
 
     protected float health;
     protected Player player;

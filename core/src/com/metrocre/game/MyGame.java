@@ -10,7 +10,8 @@ import com.metrocre.game.screens.MainMenuScreen;
 public class MyGame extends Game {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 480;
-    public static final float UNIT_SCALE = 1 / 32f;
+    public static final int SCALE = 15;
+    public static final float UNIT_SCALE = SCALE / 32f;
     static final long FPS = 60;
     static final long NANOS_PER_FRAME = 1_000_000_000 / FPS;
     public PlayersProfile playersProfile = new PlayersProfile("Player", 1, 0, 0, 1, 1, 1);

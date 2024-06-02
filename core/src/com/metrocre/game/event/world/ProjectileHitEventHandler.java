@@ -3,7 +3,7 @@ package com.metrocre.game.event.world;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.metrocre.game.world.Enemy;
+import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.wepons.Projectile;
 
 public class ProjectileHitEventHandler implements Telegraph {

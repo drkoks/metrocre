@@ -1,5 +1,7 @@
 package com.metrocre.game.wepons;
 
+import static com.metrocre.game.MyGame.SCALE;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.world.Entity;
@@ -7,7 +9,7 @@ import com.metrocre.game.world.Player;
 import com.metrocre.game.world.ProjectileManager;
 
 public class Pistol extends Weapon {
-    private float bulletSpeed = 7;
+    private float bulletSpeed = 7*SCALE;
 
     public Pistol(Entity owner, ProjectileManager projectileManager, Texture texture) {
         super(owner, 0.3f, projectileManager, texture);
