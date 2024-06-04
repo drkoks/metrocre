@@ -12,6 +12,11 @@
       "down": "exit",
       "up": "exit",
       "font": "default-font"
+    },
+    "settings": {
+      "down": "settings",
+      "up": "settings",
+      "font": "default-font"
     }
   }
 }
