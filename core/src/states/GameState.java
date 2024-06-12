@@ -11,8 +11,8 @@ import java.util.List;
 
 public class GameState implements Serializable {
     private PlayerState playerState;
-    private List<Vector2> enemyPositions;
-    private List<Vector2> bulletPositions;
+    private List<Vector2> enemyPositions; // #TODO change to enemyStates
+    private List<Vector2> bulletPositions; // #TODO change to bulletStates
 
     public GameState(Player player, WorldManager worldManager) {
         this.playerState = new PlayerState(player);

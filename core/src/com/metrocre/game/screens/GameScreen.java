@@ -97,7 +97,7 @@ public class GameScreen implements Screen {
             worldManager.addEntity(new Enemy1(14 * SCALE, 7 * SCALE, worldManager));
         } else {
             for (Vector2 enemyPosition : gameState.getEnemyPositions()) {
-                worldManager.addEntity(new Enemy1(enemyPosition.x, enemyPosition.y, worldManager));
+                worldManager.addEntity(new Enemy1(enemyPosition.x, enemyPosition.y, worldManager)); // #TODO load enemies
             }
         }
         worldManager.addEntity(new GunTower(6.5f * SCALE, 5.9f * SCALE, 5, 10 * SCALE, worldManager, player, "gunTower"));
