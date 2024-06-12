@@ -1,5 +1,7 @@
 package com.metrocre.game.wepons;
 
+import static com.metrocre.game.MyGame.SCALE;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.world.Entity;
@@ -7,10 +9,10 @@ import com.metrocre.game.world.Player;
 import com.metrocre.game.world.ProjectileManager;
 
 public class Railgun extends Weapon {
-    private final float range = 10;
+    private final float range = 10*SCALE;
 
     public Railgun(Entity owner, ProjectileManager projectileManager, Texture texture) {
-        super(owner, 0, projectileManager, texture);
+        super(owner, 1, projectileManager, texture);
     }
 
     @Override

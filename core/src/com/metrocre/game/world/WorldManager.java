@@ -127,6 +127,16 @@ public class WorldManager {
         return enemies;
     }
 
+    public List<Projectile> getProjectiles() {
+        List<Projectile> projectiles = new ArrayList<>();
+        for (Entity entity : entities.values()) {
+            if (entity instanceof Projectile) {
+                projectiles.add((Projectile) entity);
+            }
+        }
+        return projectiles;
+    }
+
     public void drawWorld(SpriteBatch batch) {
         for (IntMap.Entry<Entity> entityEntry : entities) {
             Entity entity = entityEntry.value;

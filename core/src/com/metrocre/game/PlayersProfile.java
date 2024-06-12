@@ -11,6 +11,7 @@ public class PlayersProfile {
     private int speedLevel;
     private int defenceLevel;
     private int attackLevel;
+    private int weaponId;
 
     public PlayersProfile(String name, int level, int experience, int money, int speedLevel, int defenceLevel, int attackLevel) {
         this.name = name;
@@ -20,8 +21,14 @@ public class PlayersProfile {
         this.speedLevel = speedLevel;
         this.defenceLevel = defenceLevel;
         this.attackLevel = attackLevel;
+        weaponId = 1;
     }
-
+    public int getWeaponId() {
+        return weaponId;
+    }
+    public void setWeaponId(int weaponId) {
+        this.weaponId = weaponId;
+    }
     public String getName() {
         return name;
     }
@@ -71,7 +78,7 @@ public class PlayersProfile {
     }
 
     public boolean canBuyItem(Upgrades item) {
-        int price = getSelectedItem(item) * 100;
+        int price = getSelectedItemCost(item);
         return getMoney() >= price;
     }
 
@@ -79,7 +86,7 @@ public class PlayersProfile {
         if (!canBuyItem(item)) {
             return false;
         }
-        int price = getSelectedItem(item) * 100;
+        int price = getSelectedItemCost(item);
         setMoney(getMoney() - price);
         switch (item) {
             case Speed:
@@ -91,17 +98,27 @@ public class PlayersProfile {
             case Attack:
                 setAttack(getAttack() + 1);
                 break;
+            case Pistol:
+                setWeaponId(1);
+                break;
+            case Railgun:
+                setWeaponId(2);
+                break;
         }
         return true;
     }
-    public int getSelectedItem(Upgrades item){
+    public int getSelectedItemCost(Upgrades item){
         switch (item) {
             case Speed:
-                return getSpeed();
+                return getSpeed()*100;
             case Defence:
-                return getDefence();
+                return getDefence()*100;
             case Attack:
-                return getAttack();
+                return getAttack()*100;
+            case Pistol:
+                return 100;
+            case Railgun:
+                return 200;
         }
         return 0;
     }

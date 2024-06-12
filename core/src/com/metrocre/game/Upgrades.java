@@ -18,6 +18,18 @@ public enum Upgrades {
         public String toString() {
             return "Attack";
         }
+    },
+    Pistol() {
+        @Override
+        public String toString() {
+            return "Pistol";
+        }
+    },
+    Railgun() {
+        @Override
+        public String toString() {
+            return "Railgun";
+        }
     };
 
     public static Upgrades fromString(String string) {
@@ -28,6 +40,10 @@ public enum Upgrades {
                 return Defence;
             case "Attack":
                 return Attack;
+            case "Pistol":
+                return Pistol;
+            case "Railgun":
+                return Railgun;
         }
         throw new IllegalArgumentException();
     }

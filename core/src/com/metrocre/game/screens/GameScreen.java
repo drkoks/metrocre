@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import states.GameState;
 import com.metrocre.game.towers.GunTower;
 import com.metrocre.game.wepons.Pistol;
 import com.metrocre.game.world.HUD;
@@ -33,6 +34,12 @@ import com.metrocre.game.world.Train;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.enemies.Enemy1;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class GameScreen implements Screen {
     private final Music backgroundMusic;
@@ -46,13 +53,17 @@ public class GameScreen implements Screen {
     private final Joystick moveJoystick;
     private final Joystick attackJoystick;
     private final TextButton nextLevelButton;
+    private final TextButton shopButton;
     private final HUD hud;
     public void addTexture(WorldManager worldManager) {
         worldManager.addTexture(new Texture("avatar.png"), "player");
         worldManager.addTexture(new Texture("enemy.png"), "enemy1");
         worldManager.addTexture(new Texture("guntower.png"), "gunTower");
     }
-    public GameScreen(MyGame game) {
+    private void commonSetup() {
+
+    }
+    public GameScreen(MyGame game, GameState gameState) {
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
         batch = new SpriteBatch();
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
@@ -64,10 +75,15 @@ public class GameScreen implements Screen {
         worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         addTexture(worldManager);
         Box2DDebugRenderer b2ddr = new Box2DDebugRenderer();
-        player = new Player(6*SCALE, SCALE, worldManager, game.playersProfile);
-        //player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
-        player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F*SCALE, 0.4F*SCALE));
-        map = new Map(worldManager);
+        if (gameState == null) {
+            player = new Player(6 * SCALE, SCALE, worldManager, game.playersProfile);
+            //player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
+            player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F * SCALE, 0.4F * SCALE));
+        } else {
+            player = new Player(gameState.getPlayerState(), worldManager, game.playersProfile);
+        }
+        worldManager.addEntity(player);
+        map = new Map(worldManager); // #TODO load map
         stage = new Stage(new StretchViewport(16*SCALE, 9*SCALE));
         hud = new HUD(player, stage, skin);
         moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6*SCALE, 6*SCALE, 0, true);
@@ -75,12 +91,16 @@ public class GameScreen implements Screen {
         attackJoystick = new Joystick(new Texture("joystick.png"), 10*SCALE, 0, 6*SCALE, 6*SCALE, 0.5f, false);
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
-        worldManager.addEntity(new Enemy1(12*SCALE, 6*SCALE, worldManager));
-        worldManager.addEntity(new Enemy1(14*SCALE, 6*SCALE,  worldManager));
-        worldManager.addEntity(new Enemy1(14*SCALE, 7*SCALE, worldManager));
-        worldManager.addEntity(player);
-        worldManager.addEntity(new GunTower(6.5f*SCALE, 5.9f*SCALE, 5, 10*SCALE, worldManager, player, "gunTower"));
-
+        if (gameState == null) {
+            worldManager.addEntity(new Enemy1(12 * SCALE, 6 * SCALE, worldManager));
+            worldManager.addEntity(new Enemy1(14 * SCALE, 6 * SCALE, worldManager));
+            worldManager.addEntity(new Enemy1(14 * SCALE, 7 * SCALE, worldManager));
+        } else {
+            for (Vector2 enemyPosition : gameState.getEnemyPositions()) {
+                worldManager.addEntity(new Enemy1(enemyPosition.x, enemyPosition.y, worldManager));
+            }
+        }
+        worldManager.addEntity(new GunTower(6.5f * SCALE, 5.9f * SCALE, 5, 10 * SCALE, worldManager, player, "gunTower"));
         train = new Train(SCALE, 0, worldManager, new Texture("data/empty.png"), 3*SCALE, map.getHeight());
         worldManager.addEntity(train);
         nextLevelButton = new TextButton("", skin, "next");
@@ -96,6 +116,22 @@ public class GameScreen implements Screen {
         });
         stage.addActor(nextLevelButton);
 
+        shopButton = new TextButton("", skin, "next");
+        shopButton.setSize(SCALE, SCALE);
+        shopButton.setPosition(stage.getWidth()-shopButton.getWidth(), stage.getHeight()-shopButton.getHeight());
+        shopButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                backgroundMusic.stop();
+                saveGameState();
+                game.setScreen(new ShopScreen(game));
+            }
+        });
+        stage.addActor(shopButton);
+
+    }
+    public GameScreen(MyGame game) {
+        this(game, null);
     }
 
     @Override
@@ -179,5 +215,34 @@ public class GameScreen implements Screen {
         hud.dispose();
         worldManager.dispose();
         stage.dispose();
+    }
+
+    public void saveGameState() {
+        try {
+            FileOutputStream fileOut = new FileOutputStream("gamestate.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(new GameState(player, worldManager));
+            out.close();
+            fileOut.close();
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
+    }
+
+    public static GameScreen loadGameState(MyGame game) {
+        try {
+            FileInputStream fileIn = new FileInputStream("gamestate.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            GameState gameState = (GameState) in.readObject();
+            in.close();
+            fileIn.close();
+            return new GameScreen(game, gameState);
+        } catch (IOException i) {
+            i.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            System.out.println("GameState class not found");
+            c.printStackTrace();
+        }
+        return new GameScreen(game);
     }
 }
