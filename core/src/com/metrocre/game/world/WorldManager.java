@@ -23,6 +23,7 @@ import com.metrocre.game.event.world.ProjectileHitEventData;
 import com.metrocre.game.event.world.ProjectileHitEventHandler;
 import com.metrocre.game.event.world.RailHitEventHandler;
 import com.metrocre.game.wepons.Projectile;
+import com.metrocre.game.world.enemies.Enemy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,6 +88,8 @@ public class WorldManager {
         return world;
     }
 
+
+
     public ProjectileManager getProjectileManager() {
         return projectileManager;
     }
@@ -112,6 +115,16 @@ public class WorldManager {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public List<Enemy> getEnemies() {
+        List<Enemy> enemies = new ArrayList<>();
+        for (Entity entity : entities.values()) {
+            if (entity instanceof Enemy) {
+                enemies.add((Enemy) entity);
+            }
+        }
+        return enemies;
     }
 
     public void drawWorld(SpriteBatch batch) {

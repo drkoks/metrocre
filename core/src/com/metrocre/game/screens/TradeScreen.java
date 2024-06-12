@@ -29,7 +29,7 @@ public class TradeScreen extends ScreenAdapter {
     private Label speedLevelLabel;
     private Label defenseLevelLabel;
     private Label attackLevelLabel;
-    private SpriteBatch batch;
+    private final SpriteBatch batch;
 
     public TradeScreen(MyGame game) {
         this.game = game;
@@ -45,7 +45,7 @@ public class TradeScreen extends ScreenAdapter {
 
         Label titleLabel = new Label("TradeCenter", skin);
         titleLabel.setSize(100, 50);
-        titleLabel.setPosition(MyGame.WIDTH / 2 - 40, MyGame.HEIGHT - 50);
+        titleLabel.setPosition((float) MyGame.WIDTH / 2 - 40, MyGame.HEIGHT - 50);
         coinsLabel = new Label("Coins: " + game.playersProfile.getMoney(), skin);
         speedLevelLabel = new Label("Speed Level: " + game.playersProfile.getSpeed(), skin);
         defenseLevelLabel = new Label("Defense Level: " + game.playersProfile.getDefence(), skin);

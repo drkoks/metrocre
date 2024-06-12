@@ -25,22 +25,20 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.metrocre.game.towers.GunTower;
 import com.metrocre.game.wepons.Pistol;
 import com.metrocre.game.world.HUD;
-import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.controller.Joystick;
 import com.metrocre.game.Map;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.Train;
 import com.metrocre.game.world.WorldManager;
+import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.enemies.Enemy1;
 
 public class GameScreen implements Screen {
-    private final MyGame game;
     private final Music backgroundMusic;
     private final SpriteBatch batch;
     private final OrthographicCamera camera;
     private final WorldManager worldManager;
-    private final Box2DDebugRenderer b2ddr;
     private final Player player;
     private final Train train;
     private final Map map;
@@ -48,14 +46,13 @@ public class GameScreen implements Screen {
     private final Joystick moveJoystick;
     private final Joystick attackJoystick;
     private final TextButton nextLevelButton;
-    private HUD hud;
+    private final HUD hud;
     public void addTexture(WorldManager worldManager) {
         worldManager.addTexture(new Texture("avatar.png"), "player");
         worldManager.addTexture(new Texture("enemy.png"), "enemy1");
         worldManager.addTexture(new Texture("guntower.png"), "gunTower");
     }
     public GameScreen(MyGame game) {
-        this.game = game;
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
         batch = new SpriteBatch();
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
@@ -66,8 +63,8 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, 16*SCALE, 9*SCALE);
         worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         addTexture(worldManager);
-        b2ddr = new Box2DDebugRenderer();
-        player = new Player(6*SCALE, 1*SCALE, worldManager, game.playersProfile);
+        Box2DDebugRenderer b2ddr = new Box2DDebugRenderer();
+        player = new Player(6*SCALE, SCALE, worldManager, game.playersProfile);
         //player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
         player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F*SCALE, 0.4F*SCALE));
         map = new Map(worldManager);
@@ -107,11 +104,11 @@ public class GameScreen implements Screen {
     }
 
     private boolean isAbleToFinishLevel() {
-//        for (Enemy enemy : enemies) {
-//            if (enemy.getBody() != null) {
-//                return false;
-//            }
-//        }
+        for (Enemy enemy : worldManager.getEnemies()){
+            if (!enemy.isDestroyed()) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -149,6 +146,7 @@ public class GameScreen implements Screen {
 
         worldManager.update(delta);
         worldManager.getWorld().step(delta, 6, 2);
+
         //b2ddr.render(worldManager.getWorld(), camera.combined);
 
         stage.act(delta);

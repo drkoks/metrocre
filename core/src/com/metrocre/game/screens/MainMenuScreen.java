@@ -21,10 +21,8 @@ public class MainMenuScreen implements Screen {
     private final Music backgroundMusic;
     private final SpriteBatch batch;
     private final Texture logo;
-    private final MyGame game;
 
     public MainMenuScreen(final MyGame game) {
-        this.game = game;
         stage = new Stage(new FitViewport(MyGame.WIDTH, MyGame.HEIGHT));
         logo = new Texture(Gdx.files.internal("logo.png"));
 
@@ -36,23 +34,13 @@ public class MainMenuScreen implements Screen {
         backgroundMusic.setVolume(game.getVolume());
         batch = new SpriteBatch();
 
-
         TextButton playButton = new TextButton("", skin, "play");
-        TextButton exitButton = new TextButton("", skin, "exit");
         TextButton settingsButton = new TextButton("", skin, "settings");
-
 
         playButton.setSize(200, 200);
         playButton.setPosition(150, MyGame.HEIGHT / 2 - 200);
         settingsButton.setSize(200, 200);
         settingsButton.setPosition(MyGame.WIDTH - 200 - 150, MyGame.HEIGHT / 2 - 200);
-
-
-        //Label.LabelStyle labelStyle = new Label.LabelStyle();
-        //labelStyle.font = skin.getFont("default-font");
-        //Label titleLabel = new Label("Metrocre", labelStyle);
-        //titleLabel.setSize(100, 50);
-        //titleLabel.setPosition(MyGame.WIDTH / 2  -40, MyGame.HEIGHT - 50);
 
 
         playButton.addListener(new ClickListener() {
@@ -71,11 +59,8 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-
         stage.addActor(playButton);
         stage.addActor(settingsButton);
-        //stage.addActor(titleLabel);
-
 
         Gdx.input.setInputProcessor(stage);
     }
