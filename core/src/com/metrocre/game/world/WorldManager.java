@@ -128,8 +128,8 @@ public class WorldManager {
     }
 
     public void drawWorld(SpriteBatch batch) {
-        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
-            Entity entity = it.next().value;
+        for (IntMap.Entry<Entity> entityEntry : entities) {
+            Entity entity = entityEntry.value;
             entity.draw(batch);
         }
         projectileManager.draw(batch);

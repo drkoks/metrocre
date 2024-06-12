@@ -38,9 +38,9 @@ public class MainMenuScreen implements Screen {
         TextButton settingsButton = new TextButton("", skin, "settings");
 
         playButton.setSize(200, 200);
-        playButton.setPosition(150, MyGame.HEIGHT / 2 - 200);
+        playButton.setPosition(150, (float) MyGame.HEIGHT / 2 - 200);
         settingsButton.setSize(200, 200);
-        settingsButton.setPosition(MyGame.WIDTH - 200 - 150, MyGame.HEIGHT / 2 - 200);
+        settingsButton.setPosition(MyGame.WIDTH - 200 - 150, (float) MyGame.HEIGHT / 2 - 200);
 
 
         playButton.addListener(new ClickListener() {
