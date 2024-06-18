@@ -11,4 +11,12 @@ public class Enemy1 extends Enemy{
         super(x, y, 3, 100, 10, SCALE, worldManager, "enemy1");
     }
 
+    @Override
+    protected void attackPlayer(Player player) {
+        if (cooldown > 0) {
+            return;
+        }
+        cooldown = 1f;
+        player.takeDamage(1, this);
+    }
 }

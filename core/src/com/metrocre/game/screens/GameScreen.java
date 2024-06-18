@@ -24,7 +24,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import states.GameState;
 import com.metrocre.game.towers.GunTower;
-import com.metrocre.game.wepons.Pistol;
+import com.metrocre.game.weapons.Pistol;
 import com.metrocre.game.world.HUD;
 import com.metrocre.game.controller.Joystick;
 import com.metrocre.game.Map;
@@ -34,6 +34,7 @@ import com.metrocre.game.world.Train;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.enemies.Enemy1;
+import com.metrocre.game.world.enemies.Enemy2;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -57,7 +58,8 @@ public class GameScreen implements Screen {
     private final HUD hud;
     public void addTexture(WorldManager worldManager) {
         worldManager.addTexture(new Texture("avatar.png"), "player");
-        worldManager.addTexture(new Texture("enemy.png"), "enemy1");
+        worldManager.addTexture(new Texture("enemies/enemy.png"), "enemy1");
+        worldManager.addTexture(new Texture("enemies/enemy2.png"), "enemy2");
         worldManager.addTexture(new Texture("guntower.png"), "gunTower");
     }
     private void commonSetup() {
@@ -93,7 +95,7 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
         if (gameState == null) {
             worldManager.addEntity(new Enemy1(12 * SCALE, 6 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy1(14 * SCALE, 6 * SCALE, worldManager));
+            worldManager.addEntity(new Enemy2(14 * SCALE, 6 * SCALE, worldManager));
             worldManager.addEntity(new Enemy1(14 * SCALE, 7 * SCALE, worldManager));
         } else {
             for (Vector2 enemyPosition : gameState.getEnemyPositions()) {

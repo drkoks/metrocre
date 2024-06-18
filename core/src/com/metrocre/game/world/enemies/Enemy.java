@@ -10,12 +10,12 @@ import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.WorldManager;
 
-public class Enemy extends Entity {
+public abstract class Enemy extends Entity {
     public static final float SIZE = SCALE;
-    private float health;
-    private int reward;
-    private float attackPower;
-    private float attackRange;
+    protected float health;
+    protected int reward;
+    protected float attackPower;
+    protected float attackRange;
     protected float cooldown = 0;
 
     public Enemy(float x, float y, float health, int reward, float attackPower, float attackRange, WorldManager worldManager, String enemyKind) {
@@ -62,11 +62,11 @@ public class Enemy extends Entity {
         return distance <= attackRange;
     }
 
-    private void attackPlayer(Player player) {
-        if (cooldown > 0) {
-            return;
-        }
-        cooldown = 1f;
-        player.takeDamage(attackPower, this);
+    protected abstract void attackPlayer(Player player);
+
+    public float getAttack() {
+        return attackPower;
     }
+
+
 }

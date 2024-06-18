@@ -9,10 +9,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.PlayersProfile;
-import com.metrocre.game.towers.Tower;
-import com.metrocre.game.wepons.Pistol;
-import com.metrocre.game.wepons.Railgun;
-import com.metrocre.game.wepons.Weapon;
+import com.metrocre.game.weapons.Pistol;
+import com.metrocre.game.weapons.Railgun;
+import com.metrocre.game.weapons.Weapon;
+import com.metrocre.game.world.enemies.Enemy;
 
 import states.PlayerState;
 
@@ -85,10 +85,15 @@ public class Player extends Entity {
         weapon.shoot(direction);
     }
     public void takeDamage(float damage, Entity sender) {
+        float multiplier = 1f;
+        if (sender instanceof Enemy) {
+            multiplier = ((Enemy) sender).getAttack();
+        }
         if (health == 0) {
             return;
         }
-        health = (int) max(0f, health - damage);
+        float finalDamage = damage * multiplier;;
+        health = (int) max(0f, health - finalDamage);
         if (health == 0) {
             onDeath();
         } else {

@@ -1,9 +1,8 @@
-package com.metrocre.game.wepons;
+package com.metrocre.game.weapons;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.world.Entity;
-import com.metrocre.game.world.Player;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
 

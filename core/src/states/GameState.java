@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
-import com.metrocre.game.wepons.Projectile;
+import com.metrocre.game.weapons.Projectile;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

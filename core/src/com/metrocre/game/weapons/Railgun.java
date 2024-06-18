@@ -1,11 +1,10 @@
-package com.metrocre.game.wepons;
+package com.metrocre.game.weapons;
 
 import static com.metrocre.game.MyGame.SCALE;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.world.Entity;
-import com.metrocre.game.world.Player;
 import com.metrocre.game.world.ProjectileManager;
 
 public class Railgun extends Weapon {

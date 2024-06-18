@@ -1,12 +1,11 @@
 package com.metrocre.game.towers;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.RayCastResult;
 import com.metrocre.game.world.WorldManager;
-import com.metrocre.game.wepons.Pistol;
+import com.metrocre.game.weapons.Pistol;
 
 import java.util.List;
 

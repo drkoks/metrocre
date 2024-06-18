@@ -1,4 +1,4 @@
-package com.metrocre.game.wepons;
+package com.metrocre.game.weapons;
 
 import static com.metrocre.game.MyGame.SCALE;
 
@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.metrocre.game.world.Entity;
-import com.metrocre.game.world.Player;
 import com.metrocre.game.world.WorldManager;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
