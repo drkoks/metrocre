@@ -20,7 +20,7 @@ public class Enemy2 extends Enemy {
 
     public Enemy2(float x, float y, WorldManager worldManager) {
         super(x, y, 3, 100, 10, SCALE, 5*SCALE,  worldManager, "enemy2");
-        setWeapon(new Pistol(this, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F * SCALE, 0.4F * SCALE));
+        setWeapon(new Pistol(this, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F * SCALE, 0.4F * SCALE, 1));
     }
     public void setWeapon(Weapon weapon) {
         this.weapon = weapon;

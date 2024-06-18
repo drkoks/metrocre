@@ -64,7 +64,7 @@ public class TradeScreen extends ScreenAdapter {
             public void changed(ChangeEvent event, Actor actor) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
                 itemInfo.setText("+ 20% to " + selectedItem.toString() + " cost " +
-                        100 * game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+                        game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
             }
         });
 

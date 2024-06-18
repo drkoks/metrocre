@@ -14,8 +14,8 @@ public class Pistol extends Weapon {
     public Pistol(Entity owner, ProjectileManager projectileManager, Texture texture) {
         super(owner, 0.3f, projectileManager, texture);
     }
-    public Pistol(Entity player, ProjectileManager projectileManager, Texture texture, float width, float height) {
-        super(player, 0.3f, projectileManager, texture, width, height);
+    public Pistol(Entity player, ProjectileManager projectileManager, Texture texture, float width, float height, int level) {
+        super(player, 0.3f, projectileManager, texture, width, height, level);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class Pistol extends Weapon {
             return false;
         }
         cooldown = fireRate;
-        projectileManager.createBullet(owner.getBody().getPosition(), direction, bulletSpeed, 1, owner);
+        projectileManager.createBullet(owner.getBody().getPosition(), direction, bulletSpeed, level, owner);
         return true;
     }
 }

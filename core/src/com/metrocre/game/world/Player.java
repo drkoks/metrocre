@@ -49,9 +49,11 @@ public class Player extends Entity {
         body = worldManager.createCircleBody(state.getPlayerX(), state.getPlayerY(), SIZE / 2, false, false, this);
         int weaponId = playersProfile.getWeaponId();
         if (weaponId == 1) {
-            setWeapon(new Pistol(this, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F * SCALE, 0.4F * SCALE));
+            setWeapon(new Pistol(this, worldManager.getProjectileManager(), new Texture("pistol.png"),
+                    0.6F * SCALE, 0.4F * SCALE, playersProfile.getWeaponLevel()));
         } else if (weaponId == 2) {
-            setWeapon(new Railgun(this, worldManager.getProjectileManager(), new Texture("railgun.png")));
+            setWeapon(new Railgun(this, worldManager.getProjectileManager(), new Texture("laser.png"),
+                    0.6F * SCALE, 0.4F * SCALE, playersProfile.getWeaponLevel()));
         }
     }
     public Player(float x, float y, WorldManager worldManager, PlayersProfile playersProfile) {
@@ -135,6 +137,11 @@ public class Player extends Entity {
     public Vector2 getPosition() {
         return body.getPosition();
     }
+
+    public String getWeapon() {
+        return weapon.getClass().getSimpleName();
+    }
+
     public int getMoney() {
         return playersProfile.getMoney();
     }

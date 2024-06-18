@@ -12,6 +12,7 @@ public class PlayersProfile {
     private int defenceLevel;
     private int attackLevel;
     private int weaponId;
+    private int weaponLevel = 1;
 
     public PlayersProfile(String name, int level, int experience, int money, int speedLevel, int defenceLevel, int attackLevel) {
         this.name = name;
@@ -28,6 +29,16 @@ public class PlayersProfile {
     }
     public void setWeaponId(int weaponId) {
         this.weaponId = weaponId;
+    }
+
+    public String getWeaponName() {
+        switch (weaponId) {
+            case 1:
+                return "Pistol";
+            case 2:
+                return "Railgun";
+        }
+        return "Unknown";
     }
     public String getName() {
         return name;
@@ -55,6 +66,10 @@ public class PlayersProfile {
 
     public int getAttack() {
         return attackLevel;
+    }
+
+    public int getWeaponLevel() {
+        return weaponLevel;
     }
 
     public void setLevel(int level) {
@@ -99,10 +114,18 @@ public class PlayersProfile {
                 setAttack(getAttack() + 1);
                 break;
             case Pistol:
-                setWeaponId(1);
+                if (weaponId == 1){
+                    weaponLevel++;
+                } else {
+                    setWeaponId(1);
+                }
                 break;
             case Railgun:
-                setWeaponId(2);
+                if (weaponId == 2){
+                    weaponLevel++;
+                } else {
+                    setWeaponId(2);
+                }
                 break;
         }
         return true;

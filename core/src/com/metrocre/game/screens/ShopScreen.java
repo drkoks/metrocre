@@ -22,12 +22,15 @@ import com.metrocre.game.MyGame;
 import com.metrocre.game.Upgrades;
 import com.metrocre.game.event.trade.BuyEventData;
 import com.metrocre.game.event.trade.TradeEvents;
+import com.metrocre.game.world.Player;
 
 public class ShopScreen extends ScreenAdapter {
     private final Stage stage;
     private final MyGame game;
     private final SpriteBatch batch;
     private Texture backgroundTexture;
+    private Label coinsLabel;
+    private Label weaponLevelLabel;
 
 
     public ShopScreen(final MyGame game) {
@@ -49,6 +52,9 @@ public class ShopScreen extends ScreenAdapter {
         backButton.setSize(100, 30);
         backButton.setPosition(Gdx.graphics.getWidth() - 150, Gdx.graphics.getHeight() - 50);
 
+        coinsLabel = new Label("Coins: " + game.playersProfile.getMoney(), skin);
+        weaponLevelLabel = new Label("Current weapon Level: " + game.playersProfile.getWeaponLevel(), skin);
+
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -64,8 +70,14 @@ public class ShopScreen extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
-                itemInfo.setText("NEW weapon: " + selectedItem.toString() + " cost " +
-                        game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+                if (game.playersProfile.getWeaponName().equals(selectedItem.toString())){
+                    itemInfo.setText("UPDATE weapon: " + selectedItem.toString() + " cost " +
+                            game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+                }
+                else {
+                    itemInfo.setText("NEW weapon: " + selectedItem.toString() + " cost " +
+                            game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+                }
             }
         });
 
@@ -78,6 +90,7 @@ public class ShopScreen extends ScreenAdapter {
                     buyEventData.upgrade = selectedItem;
                     game.getMessageDispatcher().dispatchMessage(TradeEvents.BUY, buyEventData);
                     itemInfo.setText(selectedItem + " purchased.");
+                    updateLabels();
                 } else {
                     itemInfo.setText("Not enough coins.");
                 }
@@ -89,6 +102,10 @@ public class ShopScreen extends ScreenAdapter {
         table.setFillParent(true);
 
         table.add(titleLabel).colspan(2).center().padTop(10);
+        table.row();
+        table.add(coinsLabel).left().padTop(10).padLeft(10);
+        table.row();
+        table.add(weaponLevelLabel).left().padTop(10).padLeft(10);
         table.row();
         table.add(itemList).expandX().fillX().padTop(20).padLeft(10).padRight(10);
         table.row();
@@ -139,5 +156,11 @@ public class ShopScreen extends ScreenAdapter {
         stage.dispose();
         backgroundTexture.dispose();
         batch.dispose();
+    }
+
+    private void updateLabels() {
+        coinsLabel.setText("Coins: " + game.playersProfile.getMoney());
+        weaponLevelLabel.setText("Current weapon Level: " + game.playersProfile.getWeaponLevel());
+
     }
 }
