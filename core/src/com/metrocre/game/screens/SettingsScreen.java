@@ -17,11 +17,8 @@ import com.metrocre.game.MyGame;
 
 public class SettingsScreen implements Screen {
     private final Stage stage;
-    private final MyGame game;
-    private Skin skin;
 
     public SettingsScreen(final MyGame game) {
-        this.game = game;
         stage = new Stage(new ScreenViewport());
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
 
