@@ -116,8 +116,8 @@ public class GameScreen implements Screen {
         });
         stage.addActor(nextLevelButton);
 
-        shopButton = new TextButton("", skin, "next");
-        shopButton.setSize(SCALE, SCALE);
+        shopButton = new TextButton("", skin, "market");
+        shopButton.setSize(2*SCALE, 2*SCALE);
         shopButton.setPosition(stage.getWidth()-shopButton.getWidth(), stage.getHeight()-shopButton.getHeight());
         shopButton.addListener(new ClickListener() {
             @Override

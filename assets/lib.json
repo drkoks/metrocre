@@ -84,6 +84,11 @@
       "down": "trade",
       "up": "trade",
       "font": "default-font"
+    },
+    "market": {
+      "down": "market",
+      "up": "market",
+      "font": "default-font"
     }
   },
   "ScrollPaneStyle": {
