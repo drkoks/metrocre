@@ -19,7 +19,7 @@ public class Enemy2 extends Enemy {
     float detectRadius = SCALE*5;
 
     public Enemy2(float x, float y, WorldManager worldManager) {
-        super(x, y, 3, 100, 10, SCALE, worldManager, "enemy2");
+        super(x, y, 3, 100, 10, SCALE, 5*SCALE,  worldManager, "enemy2");
         setWeapon(new Pistol(this, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F * SCALE, 0.4F * SCALE));
     }
     public void setWeapon(Weapon weapon) {

@@ -131,6 +131,10 @@ public class Player extends Entity {
     public int getHealth() {
         return health;
     }
+
+    public Vector2 getPosition() {
+        return body.getPosition();
+    }
     public int getMoney() {
         return playersProfile.getMoney();
     }
