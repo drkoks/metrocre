@@ -198,11 +198,13 @@ public class GameScreen implements Screen {
         if (isVictory()){
             backgroundMusic.stop();
             MyGame game = (MyGame) Gdx.app.getApplicationListener();
-            game.setScreen(new GameOverScreen(game, false));
+            game.resetCounter();
+            game.setScreen(new GameOverScreen(game, true));
         }
         if (player.isDestroyed()) {
             backgroundMusic.stop();
             MyGame game = (MyGame) Gdx.app.getApplicationListener();
+            game.resetCounter();
             game.setScreen(new GameOverScreen(game, false));
         }
         Gdx.gl.glClearColor(1, 0, 0, 1);
