@@ -26,6 +26,7 @@ import com.metrocre.game.Map;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.controller.Joystick;
 import com.metrocre.game.towers.GunTower;
+import com.metrocre.game.towers.HealTower;
 import com.metrocre.game.weapons.Pistol;
 import com.metrocre.game.world.HUD;
 import com.metrocre.game.world.Player;
@@ -82,9 +83,15 @@ public class GameScreen implements Screen {
         map = new Map(worldManager); // #TODO load map
         stage = new Stage(new StretchViewport(16 * SCALE, 9 * SCALE));
         hud = new HUD(player, stage, skin);
-        moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6 * SCALE, 6 * SCALE, 0, true);
+
+        moveJoystick = new Joystick(new Texture("joystick.png"),
+                0, 0, 6 * SCALE, 6 * SCALE, 0, true);
+
         stage.addActor(moveJoystick);
-        attackJoystick = new Joystick(new Texture("joystick.png"), 10 * SCALE, 0, 6 * SCALE, 6 * SCALE, 0.5f, false);
+
+        attackJoystick = new Joystick(new Texture("joystick.png"),
+                10 * SCALE, 0, 6 * SCALE, 6 * SCALE, 0.5f, false);
+
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
         if (gameState == null) {
@@ -96,7 +103,12 @@ public class GameScreen implements Screen {
                 worldManager.addEntity(new Enemy1(enemyPosition.x, enemyPosition.y, worldManager)); // #TODO load enemies
             }
         }
-        worldManager.addEntity(new GunTower(6.5f * SCALE, 5.9f * SCALE, 5, 10 * SCALE, worldManager, player, "gunTower"));
+        worldManager.addEntity(new GunTower(6.5f * SCALE, 5.9f * SCALE, 5,
+                10 * SCALE, worldManager, player, "gunTower"));
+
+        worldManager.addEntity(new HealTower(6.5f * SCALE, 8f * SCALE, 5,
+                2 * SCALE, worldManager, player, "healTower"));
+
         train = new Train(SCALE, 0, worldManager, new Texture("data/empty.png"), 3 * SCALE, map.getHeight());
         worldManager.addEntity(train);
         nextLevelButton = new TextButton("", skin, "next");
@@ -153,6 +165,7 @@ public class GameScreen implements Screen {
         worldManager.addTexture(new Texture("enemies/enemy.png"), "enemy1");
         worldManager.addTexture(new Texture("enemies/enemy2.png"), "enemy2");
         worldManager.addTexture(new Texture("guntower.png"), "gunTower");
+        worldManager.addTexture(new Texture("healTower.png"), "healTower");
     }
 
     private void commonSetup() {

@@ -152,4 +152,10 @@ public class Player extends Entity {
         return damageTime;
     }
 
+    public void heal(float i) {
+        health += i;
+        if (health > healthFromDefence()) {
+            health = healthFromDefence();
+        }
+    }
 }

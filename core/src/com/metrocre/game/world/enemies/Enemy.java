@@ -4,26 +4,28 @@ import static com.metrocre.game.MyGame.SCALE;
 import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.towers.Tower;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
+import com.metrocre.game.world.RayCastResult;
 import com.metrocre.game.world.WorldManager;
+
+import java.util.List;
 
 public abstract class Enemy extends Entity {
     public static final float SIZE = SCALE;
     protected float health;
     protected int reward;
     protected float attackPower;
-    float speed = 20.0f;
     protected float attackRange;
     protected float detectionRange;
     protected float cooldown = 0;
     protected Player targetPlayer;
+    float speed = 20.0f;
     private Vector2 position;
 
-    public Enemy(float x, float y, float health, int reward, float attackPower, float attackRange, float detectionRange,  WorldManager worldManager, String enemyKind) {
+    public Enemy(float x, float y, float health, int reward, float attackPower, float attackRange, float detectionRange, WorldManager worldManager, String enemyKind) {
         super(worldManager, worldManager.getTexture(enemyKind), SIZE, SIZE);
         this.attackPower = attackPower;
         this.detectionRange = detectionRange;
@@ -35,23 +37,36 @@ public abstract class Enemy extends Entity {
     }
 
 
-
     public void update(float deltaTime) {
-        Player player = worldManager.getPlayer();
-        if (player == null) {
+        targetPlayer = getTarget();
+        if (targetPlayer == null) {
+            patrol();
             return;
         }
         cooldown = max(cooldown - deltaTime, 0);
-        if (isPlayerInDetectionRange(player)) {
-            targetPlayer = player;
-            moveTowardsPlayer();
-            if (isPlayerInRange(player)) {
-                attackPlayer(player);
-            }
-        } else {
-            patrol();
+        moveTowardsPlayer();
+        if (isPlayerInRange(targetPlayer)) {
+            attackPlayer(targetPlayer);
         }
+    }
 
+
+    private Player getTarget() {
+        List<Entity> entitiesInRadius = worldManager.getEntitiesInRadius(body.getPosition(), detectionRange);
+        Player target = null;
+        float distance = detectionRange;
+        for (Entity entity : entitiesInRadius) {
+            float thisDistance = entity.getBody().getPosition().cpy().sub(body.getPosition()).len();
+            if (!(entity instanceof Player) || thisDistance > distance) {
+                continue;
+            }
+            RayCastResult rayCastResult = worldManager.castRay(body.getPosition(), entity.getBody().getPosition());
+            if (rayCastResult.hitPointFraction == 1) {
+                target = (Player) entity;
+                distance = thisDistance;
+            }
+        }
+        return target;
     }
 
     private void patrol() {
@@ -90,12 +105,6 @@ public abstract class Enemy extends Entity {
         return distance <= attackRange;
     }
 
-    private boolean isPlayerInDetectionRange(Player player) {
-        float distance = (float) sqrt((player.getX() - getX()) * (player.getX() - getX()) +
-                (player.getY() - getY()) * (player.getY() - getY()));
-        return distance <= detectionRange;
-
-    }
 
     public float getAttack() {
         return attackPower;
