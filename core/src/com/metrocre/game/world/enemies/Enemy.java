@@ -106,6 +106,7 @@ public abstract class Enemy extends Entity {
     }
 
 
+
     public float getAttack() {
         return attackPower;
     }

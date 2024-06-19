@@ -41,6 +41,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Random;
 
 import states.GameState;
 
@@ -76,11 +77,24 @@ public class GameScreen implements Screen {
             //player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
             player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"),
                     0.6F * SCALE, 0.4F * SCALE, game.playersProfile.getWeaponLevel()));
+            Random rand = new Random();
+            int randomNumber = rand.nextInt(5) + 1;
+            map = new Map(worldManager, 5, true); // #TODO load map
+
+
+
         } else {
             player = new Player(gameState.getPlayerState(), worldManager, game.playersProfile);
+
+            for (Vector2 enemyPosition : gameState.getEnemyPositions()) {
+                worldManager.addEntity(new Enemy1(enemyPosition.x, enemyPosition.y, worldManager)); // #TODO load enemies
+            }
+            map = new Map(worldManager, gameState.getMapState().getMapID(), false);
         }
         worldManager.addEntity(player);
-        map = new Map(worldManager); // #TODO load map
+
+
+
         stage = new Stage(new StretchViewport(16 * SCALE, 9 * SCALE));
         hud = new HUD(player, stage, skin);
 
@@ -94,20 +108,8 @@ public class GameScreen implements Screen {
 
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
-        if (gameState == null) {
-            worldManager.addEntity(new Enemy1(12 * SCALE, 6 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(14 * SCALE, 6 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy1(14 * SCALE, 7 * SCALE, worldManager));
-        } else {
-            for (Vector2 enemyPosition : gameState.getEnemyPositions()) {
-                worldManager.addEntity(new Enemy1(enemyPosition.x, enemyPosition.y, worldManager)); // #TODO load enemies
-            }
-        }
-        worldManager.addEntity(new GunTower(6.5f * SCALE, 5.9f * SCALE, 5,
-                10 * SCALE, worldManager, player, "gunTower"));
 
-        worldManager.addEntity(new HealTower(6.5f * SCALE, 8f * SCALE, 5,
-                2 * SCALE, worldManager, player, "healTower"));
+
 
         train = new Train(SCALE, 0, worldManager, new Texture("data/empty.png"), 3 * SCALE, map.getHeight());
         worldManager.addEntity(train);
@@ -198,7 +200,7 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        ScreenUtils.clear(1, 1, 1, 1);
+        ScreenUtils.clear(0.2f, 0.2f, 0.2f, 1);
 
         camera.position.set(getCameraX(), getCameraY(), 0);
         camera.update();
@@ -260,7 +262,7 @@ public class GameScreen implements Screen {
         try {
             FileOutputStream fileOut = new FileOutputStream("gamestate.ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(new GameState(player, worldManager));
+            out.writeObject(new GameState(player, worldManager, map));
             out.close();
             fileOut.close();
         } catch (IOException i) {

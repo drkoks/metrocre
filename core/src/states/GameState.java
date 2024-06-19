@@ -1,6 +1,7 @@
 
 package states;
 import com.badlogic.gdx.math.Vector2;
+import com.metrocre.game.Map;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
@@ -10,11 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameState implements Serializable {
+    private MapState mapState;
     private PlayerState playerState;
     private List<Vector2> enemyPositions; // #TODO change to enemyStates
     private List<Vector2> bulletPositions; // #TODO change to bulletStates
 
-    public GameState(Player player, WorldManager worldManager) {
+    public GameState(Player player, WorldManager worldManager, Map map) {
+        this.mapState = new MapState(map);
         this.playerState = new PlayerState(player);
         this.enemyPositions = new ArrayList<>();
         for (Enemy enemy : worldManager.getEnemies()) {
@@ -39,5 +42,9 @@ public class GameState implements Serializable {
 
     public List<Vector2> getBulletPositions() {
         return bulletPositions;
+    }
+
+    public MapState getMapState() {
+        return mapState;
     }
 }
