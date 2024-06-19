@@ -3,7 +3,7 @@ package com.metrocre.game.event.world;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.metrocre.game.world.enemies.Enemy;
-import com.metrocre.game.wepons.Rail;
+import com.metrocre.game.weapons.Rail;
 
 public class RailHitEventHandler implements Telegraph {
     @Override

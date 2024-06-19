@@ -249,3 +249,16 @@ next
   offset: 0, 0
   index: -1
 
+
+market.png
+size: 80, 80
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+market
+  rotate: false
+  xy: 0, 0
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1

@@ -18,11 +18,12 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.IntMap;
-import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.ProjectileHitEventData;
 import com.metrocre.game.event.world.ProjectileHitEventHandler;
 import com.metrocre.game.event.world.RailHitEventHandler;
-import com.metrocre.game.wepons.Projectile;
+import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.towers.Tower;
+import com.metrocre.game.weapons.Projectile;
 import com.metrocre.game.world.enemies.Enemy;
 
 import java.util.ArrayList;
@@ -33,8 +34,8 @@ import java.util.Map;
 
 public class WorldManager {
     private final World world;
-    private Player player;
     private final MessageDispatcher messageDispatcher = new MessageDispatcher();
+    private Player player;
     private IntMap<Entity> entities = new IntMap<>();
     private Map<String, Texture> textures = new HashMap<>();
     private ProjectileManager projectileManager = new ProjectileManager(this);
@@ -60,10 +61,22 @@ public class WorldManager {
                 }
                 if (data1 instanceof Projectile) {
                     Projectile bullet = (Projectile) data1;
+                    if (bullet.isHeal() && data2 instanceof Enemy) {
+                        return;
+                    }
+                    if (!bullet.isHeal()) {
+                        if (bullet.getSender() instanceof Enemy && data2 instanceof Enemy) {
+                            return;
+                        }
+                        if ((bullet.getSender() instanceof Tower || bullet.getSender() instanceof Player) && data2 instanceof Player) {
+                            return;
+                        }
+                    }
                     ProjectileHitEventData projectileHitEventData = new ProjectileHitEventData();
                     projectileHitEventData.projectile = bullet;
                     projectileHitEventData.hittedObject = data2;
                     messageDispatcher.dispatchMessage(WorldEvents.PROJECTILE_HIT, projectileHitEventData);
+
                 }
             }
 
@@ -89,14 +102,13 @@ public class WorldManager {
     }
 
 
-
     public ProjectileManager getProjectileManager() {
         return projectileManager;
     }
 
     public void update(float delta) {
         projectileManager.update(delta);
-        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
+        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext(); ) {
             Entity entity = it.next().value;
             if (entity.isDestroyed()) {
                 world.destroyBody(entity.getBody());
@@ -125,6 +137,16 @@ public class WorldManager {
             }
         }
         return enemies;
+    }
+
+    public List<Projectile> getProjectiles() {
+        List<Projectile> projectiles = new ArrayList<>();
+        for (Entity entity : entities.values()) {
+            if (entity instanceof Projectile) {
+                projectiles.add((Projectile) entity);
+            }
+        }
+        return projectiles;
     }
 
     public void drawWorld(SpriteBatch batch) {
@@ -164,7 +186,7 @@ public class WorldManager {
         List<Entity> result = new ArrayList<>();
         world.QueryAABB(fixture -> {
             if (fixture.getBody().getPosition().cpy().sub(position).len() <= radius
-                && fixture.getBody().getUserData() instanceof Entity) {
+                    && fixture.getBody().getUserData() instanceof Entity) {
                 result.add((Entity) fixture.getBody().getUserData());
             }
             return true;
@@ -183,7 +205,6 @@ public class WorldManager {
 
         CircleShape shape = new CircleShape();
         shape.setRadius(radius);
-
         FixtureDef fd = new FixtureDef();
         fd.shape = shape;
         fd.friction = 0;
@@ -232,6 +253,7 @@ public class WorldManager {
     public void addTexture(Texture texture, String name) {
         textures.put(name, texture);
     }
+
     public Texture getTexture(String name) {
         return textures.get(name);
     }

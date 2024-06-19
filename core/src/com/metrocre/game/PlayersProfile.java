@@ -11,6 +11,8 @@ public class PlayersProfile {
     private int speedLevel;
     private int defenceLevel;
     private int attackLevel;
+    private int weaponId;
+    private int weaponLevel = 1;
 
     public PlayersProfile(String name, int level, int experience, int money, int speedLevel, int defenceLevel, int attackLevel) {
         this.name = name;
@@ -20,8 +22,24 @@ public class PlayersProfile {
         this.speedLevel = speedLevel;
         this.defenceLevel = defenceLevel;
         this.attackLevel = attackLevel;
+        weaponId = 1;
+    }
+    public int getWeaponId() {
+        return weaponId;
+    }
+    public void setWeaponId(int weaponId) {
+        this.weaponId = weaponId;
     }
 
+    public String getWeaponName() {
+        switch (weaponId) {
+            case 1:
+                return "Pistol";
+            case 2:
+                return "Railgun";
+        }
+        return "Unknown";
+    }
     public String getName() {
         return name;
     }
@@ -50,6 +68,10 @@ public class PlayersProfile {
         return attackLevel;
     }
 
+    public int getWeaponLevel() {
+        return weaponLevel;
+    }
+
     public void setLevel(int level) {
         this.level = level;
     }
@@ -71,7 +93,7 @@ public class PlayersProfile {
     }
 
     public boolean canBuyItem(Upgrades item) {
-        int price = getSelectedItem(item) * 100;
+        int price = getSelectedItemCost(item);
         return getMoney() >= price;
     }
 
@@ -79,7 +101,7 @@ public class PlayersProfile {
         if (!canBuyItem(item)) {
             return false;
         }
-        int price = getSelectedItem(item) * 100;
+        int price = getSelectedItemCost(item);
         setMoney(getMoney() - price);
         switch (item) {
             case Speed:
@@ -91,17 +113,35 @@ public class PlayersProfile {
             case Attack:
                 setAttack(getAttack() + 1);
                 break;
+            case Pistol:
+                if (weaponId == 1){
+                    weaponLevel++;
+                } else {
+                    setWeaponId(1);
+                }
+                break;
+            case Railgun:
+                if (weaponId == 2){
+                    weaponLevel++;
+                } else {
+                    setWeaponId(2);
+                }
+                break;
         }
         return true;
     }
-    public int getSelectedItem(Upgrades item){
+    public int getSelectedItemCost(Upgrades item){
         switch (item) {
             case Speed:
-                return getSpeed();
+                return getSpeed()*100;
             case Defence:
-                return getDefence();
+                return getDefence()*100;
             case Attack:
-                return getAttack();
+                return getAttack()*100;
+            case Pistol:
+                return 100;
+            case Railgun:
+                return 200;
         }
         return 0;
     }
