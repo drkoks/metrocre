@@ -25,8 +25,6 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.metrocre.game.Map;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.controller.Joystick;
-import com.metrocre.game.towers.GunTower;
-import com.metrocre.game.towers.HealTower;
 import com.metrocre.game.weapons.Pistol;
 import com.metrocre.game.world.HUD;
 import com.metrocre.game.world.Player;
@@ -34,7 +32,6 @@ import com.metrocre.game.world.Train;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.enemies.Enemy1;
-import com.metrocre.game.world.enemies.Enemy2;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -196,7 +193,7 @@ public class GameScreen implements Screen {
         if (player.isDestroyed()) {
             backgroundMusic.stop();
             MyGame game = (MyGame) Gdx.app.getApplicationListener();
-            game.setScreen(new DeathScreen(game));
+            game.setScreen(new GameOverScreen(game, false));
         }
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

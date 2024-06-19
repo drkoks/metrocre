@@ -4,33 +4,37 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
-import com.metrocre.game.PlayersProfile;
 
 import java.util.Map;
 
 import states.PlayerStat;
 
-public class DeathScreen implements Screen {
+public class GameOverScreen implements Screen {
     private final Stage stage;
-    Image img;
+    private Image img;
+    private boolean isWin;
 
-    public DeathScreen(final MyGame game) {
+    public GameOverScreen(final MyGame game, boolean isWin) {
+        this.isWin = isWin;
         stage = new Stage(new ScreenViewport());
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
-        img = new Image(new Texture("game-over.png"));
-        img.setSize(300, 200);
+        if (isWin) {
+            img = new Image(new Texture("victory.png"));
+            img.setSize(150, 150);
+        } else {
+            img = new Image(new Texture("game-over.png"));
+            img.setSize(300, 200);
+        }
+
         img.setPosition((float) (Gdx.graphics.getWidth() - img.getWidth()) / 2, Gdx.graphics.getHeight()- img.getHeight());
 
         PlayerStat stats  = game.playersProfile.getStatistics();
@@ -67,7 +71,11 @@ public class DeathScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        if (isWin) {
+            Gdx.gl.glClearColor(1, 0.2f, 0.5f, 1);
+        } else {
+            Gdx.gl.glClearColor(0, 0, 0, 1);
+        }
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(delta);
         stage.draw();
