@@ -57,7 +57,9 @@ public class GameScreen implements Screen {
     private final TextButton shopButton;
     private final HUD hud;
 
+
     public GameScreen(MyGame game, GameState gameState) {
+        game.increaseCounter();
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
         batch = new SpriteBatch();
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
@@ -187,9 +189,17 @@ public class GameScreen implements Screen {
     private float getCameraY() {
         return min(max(player.getY(), 4.5F * SCALE), map.getHeight() - 4.5F * SCALE);
     }
+    private boolean isVictory() {
+        return  ((MyGame) Gdx.app.getApplicationListener()).isWin();
+    }
 
     @Override
     public void render(float delta) {
+        if (isVictory()){
+            backgroundMusic.stop();
+            MyGame game = (MyGame) Gdx.app.getApplicationListener();
+            game.setScreen(new GameOverScreen(game, false));
+        }
         if (player.isDestroyed()) {
             backgroundMusic.stop();
             MyGame game = (MyGame) Gdx.app.getApplicationListener();

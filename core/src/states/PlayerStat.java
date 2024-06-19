@@ -5,16 +5,21 @@ import java.util.Map;
 
 public class PlayerStat {
     Map<String, Integer> kills =new HashMap<>();
+    Map<String, Integer> newKills =new HashMap<>();
 
     public void addKill(String enemyType) {
-        if (kills.containsKey(enemyType)) {
-            kills.put(enemyType, kills.get(enemyType) + 1);
+        if (newKills.containsKey(enemyType)) {
+            newKills.put(enemyType, newKills.get(enemyType) + 1);
         } else {
-            kills.put(enemyType, 1);
+            newKills.put(enemyType, 1);
         }
     }
 
+
     public Map<String, Integer> getKills() {
-        return kills;
+        Map<String, Integer> buf = new HashMap<>(newKills);
+        kills.putAll(newKills);
+        newKills.clear();
+        return buf;
     }
 }

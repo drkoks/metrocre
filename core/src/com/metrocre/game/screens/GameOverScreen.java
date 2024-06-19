@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import states.PlayerStat;
@@ -39,11 +40,12 @@ public class GameOverScreen implements Screen {
 
         PlayerStat stats  = game.playersProfile.getStatistics();
         int y = Gdx.graphics.getHeight() - 200;
-        Label label = new Label("You defeted " + stats.getKills().size() + " different enemies, here is list:", skin);
+        Map<String, Integer> kills = new HashMap<>(stats.getKills());
+        Label label = new Label("You defeted " + kills.size() + " different enemies, here is list:", skin);
         label.setPosition(50, y);
         stage.addActor(label);
         y -= 20; // move down for the next label
-        for (Map.Entry<String, Integer> entry : stats.getKills().entrySet()) {
+        for (Map.Entry<String, Integer> entry : kills.entrySet()) {
             label = new Label(entry.getKey() + ": " + entry.getValue(), skin);
             label.setPosition(50, y);
             stage.addActor(label);

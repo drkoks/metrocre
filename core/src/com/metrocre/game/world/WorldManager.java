@@ -200,7 +200,12 @@ public class WorldManager {
         bd.fixedRotation = true;
         bd.position.set(new Vector2(x, y));
         bd.bullet = isBullet;
-        Body body = world.createBody(bd);
+        Body body;
+        try {
+            body = world.createBody(bd);
+        } catch (Exception e) {
+            return null;
+        }
         body.setUserData(userData);
 
         CircleShape shape = new CircleShape();
