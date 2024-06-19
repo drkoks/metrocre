@@ -1,5 +1,6 @@
 package com.metrocre.game.towers;
 
+import com.metrocre.game.weapons.HealGun;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
@@ -11,24 +12,21 @@ import java.util.List;
 
 public class HealTower extends Tower {
     private final float detectRadius;
-    float cooldown = 0;
+    private HealGun gun;
 
     public HealTower(float x, float y, float health, float detectRadius, WorldManager worldManager, Player player, String texture) {
         super(x, y, health, worldManager, player, worldManager.getTexture(texture));
+        gun = new HealGun(this, worldManager.getProjectileManager(), null);
         this.detectRadius = detectRadius;
     }
 
     public void update(float delta) {
-        if (cooldown > 0) {
-            cooldown -= delta;
-            return;
-        }
-        cooldown = 1f;
         Player target = getTarget();
         if (target == null) {
             return;
         }
-        target.heal(10);
+        gun.update(delta);
+        gun.shoot(target.getBody().getPosition().cpy().sub(body.getPosition()).setLength(1));
     }
 
     private Player getTarget() {

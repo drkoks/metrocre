@@ -16,10 +16,13 @@ public class Projectile extends Entity {
     public static final float SIZE = (float) SCALE / 8;
 
     private float damage;
+
+    private boolean isHeal = false;
     private Entity sender;
 
-    public Projectile(Vector2 position, Vector2 direction, float damage, float speed, WorldManager worldManager, Texture texture, Entity sender) {
+    public Projectile(Vector2 position, Vector2 direction, float damage, float speed, WorldManager worldManager, Texture texture, Entity sender, boolean isHeal) {
         super(worldManager, texture);
+        this.isHeal = isHeal;
         this.damage = damage;
         this.sender = sender;
         body = worldManager.createCircleBody(position.x, position.y, SIZE / 2, true, true, this);
@@ -40,6 +43,10 @@ public class Projectile extends Entity {
 
     public Body getBody() {
         return body;
+    }
+
+    public boolean isHeal() {
+        return isHeal;
     }
 
     public float getDamage() {

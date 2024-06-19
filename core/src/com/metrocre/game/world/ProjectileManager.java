@@ -28,6 +28,7 @@ public class ProjectileManager {
     private final Texture texture;
     private final TextureRegion region;
     private final Texture bulletTexture = new Texture("bullet.png");
+    private final Texture healBulletTexture = new Texture("healBullet.png");
 
     public ProjectileManager(WorldManager worldManager) {
         this.worldManager = worldManager;
@@ -72,8 +73,9 @@ public class ProjectileManager {
         }
     }
 
-    public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Entity owner) {
-        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager, bulletTexture, owner);
+    public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Entity owner, boolean isHeal) {
+        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager,
+                isHeal ? healBulletTexture : bulletTexture, owner, isHeal);
 
         worldManager.addEntity(bullet);
     }

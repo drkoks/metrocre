@@ -8,13 +8,15 @@ import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.ProjectileManager;
 
-public class Pistol extends Weapon {
-    private float bulletSpeed = 7*SCALE;
+public class HealGun extends Weapon {
+    private float bulletSpeed = 3*SCALE;
+    private float healAmount = 3;
+    private HealGun gun;
 
-    public Pistol(Entity owner, ProjectileManager projectileManager, Texture texture) {
-        super(owner, 0.3f, projectileManager, texture);
+    public HealGun(Entity owner, ProjectileManager projectileManager, Texture texture) {
+        super(owner, 0.5f, projectileManager, texture);
     }
-    public Pistol(Entity player, ProjectileManager projectileManager, Texture texture, float width, float height, int level) {
+    public HealGun(Entity player, ProjectileManager projectileManager, Texture texture, float width, float height, int level) {
         super(player, 0.3f, projectileManager, texture, width, height, level);
     }
 
@@ -24,7 +26,7 @@ public class Pistol extends Weapon {
             return false;
         }
         cooldown = fireRate;
-        projectileManager.createBullet(owner.getBody().getPosition(), direction, bulletSpeed, level, owner, false);
+        projectileManager.createBullet(owner.getBody().getPosition(), direction, bulletSpeed, level*healAmount, owner, true);
         return true;
     }
 }

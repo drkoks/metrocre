@@ -61,11 +61,16 @@ public class WorldManager {
                 }
                 if (data1 instanceof Projectile) {
                     Projectile bullet = (Projectile) data1;
-                    if (bullet.getSender() instanceof Enemy && data2 instanceof Enemy) {
+                    if (bullet.isHeal() && data2 instanceof Enemy) {
                         return;
                     }
-                    if ((bullet.getSender() instanceof Tower || bullet.getSender() instanceof Player) && data2 instanceof Player) {
-                        return;
+                    if (!bullet.isHeal()) {
+                        if (bullet.getSender() instanceof Enemy && data2 instanceof Enemy) {
+                            return;
+                        }
+                        if ((bullet.getSender() instanceof Tower || bullet.getSender() instanceof Player) && data2 instanceof Player) {
+                            return;
+                        }
                     }
                     ProjectileHitEventData projectileHitEventData = new ProjectileHitEventData();
                     projectileHitEventData.projectile = bullet;
