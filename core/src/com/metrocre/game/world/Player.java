@@ -3,12 +3,15 @@ package com.metrocre.game.world;
 import static com.metrocre.game.MyGame.SCALE;
 import static java.lang.Math.max;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.PlayersProfile;
+import com.metrocre.game.screens.MainMenuScreen;
 import com.metrocre.game.weapons.Pistol;
 import com.metrocre.game.weapons.Railgun;
 import com.metrocre.game.weapons.Weapon;
@@ -25,6 +28,7 @@ public class Player extends Entity {
     private int health;
     private Sprite sprite;
     private int attack;
+    private boolean isDead = false;
     private boolean isDamaged;
     private float damageTime;
     private static final float DAMAGE_DISPLAY_DURATION = 0.5f;
@@ -105,7 +109,7 @@ public class Player extends Entity {
         }
     }
     private void onDeath() {
-
+        isDead = true;
     }
 
     public void setWeapon(Weapon weapon) {
@@ -157,5 +161,9 @@ public class Player extends Entity {
         if (health > healthFromDefence()) {
             health = healthFromDefence();
         }
+    }
+
+    public boolean isDead() {
+        return isDead;
     }
 }
