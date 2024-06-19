@@ -1,6 +1,9 @@
 package com.metrocre.game;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.metrocre.game.world.enemies.Enemy;
+
+import states.PlayerStat;
 
 public class PlayersProfile {
     private final String name;
@@ -13,6 +16,8 @@ public class PlayersProfile {
     private int attackLevel;
     private int weaponId;
     private int weaponLevel = 1;
+
+    private PlayerStat statistics = new PlayerStat();
 
     public PlayersProfile(String name, int level, int experience, int money, int speedLevel, int defenceLevel, int attackLevel) {
         this.name = name;
@@ -148,5 +153,16 @@ public class PlayersProfile {
 
     public void setAttack(int attackLevel) {
         this.attackLevel = attackLevel;
+    }
+
+    public void reportKill(Enemy enemy) {
+        if (enemy == null) {
+            return;
+        }
+        statistics.addKill(enemy.getCoolName());
+    }
+
+    public PlayerStat getStatistics() {
+        return statistics;
     }
 }

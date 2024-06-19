@@ -94,6 +94,7 @@ public abstract class Enemy extends Entity {
                 player = ((Tower) sender).getPlayer();
             }
             if (player != null) {
+                player.getPlayersProfile().reportKill(this);
                 player.addMoney(reward);
             }
         }
@@ -106,10 +107,12 @@ public abstract class Enemy extends Entity {
     }
 
 
+
     public float getAttack() {
         return attackPower;
     }
 
     protected abstract void attackPlayer(Player player);
 
+    abstract public String getCoolName();
 }
