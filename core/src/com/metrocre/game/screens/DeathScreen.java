@@ -16,6 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.PlayersProfile;
+
+import java.util.Map;
+
+import states.PlayerStat;
 
 public class DeathScreen implements Screen {
     private final Stage stage;
@@ -28,7 +33,18 @@ public class DeathScreen implements Screen {
         img.setSize(300, 200);
         img.setPosition((float) (Gdx.graphics.getWidth() - img.getWidth()) / 2, Gdx.graphics.getHeight()- img.getHeight());
 
-
+        PlayerStat stats  = game.playersProfile.getStatistics();
+        int y = Gdx.graphics.getHeight() - 200;
+        Label label = new Label("You defeted " + stats.getKills().size() + " different enemies, here is list:", skin);
+        label.setPosition(50, y);
+        stage.addActor(label);
+        y -= 20; // move down for the next label
+        for (Map.Entry<String, Integer> entry : stats.getKills().entrySet()) {
+            label = new Label(entry.getKey() + ": " + entry.getValue(), skin);
+            label.setPosition(50, y);
+            stage.addActor(label);
+            y -= 20;
+        }
         TextButton backButton = new TextButton("Back to Main menu", skin);
         backButton.setSize(200, 30);
         backButton.setPosition((float) (Gdx.graphics.getWidth()-backButton.getWidth()) /2, 50);

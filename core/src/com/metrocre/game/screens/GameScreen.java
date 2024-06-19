@@ -74,26 +74,21 @@ public class GameScreen implements Screen {
         Box2DDebugRenderer b2ddr = new Box2DDebugRenderer();
         if (gameState == null) {
             player = new Player(6 * SCALE, SCALE, worldManager, game.playersProfile);
-            //player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
+            worldManager.addEntity(player);
             player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"),
                     0.6F * SCALE, 0.4F * SCALE, game.playersProfile.getWeaponLevel()));
             Random rand = new Random();
             int randomNumber = rand.nextInt(5) + 1;
-            map = new Map(worldManager, randomNumber, true); // #TODO load map
-
-
+            map = new Map(worldManager, 1, true); // #TODO load map
 
         } else {
             player = new Player(gameState.getPlayerState(), worldManager, game.playersProfile);
-
+            worldManager.addEntity(player);
             for (Vector2 enemyPosition : gameState.getEnemyPositions()) {
                 worldManager.addEntity(new Enemy1(enemyPosition.x, enemyPosition.y, worldManager)); // #TODO load enemies
             }
             map = new Map(worldManager, gameState.getMapState().getMapID(), false);
         }
-        worldManager.addEntity(player);
-
-
 
         stage = new Stage(new StretchViewport(16 * SCALE, 9 * SCALE));
         hud = new HUD(player, stage, skin);
@@ -198,7 +193,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        if (player.isDead()) {
+        if (player.isDestroyed()) {
             backgroundMusic.stop();
             MyGame game = (MyGame) Gdx.app.getApplicationListener();
             game.setScreen(new DeathScreen(game));

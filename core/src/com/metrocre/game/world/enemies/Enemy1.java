@@ -19,4 +19,9 @@ public class Enemy1 extends Enemy {
         cooldown = 1f;
         player.takeDamage(1, this);
     }
+
+    @Override
+    public String getCoolName() {
+        return "Phasmax";
+    }
 }

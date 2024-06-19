@@ -69,5 +69,9 @@ public class Enemy2 extends Enemy {
     @Override
     protected void attackPlayer(Player player) {
     }
+    @Override
+    public String getCoolName() {
+        return "Chompzilla";
+    }
 
 }

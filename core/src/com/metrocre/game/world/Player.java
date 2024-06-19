@@ -28,7 +28,6 @@ public class Player extends Entity {
     private int health;
     private Sprite sprite;
     private int attack;
-    private boolean isDead = false;
     private boolean isDamaged;
     private float damageTime;
     private static final float DAMAGE_DISPLAY_DURATION = 0.5f;
@@ -109,7 +108,7 @@ public class Player extends Entity {
         }
     }
     private void onDeath() {
-        isDead = true;
+        destroyed = true;
     }
 
     public void setWeapon(Weapon weapon) {
@@ -163,7 +162,5 @@ public class Player extends Entity {
         }
     }
 
-    public boolean isDead() {
-        return isDead;
-    }
+
 }
