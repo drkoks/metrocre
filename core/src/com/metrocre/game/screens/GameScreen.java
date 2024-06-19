@@ -76,7 +76,7 @@ public class GameScreen implements Screen {
                     0.6F * SCALE, 0.4F * SCALE, game.playersProfile.getWeaponLevel()));
             Random rand = new Random();
             int randomNumber = rand.nextInt(5) + 1;
-            map = new Map(worldManager, 1, true); // #TODO load map
+            map = new Map(worldManager, randomNumber, true); // #TODO load map
 
         } else {
             player = new Player(gameState.getPlayerState(), worldManager, game.playersProfile);
