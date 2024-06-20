@@ -22,4 +22,8 @@ public class PlayerStat {
         newKills.clear();
         return buf;
     }
+
+    public Map<String, Integer> getAllKills() {
+        return kills;
+    }
 }

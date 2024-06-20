@@ -44,7 +44,7 @@ public class GameOverScreen implements Screen {
         Label label = new Label("You defeted " + kills.size() + " different enemies, here is list:", skin);
         label.setPosition(50, y);
         stage.addActor(label);
-        y -= 20; // move down for the next label
+        y -= 20;
         for (Map.Entry<String, Integer> entry : kills.entrySet()) {
             label = new Label(entry.getKey() + ": " + entry.getValue(), skin);
             label.setPosition(50, y);

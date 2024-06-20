@@ -15,6 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import states.PlayerStat;
+
 public class SettingsScreen implements Screen {
     private final Stage stage;
 
@@ -49,6 +54,20 @@ public class SettingsScreen implements Screen {
                 game.setScreen(new MainMenuScreen(game));
             }
         });
+
+        PlayerStat stats  = game.playersProfile.getStatistics();
+        int y = Gdx.graphics.getHeight() - 200;
+        Map<String, Integer> kills = new HashMap<>(stats.getAllKills());
+        Label label = new Label("You defeted " + kills.size() + " different enemies all-time, here is list:", skin);
+        label.setPosition(50, y);
+        stage.addActor(label);
+        y -= 20;
+        for (Map.Entry<String, Integer> entry : kills.entrySet()) {
+            label = new Label(entry.getKey() + ": " + entry.getValue(), skin);
+            label.setPosition(50, y);
+            stage.addActor(label);
+            y -= 20;
+        }
 
         stage.addActor(volumeLabel);
         stage.addActor(volumeSlider);
