@@ -17,6 +17,9 @@ public class PlayersProfile {
     private int weaponId;
     private int weaponLevel = 1;
 
+    private int healTowerCounter = 0;
+    private int gunTowerCounter = 0;
+
     private PlayerStat statistics = new PlayerStat();
 
     public PlayersProfile(String name, int level, int experience, int money, int speedLevel, int defenceLevel, int attackLevel) {
@@ -132,6 +135,10 @@ public class PlayersProfile {
                     setWeaponId(2);
                 }
                 break;
+            case HealTower:
+                healTowerCounter++;
+            case GunTower:
+                gunTowerCounter++;
         }
         return true;
     }
@@ -147,12 +154,21 @@ public class PlayersProfile {
                 return 100;
             case Railgun:
                 return 200;
+            case HealTower:
+                return 0;
+            case GunTower:
+                return 0;
         }
         return 0;
     }
 
     public void setAttack(int attackLevel) {
         this.attackLevel = attackLevel;
+    }
+
+    public void resetAfterLevel(){
+        healTowerCounter = 0;
+        gunTowerCounter = 0;
     }
 
     public void reportKill(Enemy enemy) {
@@ -164,5 +180,13 @@ public class PlayersProfile {
 
     public PlayerStat getStatistics() {
         return statistics;
+    }
+
+    public int getHealTowers() {
+        return healTowerCounter;
+    }
+
+    public int getGunTowers() {
+        return gunTowerCounter;
     }
 }

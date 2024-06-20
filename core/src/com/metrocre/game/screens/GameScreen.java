@@ -25,6 +25,8 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.metrocre.game.Map;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.controller.Joystick;
+import com.metrocre.game.towers.HealTower;
+import com.metrocre.game.towers.TowerPlace;
 import com.metrocre.game.weapons.Pistol;
 import com.metrocre.game.world.HUD;
 import com.metrocre.game.world.Player;
@@ -40,7 +42,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Random;
 
+import states.EnemyState;
 import states.GameState;
+import states.SpawnerState;
 
 public class GameScreen implements Screen {
     private final Music backgroundMusic;
@@ -59,7 +63,7 @@ public class GameScreen implements Screen {
 
 
     public GameScreen(MyGame game, GameState gameState) {
-        game.increaseCounter();
+
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
         batch = new SpriteBatch();
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
@@ -72,22 +76,35 @@ public class GameScreen implements Screen {
         addTexture(worldManager);
         Box2DDebugRenderer b2ddr = new Box2DDebugRenderer();
         if (gameState == null) {
+            game.increaseCounter();
             player = new Player(6 * SCALE, SCALE, worldManager, game.playersProfile);
             worldManager.addEntity(player);
             player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"),
                     0.6F * SCALE, 0.4F * SCALE, game.playersProfile.getWeaponLevel()));
             Random rand = new Random();
             int randomNumber = rand.nextInt(5) + 1;
-            map = new Map(worldManager, randomNumber, true); // #TODO load map
+            map = new Map(worldManager, 1, true);
 
         } else {
             player = new Player(gameState.getPlayerState(), worldManager, game.playersProfile);
             worldManager.addEntity(player);
-            for (Vector2 enemyPosition : gameState.getEnemyPositions()) {
-                worldManager.addEntity(new Enemy1(enemyPosition.x, enemyPosition.y, worldManager)); // #TODO load enemies
+            for (EnemyState enemyStates : gameState.getEnemyStates()) {
+                worldManager.addEntity(enemyStates.getEnemyFromState(worldManager));
+            }
+            for (SpawnerState spawnerState : gameState.getSpawnersStates()) {
+                worldManager.addSpawner(spawnerState.getSpawnerFromState(worldManager));
+            }
+            for (TowerPlace healTower : gameState.getHealTowerPlaces()) {
+                worldManager.addTowerPlace(healTower);
+            }
+            for (TowerPlace gunTower : gameState.getGunTowerPlaces()) {
+                worldManager.addTowerPlace(gunTower);
             }
             map = new Map(worldManager, gameState.getMapState().getMapID(), false);
         }
+
+        worldManager.buildTowers(game.playersProfile.getHealTowers(), game.playersProfile.getGunTowers());
+        game.playersProfile.resetAfterLevel();
 
         stage = new Stage(new StretchViewport(16 * SCALE, 9 * SCALE));
         hud = new HUD(player, stage, skin);
@@ -174,11 +191,12 @@ public class GameScreen implements Screen {
     }
 
     private boolean isAbleToFinishLevel() {
-        for (Enemy enemy : worldManager.getEnemies()) {
-            if (!enemy.isDestroyed()) {
-                return false;
-            }
-        }
+//        for (Enemy enemy : worldManager.getEnemies()) {
+//            if (!enemy.isDestroyed()) {
+//                return false;
+//            }
+//        }
+//        return worldManager.spawnersAreDone();
         return true;
     }
 

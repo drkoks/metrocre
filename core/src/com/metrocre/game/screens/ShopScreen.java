@@ -63,7 +63,7 @@ public class ShopScreen extends ScreenAdapter {
         });
         List<String> itemList = new List<>(skin);
         Label itemInfo = new Label("", skin);
-        itemList.setItems("Railgun", "Pistol");
+        itemList.setItems("Railgun", "Pistol", "HealTower", "GunTower");
         TextButton tradeButton = new TextButton("Trade", skin, "trade");
         tradeButton.setSize(100, 50);
         itemList.addListener(new ChangeListener() {
@@ -71,11 +71,15 @@ public class ShopScreen extends ScreenAdapter {
             public void changed(ChangeEvent event, Actor actor) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
                 if (game.playersProfile.getWeaponName().equals(selectedItem.toString())){
-                    itemInfo.setText("UPDATE weapon: " + selectedItem.toString() + " cost " +
+                    itemInfo.setText("UPDATE weapon: " + selectedItem + " cost " +
                             game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
                 }
-                else {
-                    itemInfo.setText("NEW weapon: " + selectedItem.toString() + " cost " +
+                else if (selectedItem.isTower()) {
+                    itemInfo.setText("Extra " + selectedItem + " cost " +
+                            game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+
+                } else {
+                    itemInfo.setText("NEW weapon: " + selectedItem + " cost " +
                             game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
                 }
             }
