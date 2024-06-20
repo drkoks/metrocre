@@ -137,8 +137,10 @@ public class PlayersProfile {
                 break;
             case HealTower:
                 healTowerCounter++;
+                break;
             case GunTower:
                 gunTowerCounter++;
+                break;
         }
         return true;
     }
@@ -155,9 +157,9 @@ public class PlayersProfile {
             case Railgun:
                 return 200;
             case HealTower:
-                return 150;
+                return 0;
             case GunTower:
-                return 100;
+                return 0;
         }
         return 0;
     }
