@@ -11,6 +11,10 @@ public class Enemy1 extends Enemy {
         super(x, y, 3, 100, 10, SCALE, 8* SCALE, worldManager, "enemy1");
     }
 
+    public Enemy1(float x, float y, float health, WorldManager worldManager) {
+        super(x, y, health, 100, 10, SCALE, 8* SCALE, worldManager, "enemy1");
+    }
+
     @Override
     protected void attackPlayer(Player player) {
         if (cooldown > 0) {

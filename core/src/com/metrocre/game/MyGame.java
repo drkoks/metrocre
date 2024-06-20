@@ -61,4 +61,8 @@ public class MyGame extends Game {
     public void dispose() {
         super.dispose();
     }
+
+    public void resetCounter() {
+        levelCounter = 0;
+    }
 }

@@ -30,7 +30,21 @@ public enum Upgrades {
         public String toString() {
             return "Railgun";
         }
-    };
+    },
+
+    HealTower() {
+        @Override
+        public String toString() {
+            return "HealTower";
+        }
+    },
+    GunTower() {
+        @Override
+        public String toString() {
+            return "GunTower";
+        }
+    },
+    ;
 
     public static Upgrades fromString(String string) {
         switch (string) {
@@ -44,7 +58,15 @@ public enum Upgrades {
                 return Pistol;
             case "Railgun":
                 return Railgun;
+            case "HealTower":
+                return HealTower;
+            case "GunTower":
+                return GunTower;
         }
         throw new IllegalArgumentException();
+    }
+
+    public boolean isTower() {
+        return this == HealTower || this == GunTower;
     }
 }

@@ -13,6 +13,8 @@ import com.metrocre.game.world.WorldManager;
 
 import java.util.List;
 
+import states.EnemyState;
+
 public abstract class Enemy extends Entity {
     public static final float SIZE = SCALE;
     protected float health;
@@ -50,6 +52,9 @@ public abstract class Enemy extends Entity {
         }
     }
 
+    public float getHealth() {
+        return health;
+    }
 
     private Player getTarget() {
         List<Entity> entitiesInRadius = worldManager.getEntitiesInRadius(body.getPosition(), detectionRange);

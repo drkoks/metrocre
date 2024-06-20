@@ -14,12 +14,15 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.metrocre.game.towers.GunTower;
 import com.metrocre.game.towers.HealTower;
+import com.metrocre.game.towers.TowerPlace;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy1;
 import com.metrocre.game.world.enemies.Enemy2;
+import com.metrocre.game.world.enemies.EnemySpawner;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Map {
@@ -32,6 +35,8 @@ public class Map {
     private  int width;
     private int id;
 
+
+
     private final TiledMap map;
     private static final Set<Integer> emptyCellsID =
             new HashSet<>(Arrays.asList(310, 695, 756, 740, 741, 757, 153));
@@ -41,10 +46,6 @@ public class Map {
         return emptyCellsID.contains(cell.getTile().getId());
     }
     public Map(WorldManager worldManager, int seedId, boolean isNew) {
-        generateDefault(worldManager, seedId);
-        if (isNew) {
-            generateEntities(worldManager, seedId);
-        }
         id = seedId;
         map = new TmxMapLoader().load("tilesAtribute/maps/map" + id + ".tmx");
         TiledMapTileLayer blockLayer = (TiledMapTileLayer) map.getLayers().get(1);
@@ -52,14 +53,30 @@ public class Map {
         height = blockLayer.getHeight()*SCALE;
         for (int x = 0; x < blockLayer.getWidth(); x++) {
             for (int y = 0; y < blockLayer.getHeight(); y++) {
-                //System.out.println(layer.getCell(x, y).getTile().getId());
-                if (isEmptyTile(blockLayer.getCell(x, y))) {
-                    worldManager.createRectangleBody(x*SCALE, y*SCALE, SCALE, SCALE, blockLayer.getCell(x, y));
-                }
+                setUpCell(blockLayer.getCell(x, y), worldManager, x, y, isNew);
             }
         }
-        //System.out.println("<<<<<" + emptyTile.getId() + ">>>>");
         renderer = new OrthogonalTiledMapRenderer(map, (float) SCALE / TILE_SIZE_KATE);
+    }
+
+    private void setUpCell(Cell cell, WorldManager worldManager, int x, int y, boolean isNew) {
+        if (isEmptyTile(cell)) {
+            worldManager.createRectangleBody(x*SCALE, y*SCALE, SCALE, SCALE, cell);
+        }
+        if (!isNew) {
+            return;
+        }
+        int type = cell.getTile().getId();
+        if (type == 101){
+            worldManager.addSpawner(new EnemySpawner(worldManager, x*SCALE, y*SCALE, 1, 2, 0));
+        } else if (type == 103) {
+            worldManager.addSpawner(new EnemySpawner(worldManager, x * SCALE, y * SCALE, 2, 2, 0));
+        } else if (type == 7) {
+            worldManager.addTowerPlace(new TowerPlace(x * SCALE, y * SCALE, 2));
+        } else if (type == 5) {
+            worldManager.addTowerPlace(new TowerPlace(x * SCALE, y * SCALE, 1));
+        }
+
     }
 
     private void generateDefault(WorldManager worldManager, int seedId) {
@@ -70,35 +87,7 @@ public class Map {
                 2 * SCALE, worldManager, worldManager.getPlayer(), "healTower"));
     }
 
-    private void generateEntities(WorldManager worldManager, int seedId) {
-        if (seedId == 1) {
-            worldManager.addEntity(new Enemy1(12 * SCALE, 6 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(14 * SCALE, 6 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy1(14 * SCALE, 7 * SCALE, worldManager));
-        } else if (seedId == 2){
-            worldManager.addEntity(new Enemy1(12 * SCALE, 11 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy1(12 * SCALE, 3 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(22 * SCALE, 12 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(20 * SCALE, 6 * SCALE, worldManager));
-        } else if (seedId == 3){
-            worldManager.addEntity(new Enemy1(16 * SCALE, 3 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy1(16 * SCALE, 12 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(29 * SCALE, 7 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(23 * SCALE, 12 * SCALE, worldManager));
-        } else if (seedId == 4){
-            worldManager.addEntity(new Enemy1(12 * SCALE, 11 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy1(10 * SCALE, 2 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(21 * SCALE, 11 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(29 * SCALE, 11 * SCALE, worldManager));
-        } else if (seedId == 5){
-            worldManager.addEntity(new Enemy1(12 * SCALE, 11 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy1(10 * SCALE, 2 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(21 * SCALE, 11 * SCALE, worldManager));
-            worldManager.addEntity(new Enemy2(29 * SCALE, 11 * SCALE, worldManager));
 
-        }
-
-    }
 
     public Map(int[][] mapData, WorldManager worldManager) {
         height = mapData.length;
