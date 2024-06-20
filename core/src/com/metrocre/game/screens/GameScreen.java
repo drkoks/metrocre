@@ -83,7 +83,7 @@ public class GameScreen implements Screen {
                     0.6F * SCALE, 0.4F * SCALE, game.playersProfile.getWeaponLevel()));
             Random rand = new Random();
             int randomNumber = rand.nextInt(5) + 1;
-            map = new Map(worldManager, 1, true);
+            map = new Map(worldManager, randomNumber, true);
 
         } else {
             player = new Player(gameState.getPlayerState(), worldManager, game.playersProfile);
@@ -191,13 +191,12 @@ public class GameScreen implements Screen {
     }
 
     private boolean isAbleToFinishLevel() {
-//        for (Enemy enemy : worldManager.getEnemies()) {
-//            if (!enemy.isDestroyed()) {
-//                return false;
-//            }
-//        }
-//        return worldManager.spawnersAreDone();
-        return true;
+        for (Enemy enemy : worldManager.getEnemies()) {
+            if (!enemy.isDestroyed()) {
+                return false;
+            }
+        }
+        return worldManager.spawnersAreDone();
     }
 
     private float getCameraX() {

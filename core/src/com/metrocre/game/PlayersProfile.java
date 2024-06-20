@@ -155,9 +155,9 @@ public class PlayersProfile {
             case Railgun:
                 return 200;
             case HealTower:
-                return 0;
+                return 150;
             case GunTower:
-                return 0;
+                return 100;
         }
         return 0;
     }
