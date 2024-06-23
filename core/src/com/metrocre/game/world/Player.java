@@ -9,13 +9,15 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.PlayersProfile;
-import com.metrocre.game.towers.Tower;
-import com.metrocre.game.wepons.Weapon;
+import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.weapons.Pistol;
+import com.metrocre.game.weapons.Railgun;
+import com.metrocre.game.weapons.Weapon;
 
 public class Player extends Entity {
     public static final float SIZE = SCALE;
 
-    private Weapon weapon;
+    private Weapon weapon = null;
     private int speed;
     private final PlayersProfile playersProfile;
     private int health;
@@ -24,6 +26,7 @@ public class Player extends Entity {
     private float damageTime;
     private static final float DAMAGE_DISPLAY_DURATION = 0.5f;
     private Sprite sprite;
+
     private int healthFromDefence(){
         int health = 100;
         for (int i = 1; i < playersProfile.getDefence(); i++) {
@@ -31,8 +34,9 @@ public class Player extends Entity {
         }
         return health;
     }
-    public Player(float x, float y, WorldManager worldManager, PlayersProfile playersProfile) {
-        super(worldManager, worldManager.getTexture("player"), SIZE, SIZE);
+
+    public Player(float x, float y, WorldManager worldManager, PlayersProfile playersProfile, Texture texture) {
+        super(worldManager, texture, SIZE, SIZE);
         this.playersProfile = playersProfile;
         speed = playersProfile.getSpeed()*10;
         health = healthFromDefence();
@@ -91,19 +95,40 @@ public class Player extends Entity {
                 sprite.setColor(Color.WHITE);
             }
         }
-        weapon.update(delta);
+        if (weapon != null) {
+            weapon.update(delta);
+        }
     }
 
     @Override
     public void draw(SpriteBatch batch) {
         super.draw(batch);
-        weapon.draw(batch);
+        if (weapon != null) {
+            weapon.draw(batch);
+        }
     }
 
     public int getHealth() {
         return health;
     }
+
     public int getMoney() {
         return playersProfile.getMoney();
+    }
+
+    public void equipWeapon(int weaponId) {
+        if (weaponId == 1) {
+            setWeapon(new Pistol(this, worldManager.getProjectileManager(), new Texture("pistol.png"),
+                    0.6F * SCALE, 0.4F * SCALE));
+        } else if (weaponId == 2) {
+            setWeapon(new Railgun(this, worldManager.getProjectileManager(), new Texture("railgun.png"),
+                    0.6F * SCALE, 0.4F * SCALE));
+        }
+        if (worldManager.getServer() != null) {
+            WorldEvents.EquipWeapon equipWeapon = new WorldEvents.EquipWeapon();
+            equipWeapon.playerId = id;
+            equipWeapon.weaponId = weaponId;
+            worldManager.getServer().packToSend(equipWeapon);
+        }
     }
 }

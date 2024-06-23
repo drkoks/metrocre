@@ -1,4 +1,4 @@
-package com.metrocre.game.wepons;
+package com.metrocre.game.weapons;
 
 import static com.metrocre.game.MyGame.SCALE;
 
@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.metrocre.game.world.Entity;
-import com.metrocre.game.world.Player;
 import com.metrocre.game.world.WorldManager;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
@@ -16,9 +15,9 @@ public class Projectile extends Entity {
     public static final float SIZE = (float) SCALE / 8;
 
     private float damage;
-    private Entity sender;
+    private int sender;
 
-    public Projectile(Vector2 position, Vector2 direction, float damage, float speed, WorldManager worldManager, Texture texture, Entity sender) {
+    public Projectile(Vector2 position, Vector2 direction, float damage, float speed, WorldManager worldManager, Texture texture, int senderId) {
         super(worldManager, texture);
         this.damage = damage;
         this.sender = sender;
@@ -46,7 +45,7 @@ public class Projectile extends Entity {
         return damage;
     }
 
-    public Entity getSender() {
+    public int getSenderId() {
         return sender;
     }
 }

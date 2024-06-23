@@ -30,14 +30,14 @@ public class Enemy extends Entity {
 
 
     public void update(float deltaTime) {
-        Player player = worldManager.getPlayer();
+        /*Player player = worldManager.getPlayer();
         cooldown = max(cooldown - deltaTime, 0);
         if (player != null && isPlayerInRange(player)) {
             attackPlayer(player);
-        }
+        }*/
     }
 
-    public void takeDamage(float damage, Entity sender) {
+    public void takeDamage(float damage, int senderId) {
         if (health == 0) {
             return;
         }
@@ -45,6 +45,7 @@ public class Enemy extends Entity {
         if (health == 0) {
             destroy();
             Player player = null;
+            Entity sender = worldManager.getEntity(senderId);
             if (sender instanceof Player) {
                 player = (Player) sender;
             } else if (sender instanceof Tower) {

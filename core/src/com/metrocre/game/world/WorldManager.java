@@ -1,6 +1,8 @@
 package com.metrocre.game.world;
 
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
+import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -18,11 +20,12 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.IntMap;
+import com.metrocre.game.network.GameServer;
 import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.ProjectileHitEventData;
 import com.metrocre.game.event.world.ProjectileHitEventHandler;
 import com.metrocre.game.event.world.RailHitEventHandler;
-import com.metrocre.game.wepons.Projectile;
+import com.metrocre.game.weapons.Projectile;
 import com.metrocre.game.world.enemies.Enemy;
 
 import java.util.ArrayList;
@@ -32,19 +35,38 @@ import java.util.List;
 import java.util.Map;
 
 public class WorldManager {
-    private final World world;
-    private Player player;
-    private final MessageDispatcher messageDispatcher = new MessageDispatcher();
+    private GameServer server;
+    private World world;
+    private MessageDispatcher messageDispatcher = new MessageDispatcher();
     private IntMap<Entity> entities = new IntMap<>();
     private Map<String, Texture> textures = new HashMap<>();
     private ProjectileManager projectileManager = new ProjectileManager(this);
     private ProjectileHitEventHandler projectileHitEventHandler = new ProjectileHitEventHandler();
     private RailHitEventHandler railHitEventHandler = new RailHitEventHandler();
+    private Entity lastAddedEntity;
+    private int entityCnt = 0;
 
-    public WorldManager(World world) {
+    public WorldManager(World world, GameServer server) {
         this.world = world;
+        this.server = server;
+
         messageDispatcher.addListener(projectileHitEventHandler, WorldEvents.PROJECTILE_HIT);
         messageDispatcher.addListener(railHitEventHandler, WorldEvents.RAIL_HIT);
+
+        messageDispatcher.addListener(new AddEntityHandler(this, server), WorldEvents.AddEntity.ID);
+        messageDispatcher.addListener(new Telegraph(){
+            @Override
+            public boolean handleMessage(Telegram msg) {
+                WorldEvents.EquipWeapon equipWeapon = (WorldEvents.EquipWeapon) msg.extraInfo;
+                Player player = (Player) getEntity(equipWeapon.playerId);
+                player.equipWeapon(equipWeapon.weaponId);
+                if (server != null) {
+                    server.packToSend(equipWeapon);
+                }
+                return true;
+            }
+        }, WorldEvents.EquipWeapon.ID);
+
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
@@ -98,23 +120,36 @@ public class WorldManager {
         projectileManager.update(delta);
         for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
             Entity entity = it.next().value;
+            entity.update(delta);
+        }
+        processDestroyed();
+    }
+
+    public void processDestroyed() {
+        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
+            Entity entity = it.next().value;
             if (entity.isDestroyed()) {
                 world.destroyBody(entity.getBody());
                 it.remove();
             }
-            entity.update(delta);
         }
     }
 
     public void addEntity(Entity entity) {
-        if (entity instanceof Player) {
-            this.player = (Player) entity;
-        }
+        lastAddedEntity = entity;
         entities.put(entity.getId(), entity);
     }
 
-    public Player getPlayer() {
-        return player;
+    public int nextEntityCnt() {
+        return entityCnt++;
+    }
+
+    public Entity getLastAddedEntity() {
+        return lastAddedEntity;
+    }
+
+    public void removeEntity(int id) {
+        entities.remove(id);
     }
 
     public List<Enemy> getEnemies() {
@@ -125,6 +160,26 @@ public class WorldManager {
             }
         }
         return enemies;
+    }
+
+    public List<Entity> getEntities() {
+        List<Entity> res = new ArrayList<>();
+        for (Entity entity : entities.values()) {
+            res.add(entity);
+        }
+        return res;
+    }
+
+    public Entity getEntity(int id) {
+        return entities.get(id);
+    }
+
+    public void addTexture(Texture texture, String name) {
+        textures.put(name, texture);
+    }
+
+    public Texture getTexture(String name) {
+        return textures.get(name);
     }
 
     public void drawWorld(SpriteBatch batch) {
@@ -228,11 +283,40 @@ public class WorldManager {
         projectileManager.dispose();
     }
 
+    private static class AddEntityHandler implements Telegraph {
+        private WorldManager worldManager;
+        private GameServer server;
 
-    public void addTexture(Texture texture, String name) {
-        textures.put(name, texture);
+        public AddEntityHandler(WorldManager worldManager, GameServer server) {
+            this.worldManager = worldManager;
+            this.server = server;
+        }
+
+        @Override
+        public boolean handleMessage(Telegram msg) {
+            System.out.println("Handling AddEntity");
+            WorldEvents.AddEntity addEntity = (WorldEvents.AddEntity) msg.extraInfo;
+            Entity entity = null;
+            if (addEntity.type == EntityType.Player) {
+                EntityData.PlayerData data = (EntityData.PlayerData) addEntity.data;
+                entity = new Player(data.x, data.y, worldManager, data.profile, new Texture("avatar.png"));
+            } else if (addEntity.type == EntityType.Enemy) {
+                EntityData.EnemyData data = (EntityData.EnemyData) addEntity.data;
+                entity = new Enemy(data.x, data.y, data.health, data.reward, data.attackPower, data.attackRange, worldManager, data.enemyKind);
+            } else if (addEntity.type == EntityType.Projectile) {
+                EntityData.ProjectileData data = (EntityData.ProjectileData) addEntity.data;
+                entity = new Projectile(data.position, data.direction, data.damage, data.speed, worldManager, new Texture("bullet.png"), data.senderId);
+            }
+            if (server != null) {
+                System.out.println("AddEntity send");
+                server.packToSend(addEntity);
+            }
+            worldManager.addEntity(entity);
+            return true;
+        }
     }
-    public Texture getTexture(String name) {
-        return textures.get(name);
+
+    public GameServer getServer() {
+        return server;
     }
 }

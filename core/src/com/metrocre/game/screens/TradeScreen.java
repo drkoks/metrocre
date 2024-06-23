@@ -46,10 +46,10 @@ public class TradeScreen extends ScreenAdapter {
         Label titleLabel = new Label("TradeCenter", skin);
         titleLabel.setSize(100, 50);
         titleLabel.setPosition((float) MyGame.WIDTH / 2 - 40, MyGame.HEIGHT - 50);
-        coinsLabel = new Label("Coins: " + game.playersProfile.getMoney(), skin);
-        speedLevelLabel = new Label("Speed Level: " + game.playersProfile.getSpeed(), skin);
-        defenseLevelLabel = new Label("Defense Level: " + game.playersProfile.getDefence(), skin);
-        attackLevelLabel = new Label("Attack Level: " + game.playersProfile.getAttack(), skin);
+//        coinsLabel = new Label("Coins: " + game.playersProfile.getMoney(), skin);
+//        speedLevelLabel = new Label("Speed Level: " + game.playersProfile.getSpeed(), skin);
+//        defenseLevelLabel = new Label("Defense Level: " + game.playersProfile.getDefence(), skin);
+//        attackLevelLabel = new Label("Attack Level: " + game.playersProfile.getAttack(), skin);
 
         Label itemInfo = new Label("", skin);
 
@@ -63,8 +63,8 @@ public class TradeScreen extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
-                itemInfo.setText("+ 20% to " + selectedItem.toString() + " cost " +
-                        100 * game.playersProfile.getSelectedItem(selectedItem) + " coins");
+//                itemInfo.setText("+ 20% to " + selectedItem.toString() + " cost " +
+//                        100 * game.playersProfile.getSelectedItem(selectedItem) + " coins");
             }
         });
 
@@ -72,15 +72,15 @@ public class TradeScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
-                if (game.playersProfile.canBuyItem(selectedItem)) {
-                    BuyEventData buyEventData = new BuyEventData();
-                    buyEventData.upgrade = selectedItem;
-                    game.getMessageDispatcher().dispatchMessage(TradeEvents.BUY, buyEventData);
-                    itemInfo.setText(selectedItem + " purchased.");
-                    updateLabels();
-                } else {
-                    itemInfo.setText("Not enough coins.");
-                }
+//                if (game.playersProfile.canBuyItem(selectedItem)) {
+//                    BuyEventData buyEventData = new BuyEventData();
+//                    buyEventData.upgrade = selectedItem;
+//                    game.getMessageDispatcher().dispatchMessage(TradeEvents.BUY, buyEventData);
+//                    itemInfo.setText(selectedItem + " purchased.");
+//                    updateLabels();
+//                } else {
+//                    itemInfo.setText("Not enough coins.");
+//                }
             }
         });
 
@@ -143,9 +143,9 @@ public class TradeScreen extends ScreenAdapter {
         batch.dispose();
     }
     private void updateLabels() {
-        coinsLabel.setText("Coins: " + game.playersProfile.getMoney());
-        speedLevelLabel.setText("Speed Level: " + game.playersProfile.getSpeed());
-        defenseLevelLabel.setText("Defense Level: " + game.playersProfile.getDefence());
-        attackLevelLabel.setText("Attack Level: " + game.playersProfile.getAttack());
+//        coinsLabel.setText("Coins: " + game.playersProfile.getMoney());
+//        speedLevelLabel.setText("Speed Level: " + game.playersProfile.getSpeed());
+//        defenseLevelLabel.setText("Defense Level: " + game.playersProfile.getDefence());
+//        attackLevelLabel.setText("Attack Level: " + game.playersProfile.getAttack());
     }
 }

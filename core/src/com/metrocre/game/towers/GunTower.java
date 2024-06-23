@@ -6,7 +6,7 @@ import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.RayCastResult;
 import com.metrocre.game.world.WorldManager;
-import com.metrocre.game.wepons.Pistol;
+import com.metrocre.game.weapons.Pistol;
 
 import java.util.List;
 
@@ -14,8 +14,8 @@ public class GunTower extends Tower {
     private Pistol gun;
     private float detectRadius;
 
-    public GunTower(float x, float y, float health, float detectRadius, WorldManager worldManager, Player player, String texture) {
-        super(x, y, health, worldManager, player, worldManager.getTexture(texture));
+    public GunTower(float x, float y, float health, float detectRadius, WorldManager worldManager, Player player, Texture texture) {
+        super(x, y, health, worldManager, player, texture);
         gun = new Pistol(this, worldManager.getProjectileManager(), null);
         this.detectRadius = detectRadius;
     }

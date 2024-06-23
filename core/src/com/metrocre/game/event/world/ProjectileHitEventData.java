@@ -1,6 +1,6 @@
 package com.metrocre.game.event.world;
 
-import com.metrocre.game.wepons.Projectile;
+import com.metrocre.game.weapons.Projectile;
 
 public class ProjectileHitEventData {
     public Projectile projectile;

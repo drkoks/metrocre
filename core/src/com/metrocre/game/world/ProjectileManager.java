@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.RailHitEventData;
-import com.metrocre.game.wepons.Projectile;
-import com.metrocre.game.wepons.Rail;
+import com.metrocre.game.weapons.Projectile;
+import com.metrocre.game.weapons.Rail;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -56,7 +56,7 @@ public class ProjectileManager {
 
     public void createRail(Vector2 position, Vector2 direction, float len, float damage, Entity owner) {
         RayCastResult rayCastResult = worldManager.castRay(position.cpy(), position.cpy().add(direction.scl(len)));
-        Rail rail = new Rail(position.cpy(), rayCastResult.hitPoint, damage, owner);
+        Rail rail = new Rail(position.cpy(), rayCastResult.hitPoint, damage, owner.getId());
         rails.add(rail);
         for (int i = 0; i < rayCastResult.fractions.size(); i++) {
             if (rayCastResult.fractions.get(i) < rayCastResult.hitPointFraction) {
@@ -69,8 +69,18 @@ public class ProjectileManager {
     }
 
     public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Entity owner) {
-        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager, bulletTexture, owner);
-        worldManager.addEntity(bullet);
+        EntityData.ProjectileData projectileData = new EntityData.ProjectileData();
+        projectileData.position = position;
+        projectileData.direction = direction;
+        projectileData.speed = speed;
+        projectileData.damage = damage;
+        projectileData.senderId = owner.getId();
+
+        WorldEvents.AddEntity addEntity = new WorldEvents.AddEntity();
+        addEntity.type = EntityType.Projectile;
+        addEntity.data = projectileData;
+
+        worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.AddEntity.ID, addEntity);
     }
 
     public void dispose() {

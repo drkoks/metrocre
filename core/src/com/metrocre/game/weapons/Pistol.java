@@ -1,4 +1,4 @@
-package com.metrocre.game.wepons;
+package com.metrocre.game.weapons;
 
 import static com.metrocre.game.MyGame.SCALE;
 
@@ -14,8 +14,8 @@ public class Pistol extends Weapon {
     public Pistol(Entity owner, ProjectileManager projectileManager, Texture texture) {
         super(owner, 0.3f, projectileManager, texture);
     }
-    public Pistol(Player player, ProjectileManager projectileManager, Texture texture, float width, float height) {
-        super(player, 0.3f, projectileManager, texture, width, height);
+    public Pistol(Entity owner, ProjectileManager projectileManager, Texture texture, float width, float height) {
+        super(owner, 0.3f, projectileManager, texture, width, height);
     }
 
     @Override

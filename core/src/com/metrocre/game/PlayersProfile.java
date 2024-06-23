@@ -1,9 +1,7 @@
 package com.metrocre.game;
 
-import com.badlogic.gdx.graphics.Texture;
-
 public class PlayersProfile {
-    private final String name;
+    private String name;
 
     private int level;
     private int experience;
@@ -11,6 +9,8 @@ public class PlayersProfile {
     private int speedLevel;
     private int defenceLevel;
     private int attackLevel;
+
+    public PlayersProfile() {}
 
     public PlayersProfile(String name, int level, int experience, int money, int speedLevel, int defenceLevel, int attackLevel) {
         this.name = name;

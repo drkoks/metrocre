@@ -4,7 +4,7 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.metrocre.game.world.enemies.Enemy;
-import com.metrocre.game.wepons.Projectile;
+import com.metrocre.game.weapons.Projectile;
 
 public class ProjectileHitEventHandler implements Telegraph {
 
@@ -14,7 +14,7 @@ public class ProjectileHitEventHandler implements Telegraph {
         Projectile projectile = data.projectile;
         if (data.hittedObject instanceof Enemy) {
             Enemy enemy = (Enemy) data.hittedObject;
-            enemy.takeDamage(projectile.getDamage(), projectile.getSender());
+            enemy.takeDamage(projectile.getDamage(), projectile.getSenderId());
             projectile.destroy();
         } else if (data.hittedObject instanceof TiledMapTileLayer.Cell) {
             projectile.destroy();

@@ -14,8 +14,10 @@ public class HUD {
     public HUD(Player player, Stage stage, Skin skin) {
         this.player = player;
         this.stage = stage;
-        healthLabel = new Label("Health: " + player.getHealth(), skin);
-        coinsLabel = new Label("Coins: " + player.getMoney(), skin);
+        if (player != null) {
+            healthLabel = new Label("Health: " + player.getHealth(), skin);
+            coinsLabel = new Label("Coins: " + player.getMoney(), skin);
+        }
 
         Table table = new Table();
         table.top();
@@ -30,8 +32,10 @@ public class HUD {
     }
 
     public void update() {
-        healthLabel.setText("Health: " + player.getHealth());
-        coinsLabel.setText("Coins: " + player.getMoney());
+        if (player != null) {
+            healthLabel.setText("Health: " + player.getHealth());
+            coinsLabel.setText("Coins: " + player.getMoney());
+        }
     }
 
     public void dispose() {

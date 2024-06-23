@@ -1,4 +1,4 @@
-package com.metrocre.game.wepons;
+package com.metrocre.game.weapons;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -11,6 +11,10 @@ public class Railgun extends Weapon {
 
     public Railgun(Entity owner, ProjectileManager projectileManager, Texture texture) {
         super(owner, 0, projectileManager, texture);
+    }
+
+    public Railgun(Entity owner, ProjectileManager projectileManager, Texture texture, float width, float height) {
+        super(owner, 0, projectileManager, texture, width, height);
     }
 
     @Override
