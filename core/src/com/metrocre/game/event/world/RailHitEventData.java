@@ -1,6 +1,6 @@
 package com.metrocre.game.event.world;
 
-import com.metrocre.game.wepons.Rail;
+import com.metrocre.game.weapons.Rail;
 
 public class RailHitEventData {
     public Rail rail;

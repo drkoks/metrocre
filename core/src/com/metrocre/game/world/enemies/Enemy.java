@@ -4,37 +4,85 @@ import static com.metrocre.game.MyGame.SCALE;
 import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.towers.Tower;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
+import com.metrocre.game.world.RayCastResult;
 import com.metrocre.game.world.WorldManager;
 
-public class Enemy extends Entity {
-    public static final float SIZE = SCALE;
-    private float health;
-    private int reward;
-    private float attackPower;
-    private float attackRange;
-    protected float cooldown = 0;
+import java.util.List;
 
-    public Enemy(float x, float y, float health, int reward, float attackPower, float attackRange, WorldManager worldManager, String enemyKind) {
+import states.EnemyState;
+
+public abstract class Enemy extends Entity {
+    public static final float SIZE = SCALE;
+    protected float health;
+    protected int reward;
+    protected float attackPower;
+    protected float attackRange;
+    protected float detectionRange;
+    protected float cooldown = 0;
+    protected Player targetPlayer;
+    float speed = 20.0f;
+    private Vector2 position;
+
+    public Enemy(float x, float y, float health, int reward, float attackPower, float attackRange, float detectionRange, WorldManager worldManager, String enemyKind) {
         super(worldManager, worldManager.getTexture(enemyKind), SIZE, SIZE);
         this.attackPower = attackPower;
+        this.detectionRange = detectionRange;
         this.attackRange = attackRange;
         this.health = health;
         this.reward = reward;
+        this.position = new Vector2();
         body = worldManager.createCircleBody(x, y, SIZE / 2, false, false, this);
     }
 
 
-
     public void update(float deltaTime) {
-        Player player = worldManager.getPlayer();
-        cooldown = max(cooldown - deltaTime, 0);
-        if (player != null && isPlayerInRange(player)) {
-            attackPlayer(player);
+        targetPlayer = getTarget();
+        if (targetPlayer == null) {
+            patrol();
+            return;
         }
+        cooldown = max(cooldown - deltaTime, 0);
+        moveTowardsPlayer();
+        if (isPlayerInRange(targetPlayer)) {
+            attackPlayer(targetPlayer);
+        }
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
+    private Player getTarget() {
+        List<Entity> entitiesInRadius = worldManager.getEntitiesInRadius(body.getPosition(), detectionRange);
+        Player target = null;
+        float distance = detectionRange;
+        for (Entity entity : entitiesInRadius) {
+            float thisDistance = entity.getBody().getPosition().cpy().sub(body.getPosition()).len();
+            if (!(entity instanceof Player) || thisDistance > distance) {
+                continue;
+            }
+            RayCastResult rayCastResult = worldManager.castRay(body.getPosition(), entity.getBody().getPosition());
+            if (rayCastResult.hitPointFraction == 1) {
+                target = (Player) entity;
+                distance = thisDistance;
+            }
+        }
+        return target;
+    }
+
+    private void patrol() {
+        body.setLinearVelocity(Vector2.Zero);
+    }
+
+    private void moveTowardsPlayer() {
+        Vector2 playerPosition = targetPlayer.getPosition();
+        Vector2 direction = new Vector2(playerPosition).sub(this.body.getPosition()).nor();
+
+        body.setLinearVelocity(direction.scl(5 + (speed - 1) * 2));
     }
 
     public void takeDamage(float damage, Entity sender) {
@@ -51,6 +99,7 @@ public class Enemy extends Entity {
                 player = ((Tower) sender).getPlayer();
             }
             if (player != null) {
+                player.getPlayersProfile().reportKill(this);
                 player.addMoney(reward);
             }
         }
@@ -62,11 +111,13 @@ public class Enemy extends Entity {
         return distance <= attackRange;
     }
 
-    private void attackPlayer(Player player) {
-        if (cooldown > 0) {
-            return;
-        }
-        cooldown = 1f;
-        player.takeDamage(attackPower, this);
+
+
+    public float getAttack() {
+        return attackPower;
     }
+
+    protected abstract void attackPlayer(Player player);
+
+    abstract public String getCoolName();
 }

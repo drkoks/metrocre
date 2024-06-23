@@ -6,11 +6,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.RailHitEventData;
-import com.metrocre.game.wepons.Projectile;
-import com.metrocre.game.wepons.Rail;
+import com.metrocre.game.towers.Tower;
+import com.metrocre.game.weapons.Projectile;
+import com.metrocre.game.weapons.Rail;
+import com.metrocre.game.world.enemies.Enemy;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,7 +27,9 @@ public class ProjectileManager {
     private final WorldManager worldManager;
     private final Texture texture;
     private final TextureRegion region;
-    private final Texture bulletTexture = new Texture("bullet.png");
+    private final Texture friedlyBulletTexture = new Texture("bullet.png");
+    private final Texture enemyBulletTexture = new Texture("bulletEnemy.png");
+    private final Texture healBulletTexture = new Texture("healBullet.png");
 
     public ProjectileManager(WorldManager worldManager) {
         this.worldManager = worldManager;
@@ -68,8 +74,10 @@ public class ProjectileManager {
         }
     }
 
-    public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Entity owner) {
-        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager, bulletTexture, owner);
+    public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Entity owner, boolean isHeal) {
+        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager,
+                isHeal ? healBulletTexture : owner instanceof Enemy ? enemyBulletTexture : friedlyBulletTexture, owner, isHeal);
+
         worldManager.addEntity(bullet);
     }
 

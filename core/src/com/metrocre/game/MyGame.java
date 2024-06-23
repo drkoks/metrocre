@@ -9,6 +9,7 @@ import com.metrocre.game.screens.MainMenuScreen;
 
 public class MyGame extends Game {
     public static final int WIDTH = 800;
+    private static int levelCounter = 0;
     public static final int HEIGHT = 480;
     public static final int SCALE = 15;
     public static final float UNIT_SCALE = SCALE / 32f;
@@ -22,6 +23,12 @@ public class MyGame extends Game {
 
     public float getVolume() {
         return volume;
+    }
+    public void increaseCounter(){
+        levelCounter++;
+    }
+    public boolean isWin(){
+        return levelCounter >= 5;
     }
 
     public void setVolume(float volume) {
@@ -53,5 +60,9 @@ public class MyGame extends Game {
     @Override
     public void dispose() {
         super.dispose();
+    }
+
+    public void resetCounter() {
+        levelCounter = 0;
     }
 }

@@ -1,4 +1,4 @@
-package com.metrocre.game.wepons;
+package com.metrocre.game.weapons;
 
 import static java.lang.Math.max;
 
@@ -7,9 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.world.Entity;
-import com.metrocre.game.world.Player;
 import com.metrocre.game.world.ProjectileManager;
-import com.metrocre.game.world.WorldManager;
 
 public abstract class Weapon {
     protected float fireRate;
@@ -18,6 +16,7 @@ public abstract class Weapon {
     protected Entity owner;
     protected float width = -1;
     protected float height = -1;
+    protected int level = 1;
     protected ProjectileManager projectileManager;
 
     public Weapon(Entity holder, float fireRate, ProjectileManager projectileManager, Texture texture) {
@@ -26,10 +25,11 @@ public abstract class Weapon {
         this.projectileManager = projectileManager;
         this.texture = texture;
     }
-    public Weapon(Entity holder, float fireRate, ProjectileManager projectileManager, Texture texture, float width, float height) {
+    public Weapon(Entity holder, float fireRate, ProjectileManager projectileManager, Texture texture, float width, float height, int level) {
         this(holder, fireRate, projectileManager, texture);
         this.width = width;
         this.height = height;
+        this.level = level;
     }
 
     public abstract boolean shoot(Vector2 direction);

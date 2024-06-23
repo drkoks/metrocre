@@ -22,17 +22,29 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.metrocre.game.towers.GunTower;
-import com.metrocre.game.wepons.Pistol;
-import com.metrocre.game.world.HUD;
-import com.metrocre.game.controller.Joystick;
 import com.metrocre.game.Map;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.controller.Joystick;
+import com.metrocre.game.towers.HealTower;
+import com.metrocre.game.towers.TowerPlace;
+import com.metrocre.game.weapons.Pistol;
+import com.metrocre.game.world.HUD;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.Train;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.enemies.Enemy1;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Random;
+
+import states.EnemyState;
+import states.GameState;
+import states.SpawnerState;
 
 public class GameScreen implements Screen {
     private final Music backgroundMusic;
@@ -46,13 +58,12 @@ public class GameScreen implements Screen {
     private final Joystick moveJoystick;
     private final Joystick attackJoystick;
     private final TextButton nextLevelButton;
+    private final TextButton shopButton;
     private final HUD hud;
-    public void addTexture(WorldManager worldManager) {
-        worldManager.addTexture(new Texture("avatar.png"), "player");
-        worldManager.addTexture(new Texture("enemy.png"), "enemy1");
-        worldManager.addTexture(new Texture("guntower.png"), "gunTower");
-    }
-    public GameScreen(MyGame game) {
+
+
+    public GameScreen(MyGame game, GameState gameState) {
+
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
         batch = new SpriteBatch();
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
@@ -60,33 +71,63 @@ public class GameScreen implements Screen {
         backgroundMusic.play();
         backgroundMusic.setVolume(game.getVolume());
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 16*SCALE, 9*SCALE);
+        camera.setToOrtho(false, 16 * SCALE, 9 * SCALE);
         worldManager = new WorldManager(new World(new Vector2(0, 0), false));
         addTexture(worldManager);
         Box2DDebugRenderer b2ddr = new Box2DDebugRenderer();
-        player = new Player(6*SCALE, SCALE, worldManager, game.playersProfile);
-        //player.setWeapon(new Railgun(player, worldManager.getProjectileManager(), new Texture("railgun.png")));
-        player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"), 0.6F*SCALE, 0.4F*SCALE));
-        map = new Map(worldManager);
-        stage = new Stage(new StretchViewport(16*SCALE, 9*SCALE));
+        if (gameState == null) {
+            game.increaseCounter();
+            player = new Player(6 * SCALE, SCALE, worldManager, game.playersProfile);
+            worldManager.addEntity(player);
+            player.setWeapon(new Pistol(player, worldManager.getProjectileManager(), new Texture("pistol.png"),
+                    0.6F * SCALE, 0.4F * SCALE, game.playersProfile.getWeaponLevel()));
+            Random rand = new Random();
+            int randomNumber = rand.nextInt(5) + 1;
+            map = new Map(worldManager, randomNumber, true);
+
+        } else {
+            player = new Player(gameState.getPlayerState(), worldManager, game.playersProfile);
+            worldManager.addEntity(player);
+            for (EnemyState enemyStates : gameState.getEnemyStates()) {
+                worldManager.addEntity(enemyStates.getEnemyFromState(worldManager));
+            }
+            for (SpawnerState spawnerState : gameState.getSpawnersStates()) {
+                worldManager.addSpawner(spawnerState.getSpawnerFromState(worldManager));
+            }
+            for (TowerPlace healTower : gameState.getHealTowerPlaces()) {
+                worldManager.addTowerPlace(healTower);
+            }
+            for (TowerPlace gunTower : gameState.getGunTowerPlaces()) {
+                worldManager.addTowerPlace(gunTower);
+            }
+            map = new Map(worldManager, gameState.getMapState().getMapID(), false);
+        }
+
+        worldManager.buildTowers(game.playersProfile.getHealTowers(), game.playersProfile.getGunTowers());
+        game.playersProfile.resetAfterLevel();
+
+        stage = new Stage(new StretchViewport(16 * SCALE, 9 * SCALE));
         hud = new HUD(player, stage, skin);
-        moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6*SCALE, 6*SCALE, 0, true);
+
+        moveJoystick = new Joystick(new Texture("joystick.png"),
+                0, 0, 6 * SCALE, 6 * SCALE, 0, true);
+
         stage.addActor(moveJoystick);
-        attackJoystick = new Joystick(new Texture("joystick.png"), 10*SCALE, 0, 6*SCALE, 6*SCALE, 0.5f, false);
+
+        attackJoystick = new Joystick(new Texture("joystick.png"),
+                10 * SCALE, 0, 6 * SCALE, 6 * SCALE, 0.5f, false);
+
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
-        worldManager.addEntity(new Enemy1(12*SCALE, 6*SCALE, worldManager));
-        worldManager.addEntity(new Enemy1(14*SCALE, 6*SCALE,  worldManager));
-        worldManager.addEntity(new Enemy1(14*SCALE, 7*SCALE, worldManager));
-        worldManager.addEntity(player);
-        worldManager.addEntity(new GunTower(6.5f*SCALE, 5.9f*SCALE, 5, 10*SCALE, worldManager, player, "gunTower"));
 
-        train = new Train(SCALE, 0, worldManager, new Texture("data/empty.png"), 3*SCALE, map.getHeight());
+
+
+        train = new Train(SCALE, 0, worldManager, new Texture("data/empty.png"), 3 * SCALE, map.getHeight());
         worldManager.addEntity(train);
         nextLevelButton = new TextButton("", skin, "next");
         nextLevelButton.setVisible(false);
-        nextLevelButton.setSize(4*SCALE, 4*SCALE);
-        nextLevelButton.setPosition(stage.getWidth()-nextLevelButton.getWidth(), 0);
+        nextLevelButton.setSize(4 * SCALE, 4 * SCALE);
+        nextLevelButton.setPosition(stage.getWidth() - nextLevelButton.getWidth(), 0);
         nextLevelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -96,6 +137,52 @@ public class GameScreen implements Screen {
         });
         stage.addActor(nextLevelButton);
 
+        shopButton = new TextButton("", skin, "market");
+        shopButton.setSize(2 * SCALE, 2 * SCALE);
+        shopButton.setPosition(stage.getWidth() - shopButton.getWidth(), stage.getHeight() - shopButton.getHeight());
+        shopButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                backgroundMusic.stop();
+                saveGameState();
+                game.setScreen(new ShopScreen(game));
+            }
+        });
+        stage.addActor(shopButton);
+
+    }
+
+    public GameScreen(MyGame game) {
+        this(game, null);
+    }
+
+    public static GameScreen loadGameState(MyGame game) {
+        try {
+            FileInputStream fileIn = new FileInputStream("gamestate.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            GameState gameState = (GameState) in.readObject();
+            in.close();
+            fileIn.close();
+            return new GameScreen(game, gameState);
+        } catch (IOException i) {
+            i.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            System.out.println("GameState class not found");
+            c.printStackTrace();
+        }
+        return new GameScreen(game);
+    }
+
+    public void addTexture(WorldManager worldManager) {
+        worldManager.addTexture(new Texture("avatar.png"), "player");
+        worldManager.addTexture(new Texture("enemies/enemy.png"), "enemy1");
+        worldManager.addTexture(new Texture("enemies/enemy2.png"), "enemy2");
+        worldManager.addTexture(new Texture("guntower.png"), "gunTower");
+        worldManager.addTexture(new Texture("healTower.png"), "healTower");
+    }
+
+    private void commonSetup() {
+
     }
 
     @Override
@@ -104,26 +191,42 @@ public class GameScreen implements Screen {
     }
 
     private boolean isAbleToFinishLevel() {
-        for (Enemy enemy : worldManager.getEnemies()){
+        for (Enemy enemy : worldManager.getEnemies()) {
             if (!enemy.isDestroyed()) {
                 return false;
             }
         }
-        return true;
+        return worldManager.spawnersAreDone();
     }
 
+    private float getCameraX() {
+        return min(max(player.getX(), 8 * SCALE), map.getWidth() - 8 * SCALE);
+    }
 
-    private float getCameraX(){
-        return min(max(player.getX(), 8*SCALE), map.getWidth() - 8*SCALE);
+    private float getCameraY() {
+        return min(max(player.getY(), 4.5F * SCALE), map.getHeight() - 4.5F * SCALE);
     }
-    private float getCameraY(){
-        return min(max(player.getY(), 4.5F*SCALE), map.getHeight() - 4.5F*SCALE);
+    private boolean isVictory() {
+        return  ((MyGame) Gdx.app.getApplicationListener()).isWin();
     }
+
     @Override
     public void render(float delta) {
+        if (isVictory()){
+            backgroundMusic.stop();
+            MyGame game = (MyGame) Gdx.app.getApplicationListener();
+            game.resetCounter();
+            game.setScreen(new GameOverScreen(game, true));
+        }
+        if (player.isDestroyed()) {
+            backgroundMusic.stop();
+            MyGame game = (MyGame) Gdx.app.getApplicationListener();
+            game.resetCounter();
+            game.setScreen(new GameOverScreen(game, false));
+        }
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        ScreenUtils.clear(1, 1, 1, 1);
+        ScreenUtils.clear(0.2f, 0.2f, 0.2f, 1);
 
         camera.position.set(getCameraX(), getCameraY(), 0);
         camera.update();
@@ -179,5 +282,17 @@ public class GameScreen implements Screen {
         hud.dispose();
         worldManager.dispose();
         stage.dispose();
+    }
+
+    public void saveGameState() {
+        try {
+            FileOutputStream fileOut = new FileOutputStream("gamestate.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(new GameState(player, worldManager, map));
+            out.close();
+            fileOut.close();
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
     }
 }

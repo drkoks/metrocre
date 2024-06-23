@@ -18,24 +18,36 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.IntMap;
-import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.ProjectileHitEventData;
 import com.metrocre.game.event.world.ProjectileHitEventHandler;
 import com.metrocre.game.event.world.RailHitEventHandler;
-import com.metrocre.game.wepons.Projectile;
+import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.towers.GunTower;
+import com.metrocre.game.towers.HealTower;
+import com.metrocre.game.towers.Tower;
+import com.metrocre.game.towers.TowerPlace;
+import com.metrocre.game.weapons.Projectile;
 import com.metrocre.game.world.enemies.Enemy;
+import com.metrocre.game.world.enemies.EnemySpawner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class WorldManager {
     private final World world;
-    private Player player;
     private final MessageDispatcher messageDispatcher = new MessageDispatcher();
+    private Player player;
     private IntMap<Entity> entities = new IntMap<>();
+
+    private Set<EnemySpawner> spawners = new HashSet<>();
+
+    private Set<TowerPlace> healPlaces = new HashSet<>();
+    private Set<TowerPlace> attackPlaces = new HashSet<>();
     private Map<String, Texture> textures = new HashMap<>();
     private ProjectileManager projectileManager = new ProjectileManager(this);
     private ProjectileHitEventHandler projectileHitEventHandler = new ProjectileHitEventHandler();
@@ -60,10 +72,22 @@ public class WorldManager {
                 }
                 if (data1 instanceof Projectile) {
                     Projectile bullet = (Projectile) data1;
+                    if (bullet.isHeal() && data2 instanceof Enemy) {
+                        return;
+                    }
+                    if (!bullet.isHeal()) {
+                        if (bullet.getSender() instanceof Enemy && data2 instanceof Enemy) {
+                            return;
+                        }
+                        if ((bullet.getSender() instanceof Tower || bullet.getSender() instanceof Player) && data2 instanceof Player) {
+                            return;
+                        }
+                    }
                     ProjectileHitEventData projectileHitEventData = new ProjectileHitEventData();
                     projectileHitEventData.projectile = bullet;
                     projectileHitEventData.hittedObject = data2;
                     messageDispatcher.dispatchMessage(WorldEvents.PROJECTILE_HIT, projectileHitEventData);
+
                 }
             }
 
@@ -89,20 +113,24 @@ public class WorldManager {
     }
 
 
-
     public ProjectileManager getProjectileManager() {
         return projectileManager;
     }
 
     public void update(float delta) {
         projectileManager.update(delta);
-        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
+        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext(); ) {
             Entity entity = it.next().value;
             if (entity.isDestroyed()) {
                 world.destroyBody(entity.getBody());
                 it.remove();
             }
             entity.update(delta);
+        }
+       for (EnemySpawner spawner : spawners) {
+           if (!spawner.isDestroyed()) {
+               spawner.update(delta);
+           }
         }
     }
 
@@ -112,6 +140,18 @@ public class WorldManager {
         }
         entities.put(entity.getId(), entity);
     }
+    public void addSpawner(EnemySpawner spawner) {
+        spawners.add(spawner);
+    }
+
+    public void addTowerPlace(TowerPlace towerPlace) {
+        if (towerPlace.getType() == 1) {
+            attackPlaces.add(towerPlace);
+        } else
+            healPlaces.add(towerPlace);
+    }
+
+
 
     public Player getPlayer() {
         return player;
@@ -125,6 +165,16 @@ public class WorldManager {
             }
         }
         return enemies;
+    }
+
+    public List<Projectile> getProjectiles() {
+        List<Projectile> projectiles = new ArrayList<>();
+        for (Entity entity : entities.values()) {
+            if (entity instanceof Projectile) {
+                projectiles.add((Projectile) entity);
+            }
+        }
+        return projectiles;
     }
 
     public void drawWorld(SpriteBatch batch) {
@@ -164,7 +214,7 @@ public class WorldManager {
         List<Entity> result = new ArrayList<>();
         world.QueryAABB(fixture -> {
             if (fixture.getBody().getPosition().cpy().sub(position).len() <= radius
-                && fixture.getBody().getUserData() instanceof Entity) {
+                    && fixture.getBody().getUserData() instanceof Entity) {
                 result.add((Entity) fixture.getBody().getUserData());
             }
             return true;
@@ -178,12 +228,16 @@ public class WorldManager {
         bd.fixedRotation = true;
         bd.position.set(new Vector2(x, y));
         bd.bullet = isBullet;
-        Body body = world.createBody(bd);
+        Body body;
+        try {
+            body = world.createBody(bd);
+        } catch (Exception e) {
+            return null;
+        }
         body.setUserData(userData);
 
         CircleShape shape = new CircleShape();
         shape.setRadius(radius);
-
         FixtureDef fd = new FixtureDef();
         fd.shape = shape;
         fd.friction = 0;
@@ -232,7 +286,61 @@ public class WorldManager {
     public void addTexture(Texture texture, String name) {
         textures.put(name, texture);
     }
+
     public Texture getTexture(String name) {
         return textures.get(name);
+    }
+    public void buildTowers(int healAmount, int GunAmount){
+        for (TowerPlace attackPlace : attackPlaces) {
+            if (attackPlace.isOccupied()) {
+                buildTower(attackPlace, 1);
+            }
+        }
+        for (TowerPlace healPlace : healPlaces) {
+            if (healPlace.isOccupied()) {
+                buildTower(healPlace, 2);
+            }
+        }
+        for (int i = 0; i < GunAmount; i++) {
+            for (TowerPlace attackPlace : attackPlaces) {
+                if (attackPlace.isOccupied()) {
+                    continue;
+                }
+                buildTower(attackPlace, 1);
+                break;
+            }
+        }
+        for (int i = 0; i < healAmount; i++) {
+            for (TowerPlace healPlace : healPlaces) {
+                if (healPlace.isOccupied()) {
+                    continue;
+                }
+                buildTower(healPlace, 2);
+                break;
+            }
+        }
+    }
+    private void buildTower(TowerPlace towerPlace, int type) {
+        towerPlace.placeTower(type, this);
+    }
+
+    public boolean spawnersAreDone() {
+        for (EnemySpawner spawner : spawners) {
+            if (!spawner.isDestroyed()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Set<EnemySpawner> getSpawners() {
+        return spawners;
+    }
+
+    public List<TowerPlace> getHealTowerPlaces() {
+        return new ArrayList<>(healPlaces);
+    }
+    public List<TowerPlace> getGunTowerPlaces() {
+        return new ArrayList<>(attackPlaces);
     }
 }
