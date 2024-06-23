@@ -1,3 +1,5 @@
+*.ser
+
 ## Java
 
 *.class
@@ -100,8 +102,6 @@ gradle-app.setting
 /desktop/build/
 /html/build/
 /ios/build/
-build.gradle
-settings.gradle
 
 ## OS Specific
 .DS_Store
