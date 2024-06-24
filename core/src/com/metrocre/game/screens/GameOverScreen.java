@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.network.Network;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +21,13 @@ import java.util.Map;
 import states.PlayerStat;
 
 public class GameOverScreen implements Screen {
+    public MyGame game;
     private final Stage stage;
     private Image img;
     private boolean isWin;
 
     public GameOverScreen(final MyGame game, boolean isWin) {
+        this.game = game;
         this.isWin = isWin;
         stage = new Stage(new ScreenViewport());
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
@@ -36,9 +39,9 @@ public class GameOverScreen implements Screen {
             img.setSize(300, 200);
         }
 
-        img.setPosition((float) (Gdx.graphics.getWidth() - img.getWidth()) / 2, Gdx.graphics.getHeight()- img.getHeight());
+        img.setPosition((Gdx.graphics.getWidth() - img.getWidth()) / 2, Gdx.graphics.getHeight() - img.getHeight());
 
-        PlayerStat stats  = game.playersProfile.getStatistics();
+        PlayerStat stats = game.localPlayerProfile.getStatistics();
         int y = Gdx.graphics.getHeight() - 200;
         Map<String, Integer> kills = new HashMap<>(stats.getKills());
         Label label = new Label("You defeted " + kills.size() + " different enemies, here is list:", skin);
@@ -53,11 +56,13 @@ public class GameOverScreen implements Screen {
         }
         TextButton backButton = new TextButton("Back to Main menu", skin);
         backButton.setSize(200, 30);
-        backButton.setPosition((float) (Gdx.graphics.getWidth()-backButton.getWidth()) /2, 50);
+        backButton.setPosition((Gdx.graphics.getWidth() - backButton.getWidth()) / 2, 50);
 
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.getClient().packToSend(new Network.PlayerReady());
+                game.getClient().sendAll();
                 game.setScreen(new MainMenuScreen(game));
             }
         });

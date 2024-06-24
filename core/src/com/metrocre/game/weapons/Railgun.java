@@ -8,7 +8,7 @@ import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.ProjectileManager;
 
 public class Railgun extends Weapon {
-    private final float range = 10*SCALE;
+    private final float range = 10 * SCALE;
 
     public Railgun(Entity owner, ProjectileManager projectileManager, Texture texture, float width, float height, int level) {
         super(owner, 1, projectileManager, texture, width, height, level);
@@ -20,7 +20,7 @@ public class Railgun extends Weapon {
             return false;
         }
         cooldown = fireRate;
-        projectileManager.createRail(owner.getBody().getPosition(), direction, range, 1f / 20, owner);
+        projectileManager.createRail(owner.getBody().getPosition(), direction, range, 3, owner);
         return true;
     }
 }

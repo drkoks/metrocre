@@ -1,7 +1,6 @@
 package com.metrocre.game.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -20,9 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.Upgrades;
-import com.metrocre.game.event.trade.BuyEventData;
-import com.metrocre.game.event.trade.TradeEvents;
-import com.metrocre.game.world.Player;
+import com.metrocre.game.network.Network;
 
 public class ShopScreen extends ScreenAdapter {
     private final Stage stage;
@@ -32,19 +28,13 @@ public class ShopScreen extends ScreenAdapter {
     private Label coinsLabel;
     private Label weaponLevelLabel;
 
-
-    public ShopScreen(final MyGame game) {
+    public ShopScreen(final MyGame game, Stage levelStage) {
         this.game = game;
         batch = new SpriteBatch();
         stage = new Stage(new ScreenViewport());
-
-    }
-
-    @Override
-    public void show() {
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
 
-        backgroundTexture = new Texture(Gdx.files.internal("data/list-background.png"));
+        backgroundTexture = new Texture("data/list-background.png");
         Label titleLabel = new Label("Shop", skin);
         titleLabel.setSize(100, 50);
         titleLabel.setPosition((float) MyGame.WIDTH / 2 - 40, MyGame.HEIGHT - 50);
@@ -52,13 +42,14 @@ public class ShopScreen extends ScreenAdapter {
         backButton.setSize(100, 30);
         backButton.setPosition(Gdx.graphics.getWidth() - 150, Gdx.graphics.getHeight() - 50);
 
-        coinsLabel = new Label("Coins: " + game.playersProfile.getMoney(), skin);
-        weaponLevelLabel = new Label("Current weapon Level: " + game.playersProfile.getWeaponLevel(), skin);
+        coinsLabel = new Label("Coins: " + game.localPlayerProfile.getMoney(), skin);
+        weaponLevelLabel = new Label("Current weapon Level: " + game.localPlayerProfile.getWeaponLevel(), skin);
 
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(GameScreen.loadGameState(game));
+                Gdx.input.setInputProcessor(levelStage);
+                game.setShopScreen(null);
             }
         });
         List<String> itemList = new List<>(skin);
@@ -70,17 +61,17 @@ public class ShopScreen extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
-                if (game.playersProfile.getWeaponName().equals(selectedItem.toString())){
+                if (game.localPlayerProfile.getWeaponName().equals(selectedItem.toString())){
                     itemInfo.setText("UPDATE weapon: " + selectedItem + " cost " +
-                            game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+                            game.localPlayerProfile.getSelectedItemCost(selectedItem) + " coins");
                 }
                 else if (selectedItem.isTower()) {
                     itemInfo.setText("Extra " + selectedItem + " cost " +
-                            game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+                            game.localPlayerProfile.getSelectedItemCost(selectedItem) + " coins");
 
                 } else {
                     itemInfo.setText("NEW weapon: " + selectedItem + " cost " +
-                            game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+                            game.localPlayerProfile.getSelectedItemCost(selectedItem) + " coins");
                 }
             }
         });
@@ -89,12 +80,11 @@ public class ShopScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
-                if (game.playersProfile.canBuyItem(selectedItem)) {
-                    BuyEventData buyEventData = new BuyEventData();
-                    buyEventData.upgrade = selectedItem;
-                    game.getMessageDispatcher().dispatchMessage(TradeEvents.BUY, buyEventData);
+                if (game.localPlayerProfile.canBuyItem(selectedItem)) {
+                    Network.Buy buy = new Network.Buy();
+                    buy.upgrades = selectedItem;
+                    game.getClient().packToSend(buy);
                     itemInfo.setText(selectedItem + " purchased.");
-                    updateLabels();
                 } else {
                     itemInfo.setText("Not enough coins.");
                 }
@@ -128,9 +118,15 @@ public class ShopScreen extends ScreenAdapter {
     }
 
     @Override
+    public void show() {
+
+    }
+
+    @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(1, 0.31f, 0.49f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        updateLabels();
         batch.begin();
         batch.draw(backgroundTexture, 0, 0, stage.getWidth(), stage.getHeight());
         batch.end();
@@ -163,8 +159,7 @@ public class ShopScreen extends ScreenAdapter {
     }
 
     private void updateLabels() {
-        coinsLabel.setText("Coins: " + game.playersProfile.getMoney());
-        weaponLevelLabel.setText("Current weapon Level: " + game.playersProfile.getWeaponLevel());
-
+        coinsLabel.setText("Coins: " + game.localPlayerProfile.getMoney());
+        weaponLevelLabel.setText("Current weapon Level: " + game.localPlayerProfile.getWeaponLevel());
     }
 }

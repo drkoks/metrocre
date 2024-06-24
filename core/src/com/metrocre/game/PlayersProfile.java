@@ -1,12 +1,16 @@
 package com.metrocre.game;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.metrocre.game.network.Network;
+import com.metrocre.game.world.Player;
+import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
+import com.metrocre.game.network.GameServer;
 
 import states.PlayerStat;
 
 public class PlayersProfile {
-    private final String name;
+    private String name;
 
     private int level;
     private int experience;
@@ -17,10 +21,9 @@ public class PlayersProfile {
     private int weaponId;
     private int weaponLevel = 1;
 
-    private int healTowerCounter = 0;
-    private int gunTowerCounter = 0;
-
     private PlayerStat statistics = new PlayerStat();
+
+    public PlayersProfile() {}
 
     public PlayersProfile(String name, int level, int experience, int money, int speedLevel, int defenceLevel, int attackLevel) {
         this.name = name;
@@ -32,9 +35,11 @@ public class PlayersProfile {
         this.attackLevel = attackLevel;
         weaponId = 1;
     }
+
     public int getWeaponId() {
         return weaponId;
     }
+
     public void setWeaponId(int weaponId) {
         this.weaponId = weaponId;
     }
@@ -48,6 +53,7 @@ public class PlayersProfile {
         }
         return "Unknown";
     }
+
     public String getName() {
         return name;
     }
@@ -106,8 +112,18 @@ public class PlayersProfile {
     }
 
     public boolean buyItem(Upgrades item) {
+        return buyItem(item, null, null, -1);
+    }
+
+    public boolean buyItem(Upgrades item, WorldManager worldManager, GameServer.GameViewConnection connection, int playerId) {
         if (!canBuyItem(item)) {
             return false;
+        }
+        if (connection != null) {
+            Network.Buy buy = new Network.Buy();
+            buy.upgrades = item;
+            buy.playerId = playerId;
+            connection.messageStock.packToSend(buy);
         }
         int price = getSelectedItemCost(item);
         setMoney(getMoney() - price);
@@ -122,24 +138,30 @@ public class PlayersProfile {
                 setAttack(getAttack() + 1);
                 break;
             case Pistol:
-                if (weaponId == 1){
+                if (weaponId == 1) {
                     weaponLevel++;
-                } else {
-                    setWeaponId(1);
+                }
+                if (worldManager.getServer() != null) {
+                    ((Player) worldManager.getEntity(playerId)).equipWeapon(1);
                 }
                 break;
             case Railgun:
                 if (weaponId == 2){
                     weaponLevel++;
-                } else {
-                    setWeaponId(2);
+                }
+                if (worldManager.getServer() != null) {
+                    ((Player) worldManager.getEntity(playerId)).equipWeapon(2);
                 }
                 break;
             case HealTower:
-                healTowerCounter++;
+                if (worldManager.getServer() != null) {
+                    worldManager.buildTower(playerId, 2);
+                }
                 break;
             case GunTower:
-                gunTowerCounter++;
+                if (worldManager.getServer() != null) {
+                    worldManager.buildTower(playerId, 1);
+                }
                 break;
         }
         return true;
@@ -157,20 +179,15 @@ public class PlayersProfile {
             case Railgun:
                 return 200;
             case HealTower:
-                return 0;
+                return 100;
             case GunTower:
-                return 0;
+                return 100;
         }
         return 0;
     }
 
     public void setAttack(int attackLevel) {
         this.attackLevel = attackLevel;
-    }
-
-    public void resetAfterLevel(){
-        healTowerCounter = 0;
-        gunTowerCounter = 0;
     }
 
     public void reportKill(Enemy enemy) {
@@ -182,13 +199,5 @@ public class PlayersProfile {
 
     public PlayerStat getStatistics() {
         return statistics;
-    }
-
-    public int getHealTowers() {
-        return healTowerCounter;
-    }
-
-    public int getGunTowers() {
-        return gunTowerCounter;
     }
 }

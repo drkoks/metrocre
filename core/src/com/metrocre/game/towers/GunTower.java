@@ -1,5 +1,8 @@
 package com.metrocre.game.towers;
 
+import static com.metrocre.game.MyGame.SCALE;
+
+import com.badlogic.gdx.graphics.Texture;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;

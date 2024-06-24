@@ -4,29 +4,50 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.metrocre.game.world.Player;
+import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.weapons.Projectile;
 
 public class ProjectileHitEventHandler implements Telegraph {
+    private WorldManager worldManager;
+
+    public ProjectileHitEventHandler(WorldManager worldManager) {
+        this.worldManager = worldManager;
+    }
 
     @Override
     public boolean handleMessage(Telegram msg) {
         ProjectileHitEventData data = (ProjectileHitEventData) msg.extraInfo;
-        Projectile projectile = data.projectile;
+        Projectile projectile = (Projectile) worldManager.getEntity(data.projectileId);
+        if (projectile.isDestroyed()) {
+            return true;
+        }
         if (data.hittedObject instanceof TiledMapTileLayer.Cell) {
-            projectile.destroy();
-        } else if (data.hittedObject instanceof Enemy ) {
+            if (worldManager.getServer() != null) {
+                projectile.destroy();
+            }
+        } else if (data.hittedObject instanceof Enemy) {
             Enemy enemy = (Enemy) data.hittedObject;
-            enemy.takeDamage(projectile.getDamage(), projectile.getSender());
-            projectile.destroy();
+            if (enemy.isDestroyed()) {
+                return true;
+            }
+            enemy.takeDamage(projectile.getDamage(), projectile.getSenderId());
+            if (worldManager.getServer() != null) {
+                projectile.destroy();
+            }
         } else if (data.hittedObject instanceof Player) {
             Player player = (Player) data.hittedObject;
+            if (player.isDestroyed()) {
+                return true;
+            }
             if (projectile.isHeal()) {
                 player.heal(projectile.getDamage());
             } else {
-                player.takeDamage(projectile.getDamage(), projectile.getSender());
+                player.takeDamage(projectile.getDamage(), projectile.getSenderId());
             }
-            projectile.destroy();
+            if (worldManager.getServer() != null) {
+                projectile.destroy();
+            }
         }
         return true;
     }

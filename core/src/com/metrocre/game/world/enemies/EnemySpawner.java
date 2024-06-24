@@ -1,5 +1,8 @@
 package com.metrocre.game.world.enemies;
 
+import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.world.EntityData;
+import com.metrocre.game.world.EntityType;
 import com.metrocre.game.world.WorldManager;
 
 public class EnemySpawner {
@@ -36,16 +39,15 @@ public class EnemySpawner {
     }
 
     private void spawnEnemy() {
-        switch (enemyType) {
-            case 1:
-                worldManager.addEntity(new Enemy1(x, y, worldManager));
-                break;
-            case 2:
-                worldManager.addEntity(new Enemy2(x, y, worldManager));
-                break;
-        }
+        EntityData.EnemyData enemyData = new EntityData.EnemyData();
+        enemyData.x = x;
+        enemyData.y = y;
+        enemyData.type = enemyType;
+        WorldEvents.AddEntity addEntity = new WorldEvents.AddEntity();
+        addEntity.type = EntityType.Enemy;
+        addEntity.data = enemyData;
+        worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.AddEntity.ID, addEntity);
         spawnAmount--;
-
     }
 
     public int getX() {

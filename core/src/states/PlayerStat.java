@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerStat {
-    Map<String, Integer> kills =new HashMap<>();
-    Map<String, Integer> newKills =new HashMap<>();
+    Map<String, Integer> kills = new HashMap<>();
+    Map<String, Integer> newKills = new HashMap<>();
 
     public void addKill(String enemyType) {
         if (newKills.containsKey(enemyType)) {

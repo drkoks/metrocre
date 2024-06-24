@@ -55,7 +55,7 @@ public class SettingsScreen implements Screen {
             }
         });
 
-        PlayerStat stats  = game.playersProfile.getStatistics();
+        PlayerStat stats  = game.localPlayerProfile.getStatistics();
         int y = Gdx.graphics.getHeight() - 200;
         Map<String, Integer> kills = new HashMap<>(stats.getAllKills());
         Label label = new Label("You defeted " + kills.size() + " different enemies all-time, here is list:", skin);

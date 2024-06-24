@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Enemy2 extends Enemy {
     private Weapon weapon;
-    float detectRadius = SCALE*5;
+    float detectRadius = SCALE * 5;
 
     public Enemy2(float x, float y, WorldManager worldManager) {
         super(x, y, 3, 100, 10, SCALE, 8*SCALE, worldManager, "enemy2");
@@ -31,14 +31,7 @@ public class Enemy2 extends Enemy {
         this.weapon = weapon;
     }
 
-    public void shoot(Vector2 direction) {
-        if (weapon == null) {
-            return;
-        }
-        weapon.shoot(direction);
-    }
     private Entity getTarget() {
-
         List<Entity> entitiesInRadius = worldManager.getEntitiesInRadius(body.getPosition(), detectRadius);
         Player target = null;
         float distance = detectRadius;

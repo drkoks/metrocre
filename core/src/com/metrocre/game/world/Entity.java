@@ -5,10 +5,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.network.Network;
 
 public abstract class Entity {
-    private static int id_counter = 0;
-
     protected int id;
     protected Texture texture;
     protected Body body;
@@ -18,7 +17,7 @@ public abstract class Entity {
     protected boolean destroyed = false;
 
     protected Entity(WorldManager worldManager, Texture texture) {
-        id = id_counter++;
+        id = worldManager.nextEntityCnt();
         this.worldManager = worldManager;
         this.texture = texture;
     }
@@ -69,5 +68,10 @@ public abstract class Entity {
 
     public void destroy() {
         destroyed = true;
+        if (worldManager.getServer() != null) {
+            Network.DestroyEntity destroyEntity = new Network.DestroyEntity();
+            destroyEntity.id = id;
+            worldManager.getServer().packToSend(destroyEntity);
+        }
     }
 }

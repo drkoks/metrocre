@@ -2,6 +2,9 @@ package com.metrocre.game.towers;
 
 import static com.metrocre.game.MyGame.SCALE;
 
+import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.world.EntityData;
+import com.metrocre.game.world.EntityType;
 import com.metrocre.game.world.WorldManager;
 
 import java.io.Serializable;
@@ -35,23 +38,16 @@ public class TowerPlace implements Serializable {
         return isOccupied;
     }
 
-
-
-    public void placeTower(int towerType, WorldManager worldManager) {
-        Tower tower;
-        if(towerType == 1) {
-            tower = new GunTower(x , y , 5,
-                    10 * SCALE, worldManager, worldManager.getPlayer(), "gunTower");
-        } else if(towerType == 2) {
-            tower = new HealTower(x , y , 5,
-                    3 * SCALE, worldManager, worldManager.getPlayer(), "healTower");
-        } else {
-            return;
-        }
+    public void placeTower(int playerId, int towerType, WorldManager worldManager) {
+        EntityData.TowerData towerData = new EntityData.TowerData();
+        towerData.x = x;
+        towerData.y = y;
+        towerData.type = towerType;
+        towerData.playerId = playerId;
         isOccupied = true;
-        worldManager.addEntity(tower);
+        WorldEvents.AddEntity addEntity = new WorldEvents.AddEntity();
+        addEntity.type = EntityType.Tower;
+        addEntity.data = towerData;
+        worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.AddEntity.ID, addEntity);
     }
-
-
-
 }

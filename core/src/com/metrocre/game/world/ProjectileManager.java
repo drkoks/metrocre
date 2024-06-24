@@ -11,6 +11,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.RailHitEventData;
+import com.metrocre.game.weapons.Projectile;
+import com.metrocre.game.weapons.Rail;
 import com.metrocre.game.towers.Tower;
 import com.metrocre.game.weapons.Projectile;
 import com.metrocre.game.weapons.Rail;
@@ -27,9 +29,6 @@ public class ProjectileManager {
     private final WorldManager worldManager;
     private final Texture texture;
     private final TextureRegion region;
-    private final Texture friedlyBulletTexture = new Texture("bullet.png");
-    private final Texture enemyBulletTexture = new Texture("bulletEnemy.png");
-    private final Texture healBulletTexture = new Texture("healBullet.png");
 
     public ProjectileManager(WorldManager worldManager) {
         this.worldManager = worldManager;
@@ -60,10 +59,14 @@ public class ProjectileManager {
         }
     }
 
+    public void addRail(Rail rail) {
+        rails.add(rail);
+    }
+
     public void createRail(Vector2 position, Vector2 direction, float len, float damage, Entity owner) {
         RayCastResult rayCastResult = worldManager.castRay(position.cpy(), position.cpy().add(direction.scl(len)));
-        Rail rail = new Rail(position.cpy(), rayCastResult.hitPoint, damage, owner);
-        rails.add(rail);
+        Rail rail = new Rail(position.cpy(), rayCastResult.hitPoint, damage, owner.getId());
+        addRail(rail);
         for (int i = 0; i < rayCastResult.fractions.size(); i++) {
             if (rayCastResult.fractions.get(i) < rayCastResult.hitPointFraction) {
                 RailHitEventData railHitEventData = new RailHitEventData();
@@ -72,13 +75,23 @@ public class ProjectileManager {
                 worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.RAIL_HIT, railHitEventData);
             }
         }
+        worldManager.getServer().packToSend(rail);
     }
 
     public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Entity owner, boolean isHeal) {
-        Projectile bullet = new Projectile(position, direction, damage, speed, worldManager,
-                isHeal ? healBulletTexture : owner instanceof Enemy ? enemyBulletTexture : friedlyBulletTexture, owner, isHeal);
+        EntityData.ProjectileData projectileData = new EntityData.ProjectileData();
+        projectileData.position = position;
+        projectileData.direction = direction;
+        projectileData.speed = speed;
+        projectileData.damage = damage;
+        projectileData.senderId = owner.getId();
+        projectileData.isHeal = isHeal;
 
-        worldManager.addEntity(bullet);
+        WorldEvents.AddEntity addEntity = new WorldEvents.AddEntity();
+        addEntity.type = EntityType.Projectile;
+        addEntity.data = projectileData;
+
+        worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.AddEntity.ID, addEntity);
     }
 
     public void dispose() {
