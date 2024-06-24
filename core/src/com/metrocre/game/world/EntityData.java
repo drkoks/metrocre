@@ -14,11 +14,7 @@ public class EntityData {
     public static class EnemyData {
         public float x;
         public float y;
-        public float health;
-        public int reward;
-        public float attackPower;
-        public float attackRange;
-        public String enemyKind;
+        public int type;
     }
 
     public static class ProjectileData {
@@ -27,5 +23,20 @@ public class EntityData {
         public float damage;
         public float speed;
         public int senderId;
+        public boolean isHeal;
+    }
+
+    public static class TrainData {
+        public float x;
+        public float y;
+        public float width;
+        public float height;
+    }
+
+    public static class TowerData {
+        public float x;
+        public float y;
+        public int type;
+        public int playerId;
     }
 }

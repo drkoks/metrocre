@@ -24,6 +24,10 @@ public class MessageStock {
         return queue;
     }
 
+    public Object getNextRecieved() {
+        return received.poll();
+    }
+
     public Queue<Object> getSended() {
         return sended;
     }

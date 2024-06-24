@@ -40,6 +40,10 @@ public class GameClient {
         return messageStock.getReceived();
     }
 
+    public Object getRemoteEvent() {
+        return messageStock.getNextRecieved();
+    }
+
     public void packToSend(Object object) {
         messageStock.packToSend(object);
     }

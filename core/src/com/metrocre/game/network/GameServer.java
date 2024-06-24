@@ -8,8 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 
 public class GameServer {
+    private static final Random random = new Random();
+
+    private int levelCounter = 0;
     private int connectionCnt = 0;
     private Server server;
     private GameState gameState;
@@ -88,5 +92,17 @@ public class GameServer {
                 gameViewConnection.sendTCP(queue.remove());
             }
         }
+    }
+
+    public void incrementLevelCnt() {
+        levelCounter++;
+    }
+
+    public Random getRandom() {
+        return random;
+    }
+
+    public boolean isWin(){
+        return levelCounter >= 5;
     }
 }

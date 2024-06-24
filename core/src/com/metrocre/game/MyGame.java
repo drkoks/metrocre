@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.metrocre.game.network.GameClient;
 import com.metrocre.game.network.GameServer;
 import com.metrocre.game.screens.GameScreen;
+import com.metrocre.game.screens.ShopScreen;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -22,6 +23,8 @@ public class MyGame extends Game {
     //private BuyEventHandler buyEventHandler = new BuyEventHandler(playersProfile);
     private GameServer server = null;
     private GameClient client = null;
+    public PlayersProfile localPlayerProfile = null;
+    private ShopScreen shopScreen;
 
     public float getVolume() {
         return volume;
@@ -65,6 +68,9 @@ public class MyGame extends Game {
                 server.update(1f / FPS);
             }
             screen.render(1f / FPS);
+            if (shopScreen != null) {
+                shopScreen.render(1f / FPS);
+            }
             prevRenderTime += NANOS_PER_FRAME;
         }
     }
@@ -83,5 +89,9 @@ public class MyGame extends Game {
 
     public GameServer getServer() {
         return server;
+    }
+
+    public void setShopScreen(ShopScreen shopScreen) {
+        this.shopScreen = shopScreen;
     }
 }

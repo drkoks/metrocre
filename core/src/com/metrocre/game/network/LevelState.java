@@ -16,22 +16,24 @@ import com.metrocre.game.world.enemies.Enemy;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 
 public class LevelState extends GameState {
     private GameServer server;
     private WorldManager worldManager;
     private Train train;
     private Map map;
+    private boolean isAbleToFinishLevel = false;
 
     public LevelState(GameServer server) {
         this.server = server;
         worldManager = new WorldManager(new World(new Vector2(0, 0), false), server);
         List<GameServer.GameViewConnection> connections = server.getConnections();
-        int cnt = 0;
+        int cnt = 1;
         for (GameServer.GameViewConnection connection : connections) {
             EntityData.PlayerData playerData = new EntityData.PlayerData();
-            playerData.x = (6 - (cnt++)) * SCALE;
-            playerData.y = SCALE;
+            playerData.x = 6 * SCALE;
+            playerData.y = (cnt++) * SCALE;
             playerData.profile = connection.gameView.playersProfile;
             WorldEvents.AddEntity addEntity = new WorldEvents.AddEntity();
             addEntity.type = EntityType.Player;
@@ -40,6 +42,7 @@ public class LevelState extends GameState {
                 WorldEvents.AddEntity.ID,
                 addEntity
             );
+
             connection.gameView.player = (Player) worldManager.getLastAddedEntity();
             Network.SetLocalPlayer setLocalPlayer = new Network.SetLocalPlayer();
             setLocalPlayer.id = connection.gameView.player.getId();
@@ -49,19 +52,36 @@ public class LevelState extends GameState {
             equipWeapon.weaponId = 1;
             worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.EquipWeapon.ID, equipWeapon);
         }
-        map = new Map(worldManager);
+        Random rand = server.getRandom();
+        int randomNumber = rand.nextInt(5) + 1;
+        map = new Map(worldManager, randomNumber, true);
         Network.SendMapSeed sendMapSeed = new Network.SendMapSeed();
+        sendMapSeed.seed = randomNumber;
         server.packToSend(sendMapSeed);
+
+        EntityData.TrainData trainData = new EntityData.TrainData();
+        trainData.x = SCALE;
+        trainData.y = 0;
+        trainData.width = 3 * SCALE;
+        trainData.height = map.getHeight();
+        WorldEvents.AddEntity addEntity = new WorldEvents.AddEntity();
+        addEntity.type = EntityType.Train;
+        addEntity.data = trainData;
+        worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.AddEntity.ID, addEntity);
     }
 
     private void processPlayerEvent(Player player, Object event) {
-        if (event instanceof Network.PlayerMove) {
-//            System.out.println("PlayerMove processed");
+        if (player != null && event instanceof Network.PlayerMove) {
             Network.PlayerMove playerMoveEvent = (Network.PlayerMove) event;
             player.move(playerMoveEvent.direction);
-        } else if (event instanceof Network.PlayerAttack) {
+        } else if (player != null && event instanceof Network.PlayerAttack) {
             Network.PlayerAttack playerAttackEvent = (Network.PlayerAttack) event;
             player.shoot(playerAttackEvent.direction);
+        } else if (player != null && event instanceof Network.Buy) {
+            player.getPlayersProfile().buyItem(((Network.Buy) event).upgrades, worldManager, player.getId());
+        } else if (event instanceof Network.CompleteLevel) {
+            server.setState(new TradeState(server));
+            server.packToSend(event);
         }
     }
 
@@ -76,6 +96,11 @@ public class LevelState extends GameState {
         worldManager.getWorld().step(deltaTime, 6, 2);
         worldManager.update(deltaTime);
 
+        isAbleToFinishLevel = worldManager.getEnemies().isEmpty() && worldManager.spawnersAreDone();
+        if (isAbleToFinishLevel) {
+            server.packToSend(new Network.AbleToFinish());
+        }
+
         for (Entity entity : worldManager.getEntities()) {
             Network.UpdateEntityPosition updateEntityPosition = new Network.UpdateEntityPosition();
             updateEntityPosition.entityId = entity.getId();
@@ -85,14 +110,5 @@ public class LevelState extends GameState {
         }
 
         server.sendAll();
-    }
-
-    private boolean isAbleToFinishLevel() {
-        for (Enemy enemy : worldManager.getEnemies()){
-            if (!enemy.isDestroyed()) {
-                return false;
-            }
-        }
-        return true;
     }
 }

@@ -23,13 +23,17 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.metrocre.game.network.Network;
 import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.world.Entity;
+import com.metrocre.game.world.EntityType;
 import com.metrocre.game.world.HUD;
 import com.metrocre.game.controller.Joystick;
 import com.metrocre.game.Map;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.world.Player;
+import com.metrocre.game.world.Train;
 import com.metrocre.game.world.WorldManager;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.metrocre.game.world.enemies.Enemy;
 
 import java.util.Queue;
 
@@ -47,52 +51,92 @@ public class GameScreen implements Screen {
     private WorldManager worldManager;
     private HUD hud;
     private Skin skin;
+    private TextButton shopButton;
+    private Train train;
+    private boolean isAbleToFinishLevel = false;
 
     public void addTexture() {
         worldManager.addTexture(new Texture("avatar.png"), "player");
-        worldManager.addTexture(new Texture("enemy.png"), "enemy1");
+        worldManager.addTexture(new Texture("enemies/enemy.png"), "enemy1");
+        worldManager.addTexture(new Texture("enemies/enemy2.png"), "enemy2");
         worldManager.addTexture(new Texture("guntower.png"), "gunTower");
+        worldManager.addTexture(new Texture("healTower.png"), "healTower");
     }
 
     public GameScreen(MyGame game) {
         this.game = game;
-        worldManager = new WorldManager(new World(new Vector2(0, 0), false), null);
+        worldManager = new WorldManager(new World(new Vector2(0, 0), true), null);
         addTexture();
         skin = new Skin(Gdx.files.internal("lib.json"));
         batch = new SpriteBatch();
-//        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
-//        backgroundMusic.setLooping(true);
-//        backgroundMusic.play();
-//        backgroundMusic.setVolume(game.getVolume());
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/GameScreenTheme.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
+        backgroundMusic.setVolume(0/*game.getVolume()*/);
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 16*SCALE, 9*SCALE);
-        stage = new Stage(new StretchViewport(16*SCALE, 9*SCALE));
+        camera.setToOrtho(false, 16 * SCALE, 9 * SCALE);
+        stage = new Stage(new StretchViewport(16 * SCALE, 9 * SCALE));
+
         hud = new HUD(player, stage, skin);
-        moveJoystick = new Joystick(new Texture("joystick.png"), 0, 0, 6*SCALE, 6*SCALE, 0, true);
+
+        moveJoystick = new Joystick(new Texture("joystick.png"),
+                0, 0, 6 * SCALE, 6 * SCALE, 0, true);
+
         stage.addActor(moveJoystick);
-        attackJoystick = new Joystick(new Texture("joystick.png"), 10*SCALE, 0, 6*SCALE, 6*SCALE, 0.5f, false);
+
+        attackJoystick = new Joystick(new Texture("joystick.png"),
+                10 * SCALE, 0, 6 * SCALE, 6 * SCALE, 0.5f, false);
+
         stage.addActor(attackJoystick);
         Gdx.input.setInputProcessor(stage);
+
         nextLevelButton = new TextButton("", skin, "next");
         nextLevelButton.setVisible(false);
-        nextLevelButton.setSize(4*SCALE, 4*SCALE);
-        nextLevelButton.setPosition(stage.getWidth()-nextLevelButton.getWidth(), 0);
+        nextLevelButton.setSize(4 * SCALE, 4 * SCALE);
+        nextLevelButton.setPosition(stage.getWidth() - nextLevelButton.getWidth(), 0);
         nextLevelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                backgroundMusic.stop();
-                game.setScreen(new TradeScreen(game));
+                game.getClient().packToSend(new Network.CompleteLevel());
             }
         });
         stage.addActor(nextLevelButton);
 
+        shopButton = new TextButton("", skin, "market");
+        shopButton.setSize(2 * SCALE, 2 * SCALE);
+        shopButton.setPosition(stage.getWidth() - shopButton.getWidth(), stage.getHeight() - shopButton.getHeight());
+        shopButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                backgroundMusic.stop();
+                game.setShopScreen(new ShopScreen(game, stage));
+            }
+        });
+        stage.addActor(shopButton);
+
     }
+
+//    public static GameScreen loadGameState(MyGame game) {
+//        try {
+//            FileInputStream fileIn = new FileInputStream("gamestate.ser");
+//            ObjectInputStream in = new ObjectInputStream(fileIn);
+//            GameState gameState = (GameState) in.readObject();
+//            in.close();
+//            fileIn.close();
+//            return new GameScreen(game, gameState);
+//        } catch (IOException i) {
+//            i.printStackTrace();
+//        } catch (ClassNotFoundException c) {
+//            System.out.println("GameState class not found");
+//            c.printStackTrace();
+//        }
+//        return new GameScreen(game);
+//    }
 
     @Override
     public void show() {
 
     }
-
 
     private float getCameraX() {
         float x = 0;
@@ -103,7 +147,7 @@ public class GameScreen implements Screen {
         if (map != null) {
             mapWidth = map.getWidth();
         }
-        return min(max(x, 8*SCALE), mapWidth - 8*SCALE);
+        return min(max(x, 8 * SCALE), mapWidth - 8 * SCALE);
     }
 
     private float getCameraY() {
@@ -115,30 +159,74 @@ public class GameScreen implements Screen {
         if (map != null) {
             mapHeight = map.getHeight();
         }
-        return min(max(y, 4.5F*SCALE), mapHeight - 4.5F*SCALE);
+        return min(max(y, 4.5F * SCALE), mapHeight - 4.5F * SCALE);
     }
 
     public void processRemoteEvent(Object o) {
         if (o instanceof WorldEvents.AddEntity) {
-            WorldEvents.AddEntity event = (WorldEvents.AddEntity) o;
-            worldManager.getMessageDispatcher().dispatchMessage(event.ID, event);
+            WorldEvents.AddEntity addEntity = (WorldEvents.AddEntity) o;
+            worldManager.getMessageDispatcher().dispatchMessage(addEntity.ID, addEntity);
+            if (addEntity.type == EntityType.Train) {
+                train = (Train) worldManager.getLastAddedEntity();
+            }
         } else if (o instanceof Network.SendMapSeed) {
-            Network.SendMapSeed event = (Network.SendMapSeed) o;
-            map = new Map(worldManager);
+            Network.SendMapSeed sendMapSeed = (Network.SendMapSeed) o;
+            map = new Map(worldManager, sendMapSeed.seed, true);
         } else if (o instanceof Network.UpdateEntityPosition) {
-            Network.UpdateEntityPosition event = (Network.UpdateEntityPosition) o;
-//            System.out.println(event.x + " " + event.y);
-            Body body = worldManager.getEntity(event.entityId).getBody();
-            body.setTransform(event.x, event.y, body.getAngle());
+            Network.UpdateEntityPosition updateEntityPosition = (Network.UpdateEntityPosition) o;
+            Entity entity = worldManager.getEntity(updateEntityPosition.entityId);
+            if (entity != null) {
+                Body body = entity.getBody();
+                body.setTransform(updateEntityPosition.x, updateEntityPosition.y, body.getAngle());
+            }
         } else if (o instanceof Network.SetLocalPlayer) {
             Network.SetLocalPlayer setLocalPlayer = (Network.SetLocalPlayer) o;
             player = (Player) worldManager.getEntity(setLocalPlayer.id);
+            if (player != null) {
+                game.localPlayerProfile = player.getPlayersProfile();
+                hud = new HUD(player, stage, skin);
+            }
         } else if (o instanceof WorldEvents.EquipWeapon) {
             WorldEvents.EquipWeapon equipWeapon = (WorldEvents.EquipWeapon) o;
             worldManager.getMessageDispatcher().dispatchMessage(equipWeapon.ID, equipWeapon);
         } else if (o instanceof Network.DestroyEntity) {
             Network.DestroyEntity destroyEntity = (Network.DestroyEntity) o;
-            worldManager.getEntity(destroyEntity.id).destroy();
+            if (destroyEntity != null) {
+                worldManager.getEntity(destroyEntity.id).destroy();
+            }
+        } else if (o instanceof Network.EndGame) {
+            Network.EndGame endGame = (Network.EndGame) o;
+            backgroundMusic.stop();
+            game.setScreen(new GameOverScreen(game, endGame.isVictory));
+        } else if (o instanceof Network.Buy) {
+            Network.Buy buy = (Network.Buy) o;
+            Player player = (Player) worldManager.getEntity(buy.playerId);
+            if (player != null) {
+                player.getPlayersProfile().buyItem(buy.upgrades, worldManager, buy.playerId);
+            }
+        } else if (o instanceof Network.CompleteLevel) {
+            backgroundMusic.stop();
+            game.setScreen(new TradeScreen(game));
+        } else if (o instanceof Network.AbleToFinish) {
+            isAbleToFinishLevel = true;
+        } else if (o instanceof Network.TakeDamage) {
+            Network.TakeDamage takeDamage = (Network.TakeDamage) o;
+            Entity receiver = worldManager.getEntity(takeDamage.receiverId);
+            if (receiver != null) {
+                if (receiver instanceof Enemy) {
+                    Enemy enemy = (Enemy) receiver;
+                    enemy.takeDamage(takeDamage.damage, takeDamage.senderId);
+                } else if (receiver instanceof Player) {
+                    Player player = (Player) receiver;
+                    player.takeDamage(takeDamage.damage, takeDamage.senderId);
+                }
+            }
+        } else if (o instanceof Network.Heal) {
+            Network.Heal heal = (Network.Heal) o;
+            Player player = (Player) worldManager.getEntity(heal.playerId);
+            if (player != null) {
+                player.heal(heal.value);
+            }
         }
     }
 
@@ -153,7 +241,7 @@ public class GameScreen implements Screen {
 
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        ScreenUtils.clear(1, 1, 1, 1);
+        ScreenUtils.clear(0.2f, 0.2f, 0.2f, 1);
 
         camera.position.set(getCameraX(), getCameraY(), 0);
         camera.update();
@@ -162,7 +250,7 @@ public class GameScreen implements Screen {
             map.draw(camera);
         }
 
-        //nextLevelButton.setVisible(train.isPlayerOnTrain(player) && isAbleToFinishLevel());
+        nextLevelButton.setVisible(train != null && train.isPlayerOnTrain(player) && isAbleToFinishLevel);
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -223,4 +311,16 @@ public class GameScreen implements Screen {
         worldManager.dispose();
         stage.dispose();
     }
+
+//    public void saveGameState() {
+//        try {
+//            FileOutputStream fileOut = new FileOutputStream("gamestate.ser");
+//            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+//            out.writeObject(new GameState(player, worldManager, map));
+//            out.close();
+//            fileOut.close();
+//        } catch (IOException i) {
+//            i.printStackTrace();
+//        }
+//    }
 }
