@@ -12,13 +12,12 @@ import com.metrocre.game.world.EntityType;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.Train;
 import com.metrocre.game.world.WorldManager;
-import com.metrocre.game.world.enemies.Enemy;
 
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
-public class LevelState extends GameState {
+public class LevelState extends ServerState {
     private GameServer server;
     private WorldManager worldManager;
     private Train train;
@@ -49,7 +48,7 @@ public class LevelState extends GameState {
             connection.messageStock.packToSend(setLocalPlayer);
             WorldEvents.EquipWeapon equipWeapon = new WorldEvents.EquipWeapon();
             equipWeapon.playerId = connection.gameView.player.getId();
-            equipWeapon.weaponId = 1;
+            equipWeapon.weaponId = connection.gameView.playersProfile.getWeaponId();
             worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.EquipWeapon.ID, equipWeapon);
         }
         Random rand = server.getRandom();
@@ -70,7 +69,8 @@ public class LevelState extends GameState {
         worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.AddEntity.ID, addEntity);
     }
 
-    private void processPlayerEvent(Player player, Object event) {
+    private void processPlayerEvent(GameServer.GameViewConnection connection, Object event) {
+        Player player = connection.gameView.player;
         if (player != null && event instanceof Network.PlayerMove) {
             Network.PlayerMove playerMoveEvent = (Network.PlayerMove) event;
             player.move(playerMoveEvent.direction);
@@ -78,10 +78,18 @@ public class LevelState extends GameState {
             Network.PlayerAttack playerAttackEvent = (Network.PlayerAttack) event;
             player.shoot(playerAttackEvent.direction);
         } else if (player != null && event instanceof Network.Buy) {
-            player.getPlayersProfile().buyItem(((Network.Buy) event).upgrades, worldManager, player.getId());
+            player.getPlayersProfile().buyItem(((Network.Buy) event).upgrades, worldManager, connection, player.getId());
         } else if (event instanceof Network.CompleteLevel) {
-            server.setState(new TradeState(server));
-            server.packToSend(event);
+            server.incrementLevelCnt();
+            if (server.isWin()) {
+                Network.EndGame endGame = new Network.EndGame();
+                endGame.isVictory = true;
+                server.packToSend(endGame);
+                server.setState(new GameOverState(server));
+            } else {
+                server.setState(new TradeState(server));
+                server.packToSend(event);
+            }
         }
     }
 
@@ -89,7 +97,7 @@ public class LevelState extends GameState {
         for (GameServer.GameViewConnection connection : server.getConnections()) {
             Queue<Object> events = connection.messageStock.getReceived();
             for (Object event : events) {
-                processPlayerEvent(connection.gameView.player, event);
+                processPlayerEvent(connection, event);
             }
         }
 
@@ -99,6 +107,19 @@ public class LevelState extends GameState {
         isAbleToFinishLevel = worldManager.getEnemies().isEmpty() && worldManager.spawnersAreDone();
         if (isAbleToFinishLevel) {
             server.packToSend(new Network.AbleToFinish());
+        }
+
+        int playersDead = 0;
+        for (GameServer.GameViewConnection connection : server.getConnections()) {
+            if (connection.gameView.player.isDestroyed()) {
+                playersDead++;
+            }
+        }
+        if (playersDead >= server.getConnections().size()) {
+            Network.EndGame endGame = new Network.EndGame();
+            endGame.isVictory = false;
+            server.packToSend(endGame);
+            server.setState(new GameOverState(server));
         }
 
         for (Entity entity : worldManager.getEntities()) {

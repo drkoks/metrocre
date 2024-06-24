@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.network.Network;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +21,13 @@ import java.util.Map;
 import states.PlayerStat;
 
 public class GameOverScreen implements Screen {
+    public MyGame game;
     private final Stage stage;
     private Image img;
     private boolean isWin;
 
     public GameOverScreen(final MyGame game, boolean isWin) {
+        this.game = game;
         this.isWin = isWin;
         stage = new Stage(new ScreenViewport());
         Skin skin = new Skin(Gdx.files.internal("lib.json"));
@@ -58,6 +61,8 @@ public class GameOverScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.getClient().packToSend(new Network.PlayerReady());
+                game.getClient().sendAll();
                 game.setScreen(new MainMenuScreen(game));
             }
         });

@@ -20,7 +20,7 @@ public class Railgun extends Weapon {
             return false;
         }
         cooldown = fireRate;
-        projectileManager.createRail(owner.getBody().getPosition(), direction, range, 1f / 20, owner);
+        projectileManager.createRail(owner.getBody().getPosition(), direction, range, 3, owner);
         return true;
     }
 }

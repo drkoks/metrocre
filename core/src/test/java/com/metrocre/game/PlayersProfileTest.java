@@ -9,12 +9,12 @@ class PlayersProfileTest {
     void testBuyItem() {
         PlayersProfile playerProfile = new PlayersProfile("Player1", 1, 0, 1000, 1, 1, 1);
 
-        assertTrue(playerProfile.buyItem(Upgrades.Speed, null, -1));
+        assertTrue(playerProfile.buyItem(Upgrades.Speed));
         assertEquals(2, playerProfile.getSpeed());
         assertEquals(900, playerProfile.getMoney());
 
         playerProfile.setMoney(50);
-        assertFalse(playerProfile.buyItem(Upgrades.Defence, null, -1));
+        assertFalse(playerProfile.buyItem(Upgrades.Defence));
         assertEquals(1, playerProfile.getDefence());
         assertEquals(50, playerProfile.getMoney());
     }

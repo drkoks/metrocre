@@ -59,10 +59,14 @@ public class ProjectileManager {
         }
     }
 
+    public void addRail(Rail rail) {
+        rails.add(rail);
+    }
+
     public void createRail(Vector2 position, Vector2 direction, float len, float damage, Entity owner) {
         RayCastResult rayCastResult = worldManager.castRay(position.cpy(), position.cpy().add(direction.scl(len)));
         Rail rail = new Rail(position.cpy(), rayCastResult.hitPoint, damage, owner.getId());
-        rails.add(rail);
+        addRail(rail);
         for (int i = 0; i < rayCastResult.fractions.size(); i++) {
             if (rayCastResult.fractions.get(i) < rayCastResult.hitPointFraction) {
                 RailHitEventData railHitEventData = new RailHitEventData();
@@ -71,6 +75,7 @@ public class ProjectileManager {
                 worldManager.getMessageDispatcher().dispatchMessage(WorldEvents.RAIL_HIT, railHitEventData);
             }
         }
+        worldManager.getServer().packToSend(rail);
     }
 
     public void createBullet(Vector2 position, Vector2 direction, float speed, float damage, Entity owner, boolean isHeal) {

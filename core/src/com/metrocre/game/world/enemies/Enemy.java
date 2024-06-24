@@ -90,7 +90,13 @@ public abstract class Enemy extends Entity {
         if (health == 0) {
             return;
         }
-        health = (int) max(0f, health - damage);
+        Entity entity = worldManager.getEntity(senderId);
+        float totalDamage = damage;
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+            totalDamage = damage + 0.2f * damage * (player.getPlayersProfile().getAttack() - 1);
+        }
+        health = (int) max(0f, health - totalDamage);
         if (health == 0) {
             if (worldManager.getServer() != null) {
                 destroy();

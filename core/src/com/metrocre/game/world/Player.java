@@ -48,7 +48,7 @@ public class Player extends Entity {
     public Player(float x, float y, WorldManager worldManager, PlayersProfile playersProfile) {
         super(worldManager, worldManager.getTexture("player"), SIZE, SIZE);
         this.playersProfile = playersProfile;
-        speed = playersProfile.getSpeed()*10;
+        speed = playersProfile.getSpeed();
         health = healthFromDefence();
         attack = playersProfile.getAttack();
         this.sprite = new Sprite(worldManager.getTexture("player"));

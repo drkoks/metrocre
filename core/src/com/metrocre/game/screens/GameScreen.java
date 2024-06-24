@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.metrocre.game.network.Network;
 import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.weapons.Rail;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.EntityType;
 import com.metrocre.game.world.HUD;
@@ -191,8 +192,9 @@ public class GameScreen implements Screen {
             worldManager.getMessageDispatcher().dispatchMessage(equipWeapon.ID, equipWeapon);
         } else if (o instanceof Network.DestroyEntity) {
             Network.DestroyEntity destroyEntity = (Network.DestroyEntity) o;
-            if (destroyEntity != null) {
-                worldManager.getEntity(destroyEntity.id).destroy();
+            Entity entity = worldManager.getEntity(destroyEntity.id);
+            if (entity != null) {
+                entity.destroy();
             }
         } else if (o instanceof Network.EndGame) {
             Network.EndGame endGame = (Network.EndGame) o;
@@ -202,7 +204,7 @@ public class GameScreen implements Screen {
             Network.Buy buy = (Network.Buy) o;
             Player player = (Player) worldManager.getEntity(buy.playerId);
             if (player != null) {
-                player.getPlayersProfile().buyItem(buy.upgrades, worldManager, buy.playerId);
+                player.getPlayersProfile().buyItem(buy.upgrades, worldManager, null, -1);
             }
         } else if (o instanceof Network.CompleteLevel) {
             backgroundMusic.stop();
@@ -227,6 +229,9 @@ public class GameScreen implements Screen {
             if (player != null) {
                 player.heal(heal.value);
             }
+        } else if (o instanceof Rail) {
+            Rail rail = (Rail) o;
+            worldManager.getProjectileManager().addRail(rail);
         }
     }
 
@@ -277,6 +282,8 @@ public class GameScreen implements Screen {
 //        worldManager.getWorld().step(delta, 6, 2);
 
         //b2ddr.render(worldManager.getWorld(), camera.combined);
+
+        worldManager.getProjectileManager().update(delta);
 
         stage.act(delta);
         stage.draw();

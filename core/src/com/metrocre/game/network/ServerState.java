@@ -1,6 +1,6 @@
 package com.metrocre.game.network;
 
-public class GameState {
+public class ServerState {
     public void update(float deltaTime) {
 
     }

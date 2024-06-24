@@ -5,6 +5,7 @@ import com.metrocre.game.network.Network;
 import com.metrocre.game.world.Player;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
+import com.metrocre.game.network.GameServer;
 
 import states.PlayerStat;
 
@@ -110,15 +111,19 @@ public class PlayersProfile {
         return getMoney() >= price;
     }
 
-    public boolean buyItem(Upgrades item, WorldManager worldManager, int playerId) {
+    public boolean buyItem(Upgrades item) {
+        return buyItem(item, null, null, -1);
+    }
+
+    public boolean buyItem(Upgrades item, WorldManager worldManager, GameServer.GameViewConnection connection, int playerId) {
         if (!canBuyItem(item)) {
             return false;
         }
-        if (worldManager != null && worldManager.getServer() != null) {
+        if (connection != null) {
             Network.Buy buy = new Network.Buy();
             buy.upgrades = item;
             buy.playerId = playerId;
-            worldManager.getServer().packToSend(buy);
+            connection.messageStock.packToSend(buy);
         }
         int price = getSelectedItemCost(item);
         setMoney(getMoney() - price);

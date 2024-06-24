@@ -1,11 +1,9 @@
 package com.metrocre.game.network;
 
-import com.metrocre.game.PlayersProfile;
-
 import java.util.HashSet;
 import java.util.Queue;
 
-public class TradeState extends GameState {
+public class TradeState extends ServerState {
     private GameServer server;
 
     private HashSet<String> isReady = new HashSet<>();
@@ -20,7 +18,12 @@ public class TradeState extends GameState {
         for (GameServer.GameViewConnection connection : server.getConnections()) {
             Queue<Object> playerEvents = connection.messageStock.getReceived();
             for (Object event : playerEvents) {
-                processPlayerEvent(connection.gameView.playersProfile, event);
+                if (event instanceof Network.Buy) {
+                    Network.Buy buy = (Network.Buy) event;
+                    connection.gameView.playersProfile.buyItem(buy.upgrades, null, connection, -1);
+                } else if (event instanceof Network.PlayerReady) {
+                    isReady.add(connection.gameView.playersProfile.getName());
+                }
             }
             if (!isReady.contains(connection.gameView.playersProfile.getName())) {
                 done = false;
@@ -33,14 +36,5 @@ public class TradeState extends GameState {
         }
 
         server.sendAll();
-    }
-
-    private void processPlayerEvent(PlayersProfile playersProfile, Object event) {
-        if (event instanceof Network.Buy) {
-            Network.Buy buy = (Network.Buy) event;
-            playersProfile.buyItem(buy.upgrades, null, -1);
-        } else if (event instanceof Network.PlayerReady) {
-            isReady.add(playersProfile.getName());
-        }
     }
 }

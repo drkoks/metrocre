@@ -9,11 +9,13 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
 public class Rail {
     public static final float LIFE_TIME = 1;
 
-    private final Vector2 p1;
-    private final Vector2 p2;
+    private Vector2 p1;
+    private Vector2 p2;
     private float clock = 0;
     private float damage;
     private int senderId;
+
+    public Rail() {}
 
     public Rail(Vector2 p1, Vector2 p2, float damage, int senderId) {
         this.damage = damage;

@@ -25,7 +25,7 @@ public class GameClient {
             }
 
             public void disconnected (Connection connection) {
-                System.exit(0);
+
             }
         });
         try {
@@ -53,5 +53,9 @@ public class GameClient {
         while (!queue.isEmpty()) {
             client.sendTCP(queue.remove());
         }
+    }
+
+    public void close() {
+        client.close();
     }
 }

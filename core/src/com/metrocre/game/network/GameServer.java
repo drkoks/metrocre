@@ -16,7 +16,7 @@ public class GameServer {
     private int levelCounter = 0;
     private int connectionCnt = 0;
     private Server server;
-    private GameState gameState;
+    private ServerState gameState;
 
     public void start() throws IOException {
         server = new Server(){
@@ -50,7 +50,7 @@ public class GameServer {
         gameState.update(deltaTime);
     }
 
-    public void setState(GameState state) {
+    public void setState(ServerState state) {
         gameState = state;
     }
 
@@ -74,6 +74,7 @@ public class GameServer {
     }
 
     public void dispose() {
+        server.stop();
         server.close();
     }
 

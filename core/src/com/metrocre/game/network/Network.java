@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.EndPoint;
 import com.metrocre.game.PlayersProfile;
 import com.metrocre.game.Upgrades;
 import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.weapons.Rail;
 import com.metrocre.game.world.EntityData;
 import com.metrocre.game.world.EntityType;
 
@@ -49,6 +50,8 @@ public class Network {
         kryo.register(Vector2.class);
 
         kryo.register(WorldEvents.EquipWeapon.class);
+
+        kryo.register(Rail.class);
     }
 
     public static class SendMapSeed {
@@ -84,6 +87,7 @@ public class Network {
     public static class Buy {
         public Upgrades upgrades;
         public int playerId;
+        public String playerName;
     }
 
     public static class CompleteLevel {

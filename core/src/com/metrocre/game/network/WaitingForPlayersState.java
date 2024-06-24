@@ -1,6 +1,6 @@
 package com.metrocre.game.network;
 
-public class WaitingForPlayersState extends GameState {
+public class WaitingForPlayersState extends ServerState {
     private float countDown;
     private GameServer server;
 

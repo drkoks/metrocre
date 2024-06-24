@@ -131,6 +131,9 @@ public class TradeScreen extends ScreenAdapter {
             if (event instanceof Network.NextLevel) {
                 game.setScreen(new GameScreen(game));
                 break;
+            } else if (event instanceof Network.Buy) {
+                Network.Buy buy = (Network.Buy) event;
+                game.localPlayerProfile.buyItem(buy.upgrades);
             }
         }
 

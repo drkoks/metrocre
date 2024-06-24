@@ -19,18 +19,27 @@ public class ProjectileHitEventHandler implements Telegraph {
     public boolean handleMessage(Telegram msg) {
         ProjectileHitEventData data = (ProjectileHitEventData) msg.extraInfo;
         Projectile projectile = (Projectile) worldManager.getEntity(data.projectileId);
+        if (projectile.isDestroyed()) {
+            return true;
+        }
         if (data.hittedObject instanceof TiledMapTileLayer.Cell) {
             if (worldManager.getServer() != null) {
                 projectile.destroy();
             }
         } else if (data.hittedObject instanceof Enemy) {
             Enemy enemy = (Enemy) data.hittedObject;
+            if (enemy.isDestroyed()) {
+                return true;
+            }
             enemy.takeDamage(projectile.getDamage(), projectile.getSenderId());
             if (worldManager.getServer() != null) {
                 projectile.destroy();
             }
         } else if (data.hittedObject instanceof Player) {
             Player player = (Player) data.hittedObject;
+            if (player.isDestroyed()) {
+                return true;
+            }
             if (projectile.isHeal()) {
                 player.heal(projectile.getDamage());
             } else {
