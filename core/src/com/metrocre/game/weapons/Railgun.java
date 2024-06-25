@@ -11,7 +11,7 @@ public class Railgun extends Weapon {
     private final float range = 10 * SCALE;
 
     public Railgun(Entity owner, ProjectileManager projectileManager, Texture texture, float width, float height, int level) {
-        super(owner, 1, projectileManager, texture, width, height, level);
+        super(owner, 0.5f, projectileManager, texture, width, height, level);
     }
 
     @Override

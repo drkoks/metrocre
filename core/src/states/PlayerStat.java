@@ -18,7 +18,13 @@ public class PlayerStat {
 
     public Map<String, Integer> getKills() {
         Map<String, Integer> buf = new HashMap<>(newKills);
-        kills.putAll(newKills);
+        for (Map.Entry<String, Integer> entry : newKills.entrySet()) {
+            if (kills.containsKey(entry.getKey())) {
+                kills.put(entry.getKey(), kills.get(entry.getKey()) + entry.getValue());
+            } else {
+                kills.put(entry.getKey(), entry.getValue());
+            }
+        }
         newKills.clear();
         return buf;
     }

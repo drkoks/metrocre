@@ -57,7 +57,7 @@ public class GameScreen implements Screen {
     private boolean isAbleToFinishLevel = false;
 
     public void addTexture() {
-        worldManager.addTexture(new Texture("avatar.png"), "player");
+        worldManager.addTexture(new Texture("dog.png"), "player");
         worldManager.addTexture(new Texture("enemies/enemy.png"), "enemy1");
         worldManager.addTexture(new Texture("enemies/enemy2.png"), "enemy2");
         worldManager.addTexture(new Texture("guntower.png"), "gunTower");
