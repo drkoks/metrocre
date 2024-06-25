@@ -34,20 +34,30 @@ public class MainMenuScreen implements Screen {
         backgroundMusic.setVolume(game.getVolume());
         batch = new SpriteBatch();
 
-        TextButton playButton = new TextButton("", skin, "play");
+        TextButton serverPlayButton = new TextButton("", skin, "play");
+        TextButton joinPlayButton = new TextButton("", skin, "join");
         TextButton settingsButton = new TextButton("", skin, "settings");
 
-        playButton.setSize(200, 200);
-        playButton.setPosition(150, (float) MyGame.HEIGHT / 2 - 200);
+        serverPlayButton.setSize(200, 200);
+        float delta = ((float) MyGame.WIDTH /3 - serverPlayButton.getWidth()) / 2;
+        serverPlayButton.setPosition(delta, 0);
+        joinPlayButton.setSize(200, 200);
+        joinPlayButton.setPosition((float) MyGame.WIDTH /3+ delta, 0);
         settingsButton.setSize(200, 200);
-        settingsButton.setPosition(MyGame.WIDTH - 200 - 150, (float) MyGame.HEIGHT / 2 - 200);
+        settingsButton.setPosition((float) 2* MyGame.WIDTH /3 + delta, 0);
 
-
-        playButton.addListener(new ClickListener() {
+        joinPlayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 backgroundMusic.stop();
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new LobbyScreen(game)); //TODO: change to join screen
+            }
+        });
+        serverPlayButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                backgroundMusic.stop();
+                game.setScreen(new LobbyScreen(game)); //TODO: change to server screen
             }
         });
 
@@ -59,8 +69,9 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        stage.addActor(playButton);
+        stage.addActor(serverPlayButton);
         stage.addActor(settingsButton);
+        stage.addActor(joinPlayButton);
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -78,7 +89,7 @@ public class MainMenuScreen implements Screen {
         batch.begin();
         float logoWidth = 400;
         float logoHeight = 200;
-        batch.draw(logo, (Gdx.graphics.getWidth() - logoWidth) / 2, Gdx.graphics.getHeight() - logoHeight, logoWidth, logoHeight);
+        batch.draw(logo, (Gdx.graphics.getWidth() - logoWidth) / 2, MyGame.HEIGHT - logoHeight, logoWidth, logoHeight);
         batch.end();
 
         stage.act(delta);
