@@ -65,9 +65,9 @@ public class LobbyScreen extends ScreenAdapter {
             if (event == null) {
                 break;
             } else if (event instanceof Network.PlayerReady) {
-                ready++;
+                ready = ((Network.PlayerReady) event).cnt;
             } else if (event instanceof Network.PlayerJoined) {
-                joined++;
+                joined = ((Network.PlayerJoined) event).cnt;
             } else if (event instanceof Network.NextLevel) {
                 game.setScreen(new GameScreen(game));
                 break;

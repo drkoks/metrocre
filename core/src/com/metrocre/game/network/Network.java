@@ -105,11 +105,11 @@ public class Network {
     }
 
     public static class PlayerReady {
-
+        public int cnt;
     }
 
     public static class PlayerJoined {
-
+        public int cnt;
     }
 
     public static class TakeDamage {

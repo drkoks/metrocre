@@ -19,7 +19,6 @@ public class LobbyState extends ServerState {
             Queue<Object> playerEvents = connection.messageStock.getReceived();
             for (Object event : playerEvents) {
                 if (event instanceof Network.PlayerReady) {
-                    System.out.println(connection.gameView.playersProfile.getName());
                     isReady.add(connection.gameView.playersProfile.getName());
                 }
             }
@@ -27,6 +26,10 @@ public class LobbyState extends ServerState {
                 done = false;
             }
         }
+
+        Network.PlayerReady playerReady = new Network.PlayerReady();
+        playerReady.cnt = isReady.size();
+        server.packToSend(playerReady);
 
         if (done) {
             server.packToSend(new Network.NextLevel());

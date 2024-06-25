@@ -35,7 +35,9 @@ public class GameServer {
                 GameViewConnection connection = (GameViewConnection) c;
                 connectionCnt++;
                 connection.gameView.init("Player" + connectionCnt);
-                sendToAll(new Network.PlayerJoined());
+                Network.PlayerJoined playerJoined = new Network.PlayerJoined();
+                playerJoined.cnt = connectionCnt;
+                sendToAll(playerJoined);
             }
 
             public void received(Connection c, Object object) {
