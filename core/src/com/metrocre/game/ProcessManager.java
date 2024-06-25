@@ -14,7 +14,9 @@ public class ProcessManager {
     public void update(float delta) {
         for (ListIterator<Process> iterator = processes.listIterator(); iterator.hasNext(); ) {
             Process process = iterator.next();
-            process.update(delta);
+            if (process.getState() == Process.State.Running) {
+                process.update(delta);
+            }
             if (process.getState() == Process.State.Complete) {
                 iterator.remove();
             }

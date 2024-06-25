@@ -3,6 +3,7 @@ package com.metrocre.game.towers;
 import static com.metrocre.game.MyGame.SCALE;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.metrocre.game.world.Worm;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
@@ -23,7 +24,7 @@ public class GunTower extends Tower {
     }
 
     public void update(float delta) {
-        Enemy target = getTarget();
+        Entity target = getTarget();
         if (target == null) {
             return;
         }
@@ -31,18 +32,18 @@ public class GunTower extends Tower {
         gun.shoot(target.getBody().getPosition().cpy().sub(body.getPosition()).setLength(1));
     }
 
-    private Enemy getTarget() {
+    private Entity getTarget() {
         List<Entity> entitiesInRadius = worldManager.getEntitiesInRadius(body.getPosition(), detectRadius);
-        Enemy target = null;
+        Entity target = null;
         float distance = detectRadius;
         for (Entity entity : entitiesInRadius) {
             float thisDistance = entity.getBody().getPosition().cpy().sub(body.getPosition()).len();
-            if (!(entity instanceof Enemy) || thisDistance > distance) {
+            if (!(entity instanceof Enemy || entity instanceof Worm) || thisDistance > distance) {
                 continue;
             }
             RayCastResult rayCastResult = worldManager.castRay(body.getPosition(), entity.getBody().getPosition());
             if (rayCastResult.hitPointFraction == 1) {
-                target = (Enemy) entity;
+                target = entity;
                 distance = thisDistance;
             }
         }

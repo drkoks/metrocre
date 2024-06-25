@@ -34,6 +34,7 @@ import com.metrocre.game.world.Player;
 import com.metrocre.game.world.Train;
 import com.metrocre.game.world.WorldManager;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.metrocre.game.world.Worm;
 import com.metrocre.game.world.enemies.Enemy;
 
 import java.util.Queue;
@@ -173,6 +174,7 @@ public class GameScreen implements Screen {
         } else if (o instanceof Network.SendMapSeed) {
             Network.SendMapSeed sendMapSeed = (Network.SendMapSeed) o;
             map = new Map(worldManager, sendMapSeed.seed, true);
+            worldManager.setMap(map);
         } else if (o instanceof Network.UpdateEntityPosition) {
             Network.UpdateEntityPosition updateEntityPosition = (Network.UpdateEntityPosition) o;
             Entity entity = worldManager.getEntity(updateEntityPosition.entityId);
@@ -221,6 +223,12 @@ public class GameScreen implements Screen {
                 } else if (receiver instanceof Player) {
                     Player player = (Player) receiver;
                     player.takeDamage(takeDamage.damage, takeDamage.senderId);
+                } else if (receiver instanceof Train) {
+                    Train train = (Train) receiver;
+                    train.takeDamage(takeDamage.damage);
+                } else if (receiver instanceof Worm) {
+                    Worm worm = (Worm) receiver;
+                    worm.takeDamage(takeDamage.damage, takeDamage.senderId);
                 }
             }
         } else if (o instanceof Network.Heal) {

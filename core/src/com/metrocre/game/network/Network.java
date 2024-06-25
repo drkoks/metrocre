@@ -48,6 +48,7 @@ public class Network {
         kryo.register(EntityData.TowerData.class);
         kryo.register(PlayersProfile.class);
         kryo.register(Vector2.class);
+        kryo.register(EntityData.WormData.class);
 
         kryo.register(WorldEvents.EquipWeapon.class);
 

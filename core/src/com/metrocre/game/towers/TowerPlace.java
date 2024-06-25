@@ -40,8 +40,8 @@ public class TowerPlace implements Serializable {
 
     public void placeTower(int playerId, int towerType, WorldManager worldManager) {
         EntityData.TowerData towerData = new EntityData.TowerData();
-        towerData.x = x;
-        towerData.y = y;
+        towerData.x = x + SCALE / 2f;
+        towerData.y = y + SCALE / 2f;
         towerData.type = towerType;
         towerData.playerId = playerId;
         isOccupied = true;
