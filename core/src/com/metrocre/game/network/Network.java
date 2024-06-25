@@ -35,6 +35,7 @@ public class Network {
         kryo.register(NextLevel.class);
         kryo.register(AbleToFinish.class);
         kryo.register(PlayerReady.class);
+        kryo.register(PlayerJoined.class);
         kryo.register(Upgrades.class);
         kryo.register(TakeDamage.class);
         kryo.register(Heal.class);
@@ -104,6 +105,10 @@ public class Network {
     }
 
     public static class PlayerReady {
+
+    }
+
+    public static class PlayerJoined {
 
     }
 

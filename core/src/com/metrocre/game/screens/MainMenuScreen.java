@@ -13,6 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.network.GameClient;
+import com.metrocre.game.network.GameServer;
+import com.metrocre.game.network.Network;
+
+import java.io.IOException;
 
 
 public class MainMenuScreen implements Screen {
@@ -50,14 +55,31 @@ public class MainMenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 backgroundMusic.stop();
-                game.setScreen(new LobbyScreen(game)); //TODO: change to join screen
+                GameClient client = new GameClient();
+                if (client.start()) {
+                    game.setClient(client);
+                    game.setScreen(new LobbyScreen(game));
+                }
             }
         });
         serverPlayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 backgroundMusic.stop();
-                game.setScreen(new LobbyScreen(game)); //TODO: change to server screen
+                GameServer server = new GameServer();
+                try {
+                    server.start();
+                } catch (IOException e) {
+                    return;
+                }
+                GameClient client = new GameClient();
+                if (client.start()) {
+                    game.setClient(client);
+                    game.setServer(server);
+                    game.setScreen(new LobbyScreen(game));
+                } else {
+                    server.dispose();
+                }
             }
         });
 

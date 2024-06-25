@@ -12,15 +12,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
+import com.metrocre.game.network.Network;
+
+import java.util.Queue;
 
 
 public class LobbyScreen extends ScreenAdapter {
     private Label inGameCounter;
     private Label readyCounter;
+    private int joined = 0;
+    private int ready = 0;
 
     private final Stage stage;
     private final MyGame game;
-    private boolean isReady = false;
 
     public LobbyScreen(final MyGame game) {
         this.game = game;
@@ -33,8 +37,6 @@ public class LobbyScreen extends ScreenAdapter {
         inGameCounter.setSize(200, 50);
         inGameCounter.setPosition((float) (Gdx.graphics.getWidth() - inGameCounter.getWidth()) /2, Gdx.graphics.getHeight() - 150);
 
-
-
         TextButton readyButton = new TextButton("Ready", skin);
         readyButton.setSize(400, 100);
         readyButton.setPosition((float) (Gdx.graphics.getWidth() - readyButton.getWidth()) /2, readyButton.getHeight());
@@ -42,11 +44,9 @@ public class LobbyScreen extends ScreenAdapter {
         readyButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                isReady = !isReady;
-                //TODO: send ready signal to server
+                game.getClient().packToSend(new Network.PlayerReady());
             }
         });
-
 
         stage.addActor(readyButton);
         stage.addActor(readyCounter);
@@ -60,24 +60,32 @@ public class LobbyScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        while (true) {
+            Object event = game.getClient().getRemoteEvent();
+            if (event == null) {
+                break;
+            } else if (event instanceof Network.PlayerReady) {
+                ready++;
+            } else if (event instanceof Network.PlayerJoined) {
+                joined++;
+            } else if (event instanceof Network.NextLevel) {
+                game.setScreen(new GameScreen(game));
+                break;
+            }
+        }
+
         Gdx.gl.glClearColor(1, 0.31f, 0.49f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(delta);
         updateLabels();
         stage.draw();
+
+        game.getClient().sendAll();
     }
 
     private void updateLabels() {
-        int playersReady = 0; //TODO: get number of players ready
-        if (isReady) {
-            playersReady++;
-        }
-        int playersInLobby = 1; //TODO: get number of players in lobby
-        if (playersReady == playersInLobby) {
-            game.setScreen(new GameScreen(game)); //TODO: start game
-        }
-        readyCounter.setText("Players ready: " + 0);
-        inGameCounter.setText("Players in lobby: " + 1);
+        readyCounter.setText("Players ready: " + ready);
+        inGameCounter.setText("Players in lobby: " + joined);
     }
     @Override
     public void resize(int width, int height) {

@@ -29,12 +29,13 @@ public class GameServer {
         Network.register(server);
         server.addListener(new Listener() {
             public void connected(Connection c) {
-                if (!(gameState instanceof WaitingForPlayersState)) {
+                if (!(gameState instanceof LobbyState)) {
                     c.close();
                 }
                 GameViewConnection connection = (GameViewConnection) c;
                 connectionCnt++;
                 connection.gameView.init("Player" + connectionCnt);
+                sendToAll(new Network.PlayerJoined());
             }
 
             public void received(Connection c, Object object) {
@@ -45,7 +46,7 @@ public class GameServer {
         server.bind(Network.PORT);
         server.start();
 
-        setState(new WaitingForPlayersState(this));
+        setState(new LobbyState(this));
     }
 
     public void update(float deltaTime) {

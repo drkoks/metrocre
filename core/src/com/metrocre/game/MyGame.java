@@ -20,8 +20,6 @@ public class MyGame extends Game {
     static final long NANOS_PER_FRAME = 1_000_000_000 / FPS;
     private float volume = 1.0f;
     private long prevRenderTime = 0;
-    //private MessageDispatcher messageDispatcher = new MessageDispatcher();
-    //private BuyEventHandler buyEventHandler = new BuyEventHandler(playersProfile);
     private GameServer server = null;
     private GameClient client = null;
     public PlayersProfile localPlayerProfile = null;
@@ -35,25 +33,9 @@ public class MyGame extends Game {
         this.volume = volume;
     }
 
-    //public MessageDispatcher getMessageDispatcher() {
-        //return messageDispatcher;
-    //}
 
     @Override
     public void create() {
-        //messageDispatcher.addListener(buyEventHandler, TradeEvents.BUY);
-       // System.out.println("s/c: ");
-        Scanner scanner = new Scanner(System.in);
-       // if (scanner.nextLine().equals("s")) {
-            server = new GameServer();
-            try {
-                server.start();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-       // }
-        client = new GameClient();
-        client.start();
         setScreen(new MainMenuScreen(this));
     }
 
@@ -89,6 +71,14 @@ public class MyGame extends Game {
 
     public GameServer getServer() {
         return server;
+    }
+
+    public void setClient(GameClient client) {
+        this.client = client;
+    }
+
+    public void setServer(GameServer server) {
+        this.server = server;
     }
 
     public void setShopScreen(ShopScreen shopScreen) {

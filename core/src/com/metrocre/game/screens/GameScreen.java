@@ -56,6 +56,7 @@ public class GameScreen implements Screen {
     private TextButton shopButton;
     private Train train;
     private boolean isAbleToFinishLevel = false;
+    private Worm worm;
 
     public void addTexture() {
         worldManager.addTexture(new Texture("dog.png"), "player");
@@ -170,6 +171,12 @@ public class GameScreen implements Screen {
             worldManager.getMessageDispatcher().dispatchMessage(addEntity.ID, addEntity);
             if (addEntity.type == EntityType.Train) {
                 train = (Train) worldManager.getLastAddedEntity();
+            } else if (addEntity.type == EntityType.Worm) {
+                Worm worm = (Worm) worldManager.getLastAddedEntity();
+                if (worm.getType() == 2) {
+                    this.worm = worm;
+                    hud.setBossMaxHealth(worm.getHealth());
+                }
             }
         } else if (o instanceof Network.SendMapSeed) {
             Network.SendMapSeed sendMapSeed = (Network.SendMapSeed) o;
@@ -264,6 +271,12 @@ public class GameScreen implements Screen {
         }
 
         nextLevelButton.setVisible(train != null && train.isPlayerOnTrain(player) && isAbleToFinishLevel);
+        if (train != null) {
+            hud.setTrainHealth(train.getHealth());
+        }
+        if (worm != null) {
+            hud.setBossHealth(worm.getHealth());
+        }
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -277,19 +290,11 @@ public class GameScreen implements Screen {
         Network.PlayerMove playerMove = new Network.PlayerMove();
         playerMove.direction = moveDirection;
         game.getClient().packToSend(playerMove);
-//        System.out.println("PlayerMove sended");
-        //player.move(moveDirection);
 
         Vector2 attackDirection = attackJoystick.getDirection();
         Network.PlayerAttack playerAttack = new Network.PlayerAttack();
         playerAttack.direction = attackDirection;
         game.getClient().packToSend(playerAttack);
-        //player.shoot(attackDirection);
-
-//        worldManager.update(delta);
-//        worldManager.getWorld().step(delta, 6, 2);
-
-        //b2ddr.render(worldManager.getWorld(), camera.combined);
 
         worldManager.getProjectileManager().update(delta);
 

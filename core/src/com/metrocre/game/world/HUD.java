@@ -14,25 +14,23 @@ public class HUD {
     private Label coinsLabel;
     private Label trainHealthLabel;
     private ProgressBar bossHealthBar;
-    private boolean bossFight = true;
+    private Skin skin;
 
-    private int bossHealth = 20;
-
-    private int trainHealth = 100;
-    private int bossMaxHealth = 100;
+    private int bossHealth = 0;
+    private int trainHealth = 0;
+    private int bossMaxHealth = 0;
 
     public HUD(Player player, Stage stage, Skin skin) {
+        this.skin = skin;
         this.player = player;
         this.stage = stage;
         Label bossHealthLabel = null;
         if (player != null) {
             healthLabel = new Label("Health: " + player.getHealth(), skin);
             coinsLabel = new Label("Coins: " + player.getMoney(), skin);
-            if (bossFight) {
-                bossHealthBar = new ProgressBar(0, bossMaxHealth, 1, false, skin);
-                bossHealthBar.setValue(bossHealth);
+            bossHealthBar = new ProgressBar(0, 200f, 1, false, skin);
+            bossHealthBar.setValue(bossHealth);
                 //bossHealthBar.setSize(50, 5);
-            }
             trainHealthLabel = new Label("Train Health: " + trainHealth, skin);
             bossHealthLabel = new Label("Boss Health: ", skin);
         }
@@ -56,6 +54,7 @@ public class HUD {
 
     public void setBossHealth(int bossHealth) {
         this.bossHealth = bossHealth;
+        bossHealthBar.setValue((float) bossHealth / bossMaxHealth * 200);
     }
 
     public void setBossMaxHealth(int bossMaxHealth) {
@@ -70,8 +69,8 @@ public class HUD {
         if (player != null) {
             healthLabel.setText("Health: " + player.getHealth());
             coinsLabel.setText("Coins: " + player.getMoney());
-            if (bossFight) {
-                bossHealthBar.setValue(bossHealth);
+            if (bossMaxHealth > 0) {
+                bossHealthBar.setValue((float) bossHealth / bossMaxHealth * 200);
             }
             trainHealthLabel.setText("Train Health: " + trainHealth);
         }

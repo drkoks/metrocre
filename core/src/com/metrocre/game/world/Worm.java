@@ -36,7 +36,7 @@ public class Worm extends Entity {
         } else {
             this.size = 2 * SCALE;
             this.numSegments = 20;
-            this.health = 200;
+            this.health = 100;
             this.damage = 30;
         }
         this.width = this.size;
@@ -128,5 +128,9 @@ public class Worm extends Entity {
 
     public int getType() {
         return type;
+    }
+
+    public int getHealth() {
+        return health;
     }
 }
