@@ -11,7 +11,7 @@ public class GameClient {
     private Client client;
     private MessageStock messageStock = new MessageStock();
 
-    public void start() {
+    public boolean start() {
         client = new Client();
         client.start();
         Network.register(client);
@@ -31,9 +31,9 @@ public class GameClient {
         try {
             client.connect(5000, "localhost", Network.PORT);
         } catch(IOException e) {
-            throw new RuntimeException(e);
+            return false;
         }
-        client.sendTCP("normalno");
+        return true;
     }
 
     public Queue<Object> getRemoteEvents() {

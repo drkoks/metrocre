@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.metrocre.game.network.GameClient;
 import com.metrocre.game.network.GameServer;
 import com.metrocre.game.screens.GameScreen;
+import com.metrocre.game.screens.MainMenuScreen;
 import com.metrocre.game.screens.ShopScreen;
 
 import java.io.IOException;
@@ -13,14 +14,12 @@ import java.util.Scanner;
 public class MyGame extends Game {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 480;
-    public static final int SCALE = 15;
+    public static final int SCALE = 20;
     public static final float UNIT_SCALE = SCALE / 32f;
     static final long FPS = 60;
     static final long NANOS_PER_FRAME = 1_000_000_000 / FPS;
     private float volume = 1.0f;
     private long prevRenderTime = 0;
-    //private MessageDispatcher messageDispatcher = new MessageDispatcher();
-    //private BuyEventHandler buyEventHandler = new BuyEventHandler(playersProfile);
     private GameServer server = null;
     private GameClient client = null;
     public PlayersProfile localPlayerProfile = null;
@@ -34,27 +33,10 @@ public class MyGame extends Game {
         this.volume = volume;
     }
 
-    //public MessageDispatcher getMessageDispatcher() {
-        //return messageDispatcher;
-    //}
 
     @Override
     public void create() {
-        //messageDispatcher.addListener(buyEventHandler, TradeEvents.BUY);
-        //setScreen(new MainMenuScreen(this));
-        System.out.println("s/c: ");
-        Scanner scanner = new Scanner(System.in);
-        if (scanner.nextLine().equals("s")) {
-            server = new GameServer();
-            try {
-                server.start();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        client = new GameClient();
-        client.start();
-        setScreen(new GameScreen(this));
+        setScreen(new MainMenuScreen(this));
     }
 
     @Override
@@ -89,6 +71,14 @@ public class MyGame extends Game {
 
     public GameServer getServer() {
         return server;
+    }
+
+    public void setClient(GameClient client) {
+        this.client = client;
+    }
+
+    public void setServer(GameServer server) {
+        this.server = server;
     }
 
     public void setShopScreen(ShopScreen shopScreen) {

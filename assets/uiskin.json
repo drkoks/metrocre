@@ -8,6 +8,11 @@
       "up": "play",
       "font": "default-font"
     },
+    "join": {
+      "down": "join",
+      "up": "join",
+      "font": "default-font"
+    },
     "exit": {
       "down": "exit",
       "up": "exit",
