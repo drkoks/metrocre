@@ -6,4 +6,5 @@ public enum EntityType {
     Tower,
     Train,
     Projectile,
+    Worm,
 }

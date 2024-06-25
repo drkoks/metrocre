@@ -77,6 +77,9 @@ public class Player extends Entity {
     }
 
     public void takeDamage(float damage, int senderId) {
+        if (worldManager.getServer() != null && isDamaged) {
+            return;
+        }
         float multiplier = 1f;
         Entity sender = worldManager.getEntity(senderId);
         if (sender instanceof Enemy) {
@@ -149,7 +152,7 @@ public class Player extends Entity {
             setWeapon(new Pistol(this, worldManager.getProjectileManager(), new Texture("pistol.png"),
                     0.6F * SCALE, 0.4F * SCALE, playersProfile.getWeaponLevel()));
         } else if (weaponId == 2) {
-            setWeapon(new Railgun(this, worldManager.getProjectileManager(), new Texture("railgun.png"),
+            setWeapon(new Railgun(this, worldManager.getProjectileManager(), new Texture("laser.png"),
                     0.6F * SCALE, 0.4F * SCALE, playersProfile.getWeaponLevel()));
         }
         if (worldManager.getServer() != null) {
@@ -168,7 +171,7 @@ public class Player extends Entity {
         return weapon.getClass().getSimpleName();
     }
 
-    public  boolean isDamaged() {
+    public boolean isDamaged() {
         return isDamaged;
     }
 

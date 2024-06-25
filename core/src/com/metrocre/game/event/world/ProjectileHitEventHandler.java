@@ -4,6 +4,7 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.metrocre.game.world.Player;
+import com.metrocre.game.world.Worm;
 import com.metrocre.game.world.WorldManager;
 import com.metrocre.game.world.enemies.Enemy;
 import com.metrocre.game.weapons.Projectile;
@@ -45,6 +46,12 @@ public class ProjectileHitEventHandler implements Telegraph {
             } else {
                 player.takeDamage(projectile.getDamage(), projectile.getSenderId());
             }
+            if (worldManager.getServer() != null) {
+                projectile.destroy();
+            }
+        } else if (data.hittedObject instanceof Worm) {
+            Worm worm = (Worm) data.hittedObject;
+            worm.takeDamage(projectile.getDamage(), projectile.getSenderId());
             if (worldManager.getServer() != null) {
                 projectile.destroy();
             }
