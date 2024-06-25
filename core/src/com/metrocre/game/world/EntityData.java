@@ -29,6 +29,7 @@ public class EntityData {
     public static class TrainData {
         public float x;
         public float y;
+        public int health;
         public float width;
         public float height;
     }
@@ -38,5 +39,11 @@ public class EntityData {
         public float y;
         public int type;
         public int playerId;
+    }
+
+    public static class WormData {
+        public float x;
+        public float y;
+        public int type;
     }
 }

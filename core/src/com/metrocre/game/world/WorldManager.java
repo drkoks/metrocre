@@ -27,6 +27,7 @@ import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.ProjectileHitEventData;
 import com.metrocre.game.event.world.ProjectileHitEventHandler;
 import com.metrocre.game.event.world.RailHitEventHandler;
+import com.metrocre.game.network.Network;
 import com.metrocre.game.towers.GunTower;
 import com.metrocre.game.towers.HealTower;
 import com.metrocre.game.towers.Tower;
@@ -48,6 +49,7 @@ import java.util.Set;
 public class WorldManager {
     private GameServer server;
     private World world;
+    private com.metrocre.game.Map map;
     private MessageDispatcher messageDispatcher = new MessageDispatcher();
     private IntMap<Entity> entities = new IntMap<>();
 
@@ -100,12 +102,12 @@ public class WorldManager {
                 }
                 if (data1 instanceof Projectile) {
                     Projectile bullet = (Projectile) data1;
-                    if (bullet.isHeal() && data2 instanceof Enemy) {
+                    if (bullet.isHeal() && (data2 instanceof Enemy || data2 instanceof Worm)) {
                         return;
                     }
                     if (!bullet.isHeal()) {
                         Entity sender = getEntity(bullet.getSenderId());
-                        if (sender instanceof Enemy && data2 instanceof Enemy) {
+                        if (sender instanceof Enemy && (data2 instanceof Enemy || data2 instanceof Worm)) {
                             return;
                         }
                         if ((sender instanceof Tower || sender instanceof Player) && data2 instanceof Player) {
@@ -116,7 +118,23 @@ public class WorldManager {
                     projectileHitEventData.projectileId = bullet.getId();
                     projectileHitEventData.hittedObject = data2;
                     messageDispatcher.dispatchMessage(WorldEvents.PROJECTILE_HIT, projectileHitEventData);
-
+                    return;
+                }
+                if (data2 instanceof Worm) {
+                    Object tmp = data1;
+                    data1 = data2;
+                    data2 = tmp;
+                }
+                if (data1 instanceof Worm) {
+                    Worm worm = (Worm) data1;
+                    if (data2 instanceof Player) {
+                        Player player = (Player) data2;
+                        player.takeDamage(worm.getDamage(), worm.getId());
+                    } else if (worm.getType() == 1 && data2 instanceof Train) {
+                        Train train = (Train) data2;
+                        train.takeDamage(worm.getDamage());
+                        worm.destroy();
+                    }
                 }
             }
 
@@ -137,6 +155,14 @@ public class WorldManager {
         });
     }
 
+    public com.metrocre.game.Map getMap() {
+        return map;
+    }
+
+    public void setMap(com.metrocre.game.Map map) {
+        this.map = map;
+    }
+
     public World getWorld() {
         return world;
     }
@@ -149,7 +175,9 @@ public class WorldManager {
         projectileManager.update(delta);
         for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext(); ) {
             Entity entity = it.next().value;
-            entity.update(delta);
+            if (entity != null) {
+                entity.update(delta);
+            }
         }
         for (EnemySpawner spawner : spawners) {
             if (!spawner.isDestroyed()) {
@@ -163,7 +191,14 @@ public class WorldManager {
         for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
             Entity entity = it.next().value;
             if (entity.isDestroyed()) {
-                world.destroyBody(entity.getBody());
+                if (entity instanceof Worm) {
+                    Worm worm = (Worm) entity;
+                    for (Body body : worm.getSegmentList()) {
+                        world.destroyBody(body);
+                    }
+                } else {
+                    world.destroyBody(entity.getBody());
+                }
                 it.remove();
             }
         }
@@ -205,6 +240,16 @@ public class WorldManager {
             }
         }
         return enemies;
+    }
+
+    public List<Player> getPlayers() {
+        List<Player> players = new ArrayList<>();
+        for (Entity entity : entities.values()) {
+            if (entity instanceof Player) {
+                players.add((Player) entity);
+            }
+        }
+        return players;
     }
 
     public List<Entity> getEntities() {
@@ -356,7 +401,6 @@ public class WorldManager {
 
         @Override
         public boolean handleMessage(Telegram msg) {
-            System.out.println("Handling AddEntity");
             WorldEvents.AddEntity addEntity = (WorldEvents.AddEntity) msg.extraInfo;
             Entity entity = null;
             if (addEntity.type == EntityType.Player) {
@@ -374,7 +418,7 @@ public class WorldManager {
                 entity = new Projectile(data.position, data.direction, data.damage, data.speed, worldManager, data.senderId, data.isHeal);
             } else if (addEntity.type == EntityType.Train) {
                 EntityData.TrainData data = (EntityData.TrainData) addEntity.data;
-                entity = new Train(data.x, data.y, worldManager, new Texture("data/empty.png"), data.width, data.height);
+                entity = new Train(data.x, data.y, data.health, worldManager, new Texture("data/empty.png"), data.width, data.height);
             } else if (addEntity.type == EntityType.Tower) {
                 EntityData.TowerData towerData = (EntityData.TowerData) addEntity.data;
                 if (towerData.type == 1) {
@@ -384,9 +428,11 @@ public class WorldManager {
                     entity = new HealTower(towerData.x, towerData.y, 5,
                             3 * SCALE, worldManager, (Player) worldManager.getEntity(towerData.playerId), "healTower");
                 }
+            } else if (addEntity.type == EntityType.Worm) {
+                EntityData.WormData wormData = (EntityData.WormData) addEntity.data;
+                entity = new Worm(wormData.x, wormData.y, worldManager, wormData.type);
             }
             if (server != null) {
-                System.out.println("AddEntity send");
                 server.packToSend(addEntity);
             }
             worldManager.addEntity(entity);

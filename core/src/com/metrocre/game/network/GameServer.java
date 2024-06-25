@@ -13,10 +13,12 @@ import java.util.Random;
 public class GameServer {
     private static final Random random = new Random();
 
-    private int levelCounter = 0;
+    private int levelCounter = 1;
+    private int lastLevel = 4;
     private int connectionCnt = 0;
     private Server server;
     private ServerState gameState;
+    private int trainHealth = 200;
 
     public void start() throws IOException {
         server = new Server(){
@@ -99,11 +101,27 @@ public class GameServer {
         levelCounter++;
     }
 
+    public int getLevelCnt() {
+        return levelCounter;
+    }
+
     public Random getRandom() {
         return random;
     }
 
     public boolean isWin(){
-        return levelCounter >= 5;
+        return levelCounter > lastLevel;
+    }
+
+    public int getLastLevel() {
+        return lastLevel;
+    }
+
+    public int getTrainHealth() {
+        return trainHealth;
+    }
+
+    public void setTrainHealth(int value) {
+        trainHealth = value;
     }
 }
