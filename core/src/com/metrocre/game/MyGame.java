@@ -22,7 +22,7 @@ public class MyGame extends Game {
     private long prevRenderTime = 0;
     private GameServer server = null;
     private GameClient client = null;
-    public PlayersProfile localPlayerProfile = null;
+    public PlayersProfile localPlayerProfile = new PlayersProfile();
     private ShopScreen shopScreen;
 
     public float getVolume() {
