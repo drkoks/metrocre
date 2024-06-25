@@ -18,8 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.metrocre.game.MyGame;
 import com.metrocre.game.Upgrades;
-import com.metrocre.game.event.trade.BuyEventData;
-import com.metrocre.game.event.trade.TradeEvents;
+import com.metrocre.game.network.Network;
 
 public class TradeScreen extends ScreenAdapter {
     private Stage stage;
@@ -46,10 +45,10 @@ public class TradeScreen extends ScreenAdapter {
         Label titleLabel = new Label("TradeCenter", skin);
         titleLabel.setSize(100, 50);
         titleLabel.setPosition((float) MyGame.WIDTH / 2 - 40, MyGame.HEIGHT - 50);
-        coinsLabel = new Label("Coins: " + game.playersProfile.getMoney(), skin);
-        speedLevelLabel = new Label("Speed Level: " + game.playersProfile.getSpeed(), skin);
-        defenseLevelLabel = new Label("Defense Level: " + game.playersProfile.getDefence(), skin);
-        attackLevelLabel = new Label("Attack Level: " + game.playersProfile.getAttack(), skin);
+        coinsLabel = new Label("Coins: " + game.localPlayerProfile.getMoney(), skin);
+        speedLevelLabel = new Label("Speed Level: " + game.localPlayerProfile.getSpeed(), skin);
+        defenseLevelLabel = new Label("Defense Level: " + game.localPlayerProfile.getDefence(), skin);
+        attackLevelLabel = new Label("Attack Level: " + game.localPlayerProfile.getAttack(), skin);
 
         Label itemInfo = new Label("", skin);
 
@@ -64,7 +63,7 @@ public class TradeScreen extends ScreenAdapter {
             public void changed(ChangeEvent event, Actor actor) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
                 itemInfo.setText("+ 20% to " + selectedItem.toString() + " cost " +
-                        game.playersProfile.getSelectedItemCost(selectedItem) + " coins");
+                        game.localPlayerProfile.getSelectedItemCost(selectedItem) + " coins");
             }
         });
 
@@ -72,10 +71,10 @@ public class TradeScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Upgrades selectedItem = Upgrades.fromString(itemList.getSelected());
-                if (game.playersProfile.canBuyItem(selectedItem)) {
-                    BuyEventData buyEventData = new BuyEventData();
-                    buyEventData.upgrade = selectedItem;
-                    game.getMessageDispatcher().dispatchMessage(TradeEvents.BUY, buyEventData);
+                if (game.localPlayerProfile.canBuyItem(selectedItem)) {
+                    Network.Buy buy = new Network.Buy();
+                    buy.upgrades = selectedItem;
+                    game.getClient().packToSend(buy);
                     itemInfo.setText(selectedItem + " purchased.");
                     updateLabels();
                 } else {
@@ -89,7 +88,7 @@ public class TradeScreen extends ScreenAdapter {
         continueButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameScreen(game));
+                game.getClient().packToSend(new Network.PlayerReady());
             }
         });
         Table table = new Table();
@@ -124,12 +123,31 @@ public class TradeScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        while (true) {
+            Object event = game.getClient().getRemoteEvent();
+            if (event == null) {
+                break;
+            }
+            if (event instanceof Network.NextLevel) {
+                game.setScreen(new GameScreen(game));
+                break;
+            } else if (event instanceof Network.Buy) {
+                Network.Buy buy = (Network.Buy) event;
+                game.localPlayerProfile.buyItem(buy.upgrades);
+            }
+        }
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
+
+        updateLabels();
+
         batch.draw(backgroundTexture, 0, 0, stage.getWidth(), stage.getHeight());
         batch.end();
         stage.act(Math.min(delta, 1 / 30f));
         stage.draw();
+
+        game.getClient().sendAll();
     }
 
     public void resize(int width, int height) {
@@ -143,9 +161,9 @@ public class TradeScreen extends ScreenAdapter {
         batch.dispose();
     }
     private void updateLabels() {
-        coinsLabel.setText("Coins: " + game.playersProfile.getMoney());
-        speedLevelLabel.setText("Speed Level: " + game.playersProfile.getSpeed());
-        defenseLevelLabel.setText("Defense Level: " + game.playersProfile.getDefence());
-        attackLevelLabel.setText("Attack Level: " + game.playersProfile.getAttack());
+        coinsLabel.setText("Coins: " + game.localPlayerProfile.getMoney());
+        speedLevelLabel.setText("Speed Level: " + game.localPlayerProfile.getSpeed());
+        defenseLevelLabel.setText("Defense Level: " + game.localPlayerProfile.getDefence());
+        attackLevelLabel.setText("Attack Level: " + game.localPlayerProfile.getAttack());
     }
 }

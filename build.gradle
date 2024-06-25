@@ -1,20 +1,19 @@
 apply plugin: 'java'
 
 buildscript {
-    
+
 
     repositories {
+        google()
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        google()
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:8.2.2'
         classpath "com.badlogicgames.gdx:gdx-ai:1.8.2"
-
-
     }
 }
 
@@ -39,9 +38,9 @@ allprojects {
     }
 
     repositories {
+        google()
         mavenLocal()
         mavenCentral()
-        google()
         gradlePluginPortal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
@@ -49,9 +48,24 @@ allprojects {
     }
 }
 
-project(":desktop") {
+project(":core") {
     apply plugin: "java-library"
 
+    dependencies {
+        implementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        runtimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
+        implementation "com.esotericsoftware:kryonet:2.22.0-RC1"
+    }
+}
+
+project(":desktop") {
+    apply plugin: "java-library"
 
     dependencies {
         implementation project(":core")
@@ -66,44 +80,28 @@ project(":desktop") {
 }
 
 project(":android") {
-    apply plugin: "com.android.application"
+   apply plugin: "com.android.application"
 
-    configurations { natives }
+   configurations { natives }
 
-    dependencies {
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-        implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-        
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
-        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+   dependencies {
+       testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+       testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+       implementation project(":core")
+       api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+       natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+       natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+       natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+       natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 
-    }
-}
+       api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+       natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
+       natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
+       natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
+       natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
+       api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
 
-project(":core") {
-    apply plugin: "java-library"
-
-
-    dependencies {
-        implementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-        runtimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
-    }
+   }
 }
 
 java {

@@ -21,7 +21,7 @@ public class Enemy1 extends Enemy {
             return;
         }
         cooldown = 1f;
-        player.takeDamage(1, this);
+        player.takeDamage(1, id);
     }
 
     @Override

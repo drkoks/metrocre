@@ -9,22 +9,25 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.WorldManager;
+import com.metrocre.game.world.enemies.Enemy;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class Projectile extends Entity {
+    private static final Texture friedlyBulletTexture = new Texture("bullet.png");
+    private static final Texture enemyBulletTexture = new Texture("bulletEnemy.png");
+    private static final Texture healBulletTexture = new Texture("healBullet.png");
     public static final float SIZE = (float) SCALE / 8;
 
     private float damage;
-
+    private int senderId;
     private boolean isHeal = false;
-    private Entity sender;
 
-    public Projectile(Vector2 position, Vector2 direction, float damage, float speed, WorldManager worldManager, Texture texture, Entity sender, boolean isHeal) {
-        super(worldManager, texture);
+    public Projectile(Vector2 position, Vector2 direction, float damage, float speed, WorldManager worldManager, int senderId, boolean isHeal) {
+        super(worldManager, isHeal ? healBulletTexture : worldManager.getEntity(senderId) instanceof Enemy ? enemyBulletTexture : friedlyBulletTexture);
         this.isHeal = isHeal;
         this.damage = damage;
-        this.sender = sender;
+        this.senderId = senderId;
         body = worldManager.createCircleBody(position.x, position.y, SIZE / 2, true, true, this);
         body.setLinearVelocity(direction.scl(speed));
     }
@@ -53,7 +56,7 @@ public class Projectile extends Entity {
         return damage;
     }
 
-    public Entity getSender() {
-        return sender;
+    public int getSenderId() {
+        return senderId;
     }
 }

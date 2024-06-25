@@ -9,11 +9,12 @@ import com.metrocre.game.world.Player;
 import com.metrocre.game.world.ProjectileManager;
 
 public class Pistol extends Weapon {
-    private float bulletSpeed = 7*SCALE;
+    private float bulletSpeed = 7 * SCALE;
 
-    public Pistol(Entity owner, ProjectileManager projectileManager, Texture texture) {
-        super(owner, 0.3f, projectileManager, texture);
+    public Pistol(Entity player, ProjectileManager projectileManager, Texture texture) {
+        super(player, 0.3f, projectileManager, texture);
     }
+
     public Pistol(Entity player, ProjectileManager projectileManager, Texture texture, float width, float height, int level) {
         super(player, 0.3f, projectileManager, texture, width, height, level);
     }

@@ -26,16 +26,10 @@ import java.util.List;
 import java.util.Set;
 
 public class Map {
-    public static final int TILE_SIZE = 32;
-    public static final int TILE_SIZE_KATE = 48;
-    public static final TextureRegion[][] SPLIT_TILES = TextureRegion.split(new Texture("tiles.png"), TILE_SIZE, TILE_SIZE);
-    public static final TextureRegion[][] SPLIT_TILES_KATE = TextureRegion.split(new Texture("tileM.png"), TILE_SIZE_KATE, TILE_SIZE_KATE);
-    public static final StaticTiledMapTile emptyTile = new StaticTiledMapTile(SPLIT_TILES_KATE[0][8]);
-    private  int height;
-    private  int width;
+    public static final int TILE_SIZE = 48;
+    private int height;
+    private int width;
     private int id;
-
-
 
     private final TiledMap map;
     private static final Set<Integer> emptyCellsID =
@@ -56,7 +50,7 @@ public class Map {
                 setUpCell(blockLayer.getCell(x, y), worldManager, x, y, isNew);
             }
         }
-        renderer = new OrthogonalTiledMapRenderer(map, (float) SCALE / TILE_SIZE_KATE);
+        renderer = new OrthogonalTiledMapRenderer(map, (float) SCALE / TILE_SIZE);
     }
 
     private void setUpCell(Cell cell, WorldManager worldManager, int x, int y, boolean isNew) {
@@ -79,46 +73,9 @@ public class Map {
 
     }
 
-    private void generateDefault(WorldManager worldManager, int seedId) {
-        worldManager.addEntity(new GunTower(6.5f * SCALE, 5.9f * SCALE, 5,
-                10 * SCALE, worldManager, worldManager.getPlayer(), "gunTower"));
-
-        worldManager.addEntity(new HealTower(6.5f * SCALE, 8f * SCALE, 5,
-                2 * SCALE, worldManager, worldManager.getPlayer(), "healTower"));
-    }
-
-
-
-    public Map(int[][] mapData, WorldManager worldManager) {
-        height = mapData.length;
-        width = mapData[0].length;
-
-        map = new TiledMap();
-        MapLayers layers = map.getLayers();
-        TiledMapTileLayer layer = new TiledMapTileLayer(width, height, TILE_SIZE, TILE_SIZE);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Cell cell = createCell(x, y, mapData, worldManager);
-                layer.setCell(x, y, cell);
-            }
-        }
-        layers.add(layer);
-
-        renderer = new OrthogonalTiledMapRenderer(map, 1f / TILE_SIZE);
-    }
-
     public void draw(OrthographicCamera camera) {
         renderer.setView(camera);
         renderer.render();
-    }
-
-    private Cell createCell(int x, int y, int[][] mapData, WorldManager worldManager) {
-        Cell cell = new Cell();
-        if (mapData[x][y] == 1) {
-            worldManager.createRectangleBody(x, y, 1, 1, cell);
-        }
-        cell.setTile(new StaticTiledMapTile(SPLIT_TILES[mapData[x][y] / SPLIT_TILES[0].length][mapData[x][y] % SPLIT_TILES[0].length]));
-        return cell;
     }
 
     public float getWidth() {

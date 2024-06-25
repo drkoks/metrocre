@@ -1,6 +1,10 @@
 package com.metrocre.game.world;
 
+import static com.metrocre.game.MyGame.SCALE;
+
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
+import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -18,16 +22,20 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.IntMap;
+import com.metrocre.game.network.GameServer;
+import com.metrocre.game.event.world.WorldEvents;
 import com.metrocre.game.event.world.ProjectileHitEventData;
 import com.metrocre.game.event.world.ProjectileHitEventHandler;
 import com.metrocre.game.event.world.RailHitEventHandler;
-import com.metrocre.game.event.world.WorldEvents;
+import com.metrocre.game.network.Network;
 import com.metrocre.game.towers.GunTower;
 import com.metrocre.game.towers.HealTower;
 import com.metrocre.game.towers.Tower;
 import com.metrocre.game.towers.TowerPlace;
 import com.metrocre.game.weapons.Projectile;
 import com.metrocre.game.world.enemies.Enemy;
+import com.metrocre.game.world.enemies.Enemy1;
+import com.metrocre.game.world.enemies.Enemy2;
 import com.metrocre.game.world.enemies.EnemySpawner;
 
 import java.util.ArrayList;
@@ -39,9 +47,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class WorldManager {
-    private final World world;
-    private final MessageDispatcher messageDispatcher = new MessageDispatcher();
-    private Player player;
+    private GameServer server;
+    private World world;
+    private com.metrocre.game.Map map;
+    private MessageDispatcher messageDispatcher = new MessageDispatcher();
     private IntMap<Entity> entities = new IntMap<>();
 
     private Set<EnemySpawner> spawners = new HashSet<>();
@@ -50,13 +59,34 @@ public class WorldManager {
     private Set<TowerPlace> attackPlaces = new HashSet<>();
     private Map<String, Texture> textures = new HashMap<>();
     private ProjectileManager projectileManager = new ProjectileManager(this);
-    private ProjectileHitEventHandler projectileHitEventHandler = new ProjectileHitEventHandler();
+    private ProjectileHitEventHandler projectileHitEventHandler = new ProjectileHitEventHandler(this);
     private RailHitEventHandler railHitEventHandler = new RailHitEventHandler();
+    private Entity lastAddedEntity;
+    private int entityCnt = 0;
 
-    public WorldManager(World world) {
+    public WorldManager(World world, GameServer server) {
         this.world = world;
-        messageDispatcher.addListener(projectileHitEventHandler, WorldEvents.PROJECTILE_HIT);
-        messageDispatcher.addListener(railHitEventHandler, WorldEvents.RAIL_HIT);
+        this.server = server;
+
+        if (server != null) {
+            messageDispatcher.addListener(projectileHitEventHandler, WorldEvents.PROJECTILE_HIT);
+            messageDispatcher.addListener(railHitEventHandler, WorldEvents.RAIL_HIT);
+        }
+
+        messageDispatcher.addListener(new AddEntityHandler(this, server), WorldEvents.AddEntity.ID);
+        messageDispatcher.addListener(new Telegraph(){
+            @Override
+            public boolean handleMessage(Telegram msg) {
+                WorldEvents.EquipWeapon equipWeapon = (WorldEvents.EquipWeapon) msg.extraInfo;
+                Player player = (Player) getEntity(equipWeapon.playerId);
+                player.equipWeapon(equipWeapon.weaponId);
+                if (server != null) {
+                    server.packToSend(equipWeapon);
+                }
+                return true;
+            }
+        }, WorldEvents.EquipWeapon.ID);
+
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
@@ -72,22 +102,39 @@ public class WorldManager {
                 }
                 if (data1 instanceof Projectile) {
                     Projectile bullet = (Projectile) data1;
-                    if (bullet.isHeal() && data2 instanceof Enemy) {
+                    if (bullet.isHeal() && (data2 instanceof Enemy || data2 instanceof Worm)) {
                         return;
                     }
                     if (!bullet.isHeal()) {
-                        if (bullet.getSender() instanceof Enemy && data2 instanceof Enemy) {
+                        Entity sender = getEntity(bullet.getSenderId());
+                        if (sender instanceof Enemy && (data2 instanceof Enemy || data2 instanceof Worm)) {
                             return;
                         }
-                        if ((bullet.getSender() instanceof Tower || bullet.getSender() instanceof Player) && data2 instanceof Player) {
+                        if ((sender instanceof Tower || sender instanceof Player) && data2 instanceof Player) {
                             return;
                         }
                     }
                     ProjectileHitEventData projectileHitEventData = new ProjectileHitEventData();
-                    projectileHitEventData.projectile = bullet;
+                    projectileHitEventData.projectileId = bullet.getId();
                     projectileHitEventData.hittedObject = data2;
                     messageDispatcher.dispatchMessage(WorldEvents.PROJECTILE_HIT, projectileHitEventData);
-
+                    return;
+                }
+                if (data2 instanceof Worm) {
+                    Object tmp = data1;
+                    data1 = data2;
+                    data2 = tmp;
+                }
+                if (data1 instanceof Worm) {
+                    Worm worm = (Worm) data1;
+                    if (data2 instanceof Player) {
+                        Player player = (Player) data2;
+                        player.takeDamage(worm.getDamage(), worm.getId());
+                    } else if (worm.getType() == 1 && data2 instanceof Train) {
+                        Train train = (Train) data2;
+                        train.takeDamage(worm.getDamage());
+                        worm.destroy();
+                    }
                 }
             }
 
@@ -108,10 +155,17 @@ public class WorldManager {
         });
     }
 
+    public com.metrocre.game.Map getMap() {
+        return map;
+    }
+
+    public void setMap(com.metrocre.game.Map map) {
+        this.map = map;
+    }
+
     public World getWorld() {
         return world;
     }
-
 
     public ProjectileManager getProjectileManager() {
         return projectileManager;
@@ -121,25 +175,40 @@ public class WorldManager {
         projectileManager.update(delta);
         for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext(); ) {
             Entity entity = it.next().value;
+            if (entity != null) {
+                entity.update(delta);
+            }
+        }
+        for (EnemySpawner spawner : spawners) {
+            if (!spawner.isDestroyed()) {
+                spawner.update(delta);
+            }
+        }
+        processDestroyed();
+    }
+
+    public void processDestroyed() {
+        for (Iterator<IntMap.Entry<Entity>> it = entities.iterator(); it.hasNext();) {
+            Entity entity = it.next().value;
             if (entity.isDestroyed()) {
-                world.destroyBody(entity.getBody());
+                if (entity instanceof Worm) {
+                    Worm worm = (Worm) entity;
+                    for (Body body : worm.getSegmentList()) {
+                        world.destroyBody(body);
+                    }
+                } else {
+                    world.destroyBody(entity.getBody());
+                }
                 it.remove();
             }
-            entity.update(delta);
-        }
-       for (EnemySpawner spawner : spawners) {
-           if (!spawner.isDestroyed()) {
-               spawner.update(delta);
-           }
         }
     }
 
     public void addEntity(Entity entity) {
-        if (entity instanceof Player) {
-            this.player = (Player) entity;
-        }
+        lastAddedEntity = entity;
         entities.put(entity.getId(), entity);
     }
+
     public void addSpawner(EnemySpawner spawner) {
         spawners.add(spawner);
     }
@@ -151,10 +220,16 @@ public class WorldManager {
             healPlaces.add(towerPlace);
     }
 
+    public int nextEntityCnt() {
+        return entityCnt++;
+    }
 
+    public Entity getLastAddedEntity() {
+        return lastAddedEntity;
+    }
 
-    public Player getPlayer() {
-        return player;
+    public void removeEntity(int id) {
+        entities.remove(id);
     }
 
     public List<Enemy> getEnemies() {
@@ -165,6 +240,39 @@ public class WorldManager {
             }
         }
         return enemies;
+    }
+
+    public List<Player> getPlayers() {
+        List<Player> players = new ArrayList<>();
+        for (Entity entity : entities.values()) {
+            if (entity instanceof Player) {
+                players.add((Player) entity);
+            }
+        }
+        return players;
+    }
+
+    public List<Entity> getEntities() {
+        List<Entity> res = new ArrayList<>();
+        for (Entity entity : entities.values()) {
+            res.add(entity);
+        }
+        return res;
+    }
+
+    public Entity getEntity(int id) {
+        return entities.get(id);
+    }
+
+    public void addTexture(Texture texture, String name) {
+        textures.put(name, texture);
+    }
+
+    public Texture getTexture(String name) {
+        if (!textures.containsKey(name)) {
+            return new Texture("data/empty.png");
+        }
+        return textures.get(name);
     }
 
     public List<Projectile> getProjectiles() {
@@ -282,46 +390,78 @@ public class WorldManager {
         projectileManager.dispose();
     }
 
+    private static class AddEntityHandler implements Telegraph {
+        private WorldManager worldManager;
+        private GameServer server;
 
-    public void addTexture(Texture texture, String name) {
-        textures.put(name, texture);
+        public AddEntityHandler(WorldManager worldManager, GameServer server) {
+            this.worldManager = worldManager;
+            this.server = server;
+        }
+
+        @Override
+        public boolean handleMessage(Telegram msg) {
+            WorldEvents.AddEntity addEntity = (WorldEvents.AddEntity) msg.extraInfo;
+            Entity entity = null;
+            if (addEntity.type == EntityType.Player) {
+                EntityData.PlayerData data = (EntityData.PlayerData) addEntity.data;
+                entity = new Player(data.x, data.y, worldManager, data.profile);
+            } else if (addEntity.type == EntityType.Enemy) {
+                EntityData.EnemyData data = (EntityData.EnemyData) addEntity.data;
+                if (data.type == 1) {
+                    entity = new Enemy1(data.x, data.y, worldManager);
+                } else if (data.type == 2) {
+                    entity = new Enemy2(data.x, data.y, worldManager);
+                }
+            } else if (addEntity.type == EntityType.Projectile) {
+                EntityData.ProjectileData data = (EntityData.ProjectileData) addEntity.data;
+                entity = new Projectile(data.position, data.direction, data.damage, data.speed, worldManager, data.senderId, data.isHeal);
+            } else if (addEntity.type == EntityType.Train) {
+                EntityData.TrainData data = (EntityData.TrainData) addEntity.data;
+                entity = new Train(data.x, data.y, data.health, worldManager, new Texture("data/empty.png"), data.width, data.height);
+            } else if (addEntity.type == EntityType.Tower) {
+                EntityData.TowerData towerData = (EntityData.TowerData) addEntity.data;
+                if (towerData.type == 1) {
+                    entity = new GunTower(towerData.x, towerData.y, 5,
+                            10 * SCALE, worldManager, (Player) worldManager.getEntity(towerData.playerId), "gunTower");
+                } else if (towerData.type == 2) {
+                    entity = new HealTower(towerData.x, towerData.y, 5,
+                            3 * SCALE, worldManager, (Player) worldManager.getEntity(towerData.playerId), "healTower");
+                }
+            } else if (addEntity.type == EntityType.Worm) {
+                EntityData.WormData wormData = (EntityData.WormData) addEntity.data;
+                entity = new Worm(wormData.x, wormData.y, worldManager, wormData.type);
+            }
+            if (server != null) {
+                server.packToSend(addEntity);
+            }
+            worldManager.addEntity(entity);
+            return true;
+        }
     }
 
-    public Texture getTexture(String name) {
-        return textures.get(name);
+    public GameServer getServer() {
+        return server;
     }
-    public void buildTowers(int healAmount, int GunAmount){
-        for (TowerPlace attackPlace : attackPlaces) {
-            if (attackPlace.isOccupied()) {
-                buildTower(attackPlace, 1);
-            }
-        }
-        for (TowerPlace healPlace : healPlaces) {
-            if (healPlace.isOccupied()) {
-                buildTower(healPlace, 2);
-            }
-        }
-        for (int i = 0; i < GunAmount; i++) {
+
+    public void buildTower(int playerId, int type) {
+        if (type == 1) {
             for (TowerPlace attackPlace : attackPlaces) {
                 if (attackPlace.isOccupied()) {
                     continue;
                 }
-                buildTower(attackPlace, 1);
+                attackPlace.placeTower(playerId, 1, this);
                 break;
             }
-        }
-        for (int i = 0; i < healAmount; i++) {
+        } else if (type == 2) {
             for (TowerPlace healPlace : healPlaces) {
                 if (healPlace.isOccupied()) {
                     continue;
                 }
-                buildTower(healPlace, 2);
+                healPlace.placeTower(playerId, 2, this);
                 break;
             }
         }
-    }
-    private void buildTower(TowerPlace towerPlace, int type) {
-        towerPlace.placeTower(type, this);
     }
 
     public boolean spawnersAreDone() {
@@ -340,6 +480,7 @@ public class WorldManager {
     public List<TowerPlace> getHealTowerPlaces() {
         return new ArrayList<>(healPlaces);
     }
+
     public List<TowerPlace> getGunTowerPlaces() {
         return new ArrayList<>(attackPlaces);
     }

@@ -5,6 +5,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
 
 import com.badlogic.gdx.math.Vector2;
+import com.metrocre.game.network.Network;
 import com.metrocre.game.towers.Tower;
 import com.metrocre.game.world.Entity;
 import com.metrocre.game.world.Player;
@@ -85,14 +86,23 @@ public abstract class Enemy extends Entity {
         body.setLinearVelocity(direction.scl(5 + (speed - 1) * 2));
     }
 
-    public void takeDamage(float damage, Entity sender) {
+    public void takeDamage(float damage, int senderId) {
         if (health == 0) {
             return;
         }
-        health = (int) max(0f, health - damage);
+        Entity entity = worldManager.getEntity(senderId);
+        float totalDamage = damage;
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+            totalDamage = damage + 0.2f * damage * (player.getPlayersProfile().getAttack() - 1);
+        }
+        health = (int) max(0f, health - totalDamage);
         if (health == 0) {
-            destroy();
+            if (worldManager.getServer() != null) {
+                destroy();
+            }
             Player player = null;
+            Entity sender = worldManager.getEntity(senderId);
             if (sender instanceof Player) {
                 player = (Player) sender;
             } else if (sender instanceof Tower) {
@@ -102,6 +112,13 @@ public abstract class Enemy extends Entity {
                 player.getPlayersProfile().reportKill(this);
                 player.addMoney(reward);
             }
+        }
+        if (worldManager.getServer() != null) {
+            Network.TakeDamage takeDamage = new Network.TakeDamage();
+            takeDamage.senderId = senderId;
+            takeDamage.receiverId = id;
+            takeDamage.damage = damage;
+            worldManager.getServer().packToSend(takeDamage);
         }
     }
 
