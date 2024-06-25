@@ -5,7 +5,7 @@ public class WaitingForPlayersState extends ServerState {
     private GameServer server;
 
     WaitingForPlayersState(GameServer server) {
-        countDown = 10f;
+        countDown = 0f;
         this.server = server;
     }
 

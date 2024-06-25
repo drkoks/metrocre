@@ -27,4 +27,8 @@ public class Train extends Entity {
         float playerY = player.getY();
         return playerX <= x + width + SCALE && playerX >= x - width -SCALE && playerY >= y && playerY <= y + height;
     }
+
+    public int getHealth() {
+        return 100; // TODO add health fot train
+    }
 }
