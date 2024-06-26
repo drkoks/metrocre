@@ -12,7 +12,7 @@ buildscript {
     }
 
     dependencies {
-        //classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath 'com.android.tools.build:gradle:8.2.2'
         classpath "com.badlogicgames.gdx:gdx-ai:1.8.2"
     }
 }
@@ -79,30 +79,30 @@ project(":desktop") {
     }
 }
 
-//project(":android") {
-//   apply plugin: "com.android.application"
-//
-//   configurations { natives }
-//
-//   dependencies {
-//       testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-//       testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-//       implementation project(":core")
-//       api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-//       natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-//       natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
-//       natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-//       natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-//
-//       api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-//       natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
-//       natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
-//       natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
-//       natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
-//       api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-//
-//   }
-//}
+project(":android") {
+  apply plugin: "com.android.application"
+
+  configurations { natives }
+
+  dependencies {
+      testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+      testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+      implementation project(":core")
+      api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+      natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+      natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+      natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+      natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
+      api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+      natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
+      natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
+      natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
+      natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
+      api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+
+  }
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
